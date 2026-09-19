@@ -22,12 +22,14 @@ const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(express.json());
 
-// Global light rate limit as a baseline anti-abuse measure (spec section 23);
-// tighter, per-team limits are applied on the game action routes themselves.
+// Global light rate limit as a baseline anti-abuse measure (spec section 23).
+// State polling happens every 4 seconds, so 20 active browsers already produce
+// about 300 requests/minute; keep this ceiling above normal event traffic while
+// tighter, per-team limits protect action and chat routes.
 app.use(
   rateLimit({
     windowMs: 60_000,
-    max: 300,
+    max: 2000,
     standardHeaders: true,
     legacyHeaders: false,
   })
