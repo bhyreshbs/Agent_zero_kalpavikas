@@ -1,0 +1,21 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Local secrets and runtime configuration
+.env
+.env.*
+!.env.example
+
+# Local databases and SQLite sidecar files
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+
+# Logs and OS/editor files
+*.log
+.DS_Store
+.vscode/*
+!.vscode/extensions.json

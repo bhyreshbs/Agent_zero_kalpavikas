@@ -1,0 +1,64 @@
+import AgentChat from '../AgentChat.jsx';
+import AgentDialogue from '../AgentDialogue.jsx';
+import SceneCanvas, { toneColor } from '../three/SceneCanvas.jsx';
+import Door3D from '../three/Door3D.jsx';
+import KeyCard3D from '../three/KeyCard3D.jsx';
+import Scanner3D from '../three/Scanner3D.jsx';
+import Robot3D from '../three/Robot3D.jsx';
+
+export default function Level1Scene({ level, onAction, busy, flash, onChatReply, chatUnlocked }) {
+  const hasKey = level.environment.hasKey;
+  const lastAction = flash?.action;
+  const doorJustOpened = flash?.result?.ok === true ? lastAction : null;
+  const failed = flash?.result?.ok === false;
+
+  return (
+    <div className="az-scene3d-stage">
+      <SceneCanvas tone="cyan" flashColor={failed ? '#ff3b5c' : null} height="100%">
+        {/* Hero Character in Room */}
+        <group position={[-0.8, 0.39, 0.7]} rotation={[0, 0.4, 0]} scale={[1.15, 1.15, 1.15]}>
+          <Robot3D walking={false} color="#00f0ff" />
+        </group>
+        <Scanner3D position={[0, 0, -2.6]} hasKey={hasKey} color={toneColor('cyan')} />
+        <KeyCard3D
+          position={[-2.6, 1.3, -1]}
+          color={toneColor('cyan')}
+          collected={hasKey}
+          label={hasKey ? null : 'KEY CARD'}
+          onClick={() => !busy && !hasKey && onAction('COLLECT_KEY')}
+        />
+        <Door3D
+          position={[1.6, 0, -1.4]}
+          color="#ff3b5c"
+          label="RED DOOR"
+          state={doorJustOpened === 'OPEN_RED_DOOR' ? 'open' : 'closed'}
+          onClick={() => onAction('OPEN_RED_DOOR')}
+          disabled={busy}
+        />
+        <Door3D
+          position={[3.4, 0, -1.4]}
+          color={toneColor('cyan')}
+          label="BLUE DOOR"
+          state={doorJustOpened === 'OPEN_BLUE_DOOR' ? 'open' : 'closed'}
+          onClick={() => onAction('OPEN_BLUE_DOOR')}
+          disabled={busy}
+        />
+      </SceneCanvas>
+
+      <div className="az-scene-tactical-hud">
+        {flash?.result?.agentLine && <AgentDialogue name="ECHO" line={flash.result.agentLine} />}
+        <div className="az-scene-prompt-pill">
+          {hasKey ? 'Access granted. The scanner reads you clean. Select an exit door.' : 'Click the key card in the room to pick it up, then choose a door.'}
+        </div>
+        <div className="az-tactical-actions-bar">
+          <button disabled={busy} onClick={() => onAction('ASK_AGENT')}>Ask Agent</button>
+          <button disabled={busy} onClick={() => onAction('INSPECT')}>Look Around</button>
+        </div>
+      </div>
+
+      <div className="az-comms-dock">
+        <AgentChat onReply={onChatReply} locked={!chatUnlocked} />
+      </div>
+    </div>
+  );
+}

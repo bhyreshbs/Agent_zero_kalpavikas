@@ -1,0 +1,119 @@
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useGame } from '../hooks/useGame.js';
+import TopNav from '../components/TopNav.jsx';
+import { api, setToken } from '../api/client.js';
+import { sfx } from '../sound.js';
+
+export default function Lobby() {
+  const nav = useNavigate();
+  const { state, loading, error, start } = useGame();
+
+  useEffect(() => {
+    if (state && state.status !== 'not_started') nav('/play');
+  }, [state, nav]);
+
+  async function handleStart() {
+    sfx.click();
+    sfx.levelTransition();
+    await start();
+    nav('/play');
+  }
+
+  return (
+    <div className="az-lobby-page">
+      <div className="az-scene-bg" />
+      <TopNav />
+      <main className="az-shell az-lobby-shell" style={{ maxWidth: 680 }}>
+        <div className="az-lobby-header">
+          <span className="az-badge az-lobby-badge">
+            <span className="az-status-beacon" />
+            MISSION STAGING AREA
+          </span>
+          <h2 className="az-title az-lobby-title">SQUAD DEPLOYMENT BAY</h2>
+          <p className="az-hint az-lobby-hint">Echo Station infiltration link is initialized and awaiting squad launch command.</p>
+        </div>
+
+        <div className="az-glass-panel az-lobby-panel">
+          {loading && (
+            <div className="az-telemetry-sync-notice">
+              <span className="az-telemetry-dot" /> SYNCHRONIZING SECURE SESSION TELEMETRY…
+            </div>
+          )}
+          {error && (
+            <div style={{ textAlign: 'center', padding: '16px 0' }}>
+              <p className="az-error az-lobby-error">{error}</p>
+              <p className="az-hint" style={{ marginBottom: 18 }}>
+                Initialize clearance with a guest operative profile or authorize with registered squad credentials.
+              </p>
+              <div className="az-actions" style={{ justifyContent: 'center' }}>
+                <button
+                  className="az-btn-primary"
+                  onClick={async () => {
+                    sfx.click();
+                    const guestId = Math.floor(1000 + Math.random() * 9000);
+                    const res = await api.register({
+                      teamName: `SQUAD-${guestId}`,
+                      member1: 'Operative 1',
+                      member2: 'Operative 2',
+                      contact: `squad${guestId}@echo-station.net`,
+                      password: `squadpass-${guestId}`,
+                    });
+                    setToken(res.token);
+                    await start();
+                    nav('/play');
+                  }}
+                  onMouseEnter={() => sfx.hover()}
+                >
+                  LAUNCH GUEST OPERATIVE ▸
+                </button>
+                <button className="az-btn-secondary" onClick={() => nav('/login')}>
+                  Squad Login
+                </button>
+              </div>
+            </div>
+          )}
+          {!loading && !error && (
+            <>
+              <div className="az-lobby-grid">
+                <div className="az-lobby-stat-card">
+                  <div className="az-sub az-lobby-stat-label">TEAM TELEMETRY</div>
+                  <div className="az-lobby-stat-val">SYNCHED</div>
+                  <span className="az-lobby-stat-dot" />
+                </div>
+                <div className="az-lobby-stat-card">
+                  <div className="az-sub az-lobby-stat-label">SHARED CLOCK</div>
+                  <div className="az-lobby-stat-val">15:00</div>
+                  <span className="az-lobby-stat-dot" />
+                </div>
+                <div className="az-lobby-stat-card">
+                  <div className="az-sub az-lobby-stat-label">STARTING LIVES</div>
+                  <div className="az-lobby-stat-val">5 SHIELDS</div>
+                  <span className="az-lobby-stat-dot" />
+                </div>
+              </div>
+
+              <div className="az-lobby-briefing-box">
+                <p className="az-lobby-lead">
+                  Your shared squad session, synchronized timer, and life pool are ready.
+                </p>
+                <p className="az-hint az-lobby-disclaimer">
+                  Once you initiate the orientation, the competitive clock will start when the tutorial concludes. All teammates share the same session.
+                </p>
+              </div>
+
+              <button
+                className="az-btn-primary az-btn-large az-lobby-cta"
+                onClick={handleStart}
+                onMouseEnter={() => sfx.hover()}
+              >
+                INITIATE ORIENTATION PROTOCOL ▸
+              </button>
+            </>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}
+
