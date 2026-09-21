@@ -42,7 +42,7 @@ const SCENES = {
 
 export default function GamePage() {
   const nav = useNavigate();
-  const { state, error, sendAction, syncStateFrom } = useGame();
+  const { state, error, sendAction, syncStateFrom, start } = useGame();
   const [flash, setFlash] = useState(null);
   const [busy, setBusy] = useState(false);
   const [levelCompleteCard, setLevelCompleteCard] = useState(null); // {title, message, timeLeft} while the reward screen shows, before handing off to the map
