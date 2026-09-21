@@ -17,13 +17,13 @@ export default function TopNav({ showLeaderboard = true }) {
       >
         <span className="az-brand-icon-shield" style={{ width: 32, height: 32, fontSize: '0.85rem' }}>▲</span>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span className="az-topnav-brand-text">AGENTIC AI</span>
-          <span style={{ fontSize: '0.58rem', color: '#60a5fa', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Think • Plan • Act • Solve</span>
+          <span className="az-topnav-brand-text">AGENT ZERO</span>
+          <span style={{ fontSize: '0.75rem', color: '#60a5fa', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Think • Plan • Act • Solve</span>
         </div>
       </Link>
 
       <div className="az-topnav-links">
-        <span className="az-badge az-topnav-status" style={{ fontSize: '0.68rem', padding: '3px 10px' }}>
+        <span className="az-topnav-status" style={{ fontSize: '0.75rem' }}>
           <span className="az-status-beacon" />
           SECURE // LINK ACTIVE
         </span>

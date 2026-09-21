@@ -29,7 +29,7 @@ export default function ObjectiveHUD({ objective }) {
     <section className={`az-game-objectives-card ${justCompleted ? 'az-objective-just-done' : ''}`} aria-label="Mission Objectives">
       <div className="az-objectives-card-header">
         <div className="az-objectives-title-group">
-          <span className="az-objectives-badge-icon"><IconCheck size={14} color="#00f0ff" /></span>
+          <span className="az-objectives-badge-icon"><IconCheck size={18} color="#00f0ff" /></span>
           <span className="az-objectives-title-text">Mission Objectives</span>
         </div>
         <span className="az-objectives-counter-pill">
@@ -48,7 +48,7 @@ export default function ObjectiveHUD({ objective }) {
             >
               <div className="az-objective-status-icon">
                 {isDone ? (
-                  <span className="az-status-check-circle"><IconCheck size={10} color="#10b981" /></span>
+                  <span className="az-status-check-circle"><IconCheck size={14} color="#10b981" /></span>
                 ) : isActive ? (
                   <span className="az-status-active-bullet" />
                 ) : (
@@ -65,7 +65,7 @@ export default function ObjectiveHUD({ objective }) {
 
       {allDone && (
         <div className="az-objectives-complete-banner">
-          <IconCheck size={12} color="#00f0ff" style={{ marginRight: 6 }} />
+          <IconCheck size={16} color="#00f0ff" style={{ marginRight: 8 }} />
           <span>ALL DIRECTIVES VERIFIED — REACH EXIT PORTAL</span>
         </div>
       )}

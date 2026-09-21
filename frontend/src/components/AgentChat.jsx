@@ -103,10 +103,10 @@ export default function AgentChat({ targets, onReply, locked, focusRequest }) {
     return (
       <div className="az-chat-collapsed">
         <button
-          className="az-chat-talk-btn az-btn-primary"
+          className="az-chat-talk-btn az-btn-primary az-attention-pulse"
           onClick={() => { sfx.click(); setExpanded(true); }}
         >
-          ▸ {log.length > 0 ? 'REOPEN COMMS CHANNEL' : 'OPEN COMMS CHANNEL'}
+          ▸ {log.length > 0 ? 'REOPEN COMMS CHANNEL' : 'OPEN COMMS CHANNEL (REQUIRED)'}
         </button>
       </div>
     );

@@ -40,7 +40,7 @@ export default function Register() {
             <span className="az-status-beacon" />
             AGENT ENLISTMENT PROTOCOL
           </span>
-          <h2 className="az-title az-auth-title">REGISTER SQUAD</h2>
+          <h1 className="az-title az-auth-title">REGISTER SQUAD</h1>
           <p className="az-hint az-auth-hint">
             2–3 Operatives per squad. ₹100/squad entry fee verified at on-site check-in.
           </p>
@@ -50,14 +50,12 @@ export default function Register() {
           <Row label="SQUAD / TEAM NAME">
             <input className="az-input" required placeholder="e.g. CYBER-GHOSTS" value={form.teamName} onChange={update('teamName')} />
           </Row>
-          <div className="az-form-grid-2">
-            <Row label="OPERATIVE 1 (LEAD)">
-              <input className="az-input" required placeholder="Lead Agent Name" value={form.member1} onChange={update('member1')} />
-            </Row>
-            <Row label="OPERATIVE 2">
-              <input className="az-input" required placeholder="Agent 2 Name" value={form.member2} onChange={update('member2')} />
-            </Row>
-          </div>
+          <Row label="OPERATIVE 1 (LEAD)">
+            <input className="az-input" required placeholder="Lead Agent Name" value={form.member1} onChange={update('member1')} />
+          </Row>
+          <Row label="OPERATIVE 2">
+            <input className="az-input" required placeholder="Agent 2 Name" value={form.member2} onChange={update('member2')} />
+          </Row>
           <Row label="OPERATIVE 3 (OPTIONAL)">
             <input className="az-input" placeholder="Agent 3 Name" value={form.member3} onChange={update('member3')} />
           </Row>
@@ -69,16 +67,23 @@ export default function Register() {
           </Row>
           {error && <p className="az-error az-auth-error">{error}</p>}
           <button
-            className="az-btn-primary az-btn-large"
+            className="az-btn-primary az-btn-large az-auth-submit-btn"
             disabled={loading}
             type="submit"
             style={{ width: '100%', marginTop: 20 }}
             onMouseEnter={() => sfx.hover()}
           >
-            {loading ? 'INITIALIZING SQUAD ENLISTMENT…' : 'INITIALIZE SQUAD REGISTRATION ▸'}
+            {loading ? (
+              <span>INITIALIZING SQUAD ENLISTMENT…</span>
+            ) : (
+              <span className="az-btn-inline-content">
+                <span>INITIALIZE SQUAD REGISTRATION</span>
+                <span className="az-btn-inline-arrow" aria-hidden="true">▸</span>
+              </span>
+            )}
           </button>
         </form>
-        <p className="az-hint az-auth-footer-link" style={{ textAlign: 'center', marginTop: 18 }}>
+        <p className="az-hint az-auth-footer-link" style={{ textAlign: 'center', marginTop: 22 }}>
           Squad already registered? <Link to="/login" className="az-link-highlight">Agent Login</Link>
         </p>
       </main>
