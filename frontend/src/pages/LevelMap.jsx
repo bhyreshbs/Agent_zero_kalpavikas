@@ -40,7 +40,7 @@ export default function LevelMap() {
         <div className="az-map-brand">
           <span className="az-brand-icon-shield">▲</span>
           <div className="az-map-brand-text">
-            <span className="az-brand-title">AGENTIC AI</span>
+            <span className="az-brand-title">AGENT ZERO</span>
             <span className="az-brand-motto">Think • Plan • Act • Solve</span>
           </div>
         </div>
@@ -74,6 +74,20 @@ export default function LevelMap() {
             onClick={() => { sfx.click(); nav('/admin'); }}
           >
             <IconGear size={14} />
+          </button>
+          <button 
+            className="az-user-settings-btn" 
+            title="Terminate Link (Log Out)"
+            style={{ marginLeft: 4, color: 'var(--az-danger)' }}
+            onClick={() => {
+              sfx.click();
+              localStorage.removeItem('az_token');
+              localStorage.removeItem('az_team_id');
+              localStorage.removeItem('az_team_secret');
+              nav('/');
+            }}
+          >
+            <span style={{ fontSize: '15px', fontWeight: 'bold' }}>⏻</span>
           </button>
         </div>
       </header>

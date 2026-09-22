@@ -174,7 +174,7 @@ export default function LevelMap3D() {
           </button>
         </div>
         <div className="az-map-header-center">
-          <span className="az-badge az-map-station-badge">ECHO STATION // FACILITY SECTOR MAP</span>
+          <span className="az-badge az-map-station-badge">ECHO STATION // LEVEL MAP</span>
           <h2 className="az-title az-map-title">
             {state.status === 'completed' ? 'FACILITY ESCAPED' : byIndex[current]?.name}
           </h2>

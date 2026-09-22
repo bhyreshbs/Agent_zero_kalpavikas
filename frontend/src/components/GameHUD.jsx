@@ -85,30 +85,30 @@ export default function GameHUD({ state }) {
   return (
     <header className={`az-hud ${low ? 'is-low-time' : ''}`} aria-label="Game HUD">
       <div className="az-hud-zone az-hud-lives">
-        <span className="az-badge az-hud-vitals-badge" style={{ fontSize: '0.65rem', padding: '2px 8px', marginRight: 6 }}>
+        <span className="az-badge az-hud-vitals-badge" style={{ fontSize: '0.85rem', padding: '4px 10px', marginRight: 8 }}>
           <span className="az-status-beacon" />
           VITALS
         </span>
-        <div className="az-lives" aria-label="Lives remaining" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div className="az-lives" aria-label="Lives remaining" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {baseHearts.map((alive, i) => (
             <span
               key={`b${i}`}
               className={`az-heart-icon ${alive ? 'is-alive' : 'lost'} ${justLostIndex === i ? 'az-heart-losing' : ''}`}
               title={`Life ${i + 1}`}
             >
-              <IconHeart size={16} alive={alive} color="#ef4444" />
+              <IconHeart size={20} alive={alive} color="#ef4444" />
             </span>
           ))}
           {recoveryCount > 0 && (
             <>
-              <span className="az-hud-divider" style={{ opacity: 0.4, margin: '0 6px', color: 'var(--az-accent)' }}>|</span>
+              <span className="az-hud-divider" style={{ opacity: 0.4, margin: '0 8px', color: 'var(--az-accent)' }}>|</span>
               {recoveryHearts.map((alive, i) => (
                 <span
                   key={`r${i}`}
                   className={`az-heart-icon az-shield-icon ${alive ? 'is-alive' : 'lost'} ${justLostIndex === initial + i ? 'az-heart-losing' : ''}`}
                   title={`Recovery Shield ${i + 1}`}
                 >
-                  <IconShield size={16} color="#38bdf8" fill={alive} />
+                  <IconShield size={20} color="#38bdf8" fill={alive} />
                 </span>
               ))}
             </>
@@ -128,7 +128,7 @@ export default function GameHUD({ state }) {
           className={`az-hud-timer ${low ? 'az-glitch is-critical' : ''}`}
           title="Station Mission Clock"
         >
-          <span className="az-timer-label"><IconChrono size={12} style={{ marginRight: 4 }} /> CHRONO</span>
+          <span className="az-timer-label"><IconChrono size={16} style={{ marginRight: 6 }} /> CHRONO</span>
           <strong className="az-timer-digits">
             {state.status === 'tutorial' ? '--:--' : fmtTime(displaySeconds)}
           </strong>
@@ -141,7 +141,7 @@ export default function GameHUD({ state }) {
           onMouseEnter={() => sfx.hover()}
           title="Mission Map"
         >
-          <IconMap size={16} />
+          <IconMap size={20} />
         </Link>
       </div>
     </header>

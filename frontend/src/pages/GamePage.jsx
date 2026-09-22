@@ -92,7 +92,8 @@ export default function GamePage() {
   useEffect(() => {
     if (!flash?.lifeLost) return;
     setLifeLostPulse(true);
-    const t = setTimeout(() => setLifeLostPulse(false), 700);
+    // Lock the UI for a punishing 2.5 seconds instead of just a quick 700ms flash
+    const t = setTimeout(() => setLifeLostPulse(false), 2500);
     return () => clearTimeout(t);
   }, [flash]);
 
@@ -251,7 +252,7 @@ export default function GamePage() {
           <span className="az-badge az-unauth-badge">
             <span className="az-status-beacon" /> TACTICAL CLEARANCE REQUIRED
           </span>
-          <h2 className="az-title az-unauth-title">ECHO STATION // ACCESS RESTRICTED</h2>
+          <h2 className="az-title az-unauth-title">ECHO STATION // ACCESS DENIED</h2>
           <p className="az-hint az-unauth-hint">
             Direct operational telemetry link requires an authorized operative profile or emergency guest clearance.
           </p>
@@ -461,12 +462,18 @@ export default function GamePage() {
   }
 
   const Scene = SCENES[level?.renderer] || Level1Scene;
+  const isLowTime = state?.status === 'active' && (state?.timeRemainingSeconds <= 180) && !levelCompleteCard && !violation;
 
   return (
-    <div className="az-game-viewport">
+    <div className={`az-game-viewport ${isLowTime ? 'az-low-time-warning' : ''}`}>
       <EnvironmentBackdrop levelIndex={state.currentLevel ?? 0} />
       {violation && <SecurityViolationModal violation={violation} onReturn={handleReturnFromViolation} />}
-      {lifeLostPulse && <div key={JSON.stringify(flash?.result)} className="az-life-lost-flash" />}
+      {lifeLostPulse && (
+        <div key={JSON.stringify(flash?.result)} className="az-shield-compromised-overlay">
+          <h1>SHIELD COMPROMISED</h1>
+          <p>SYSTEM RECALIBRATING...</p>
+        </div>
+      )}
       {showEntry && (
         <div className="az-scene-transition">
           <div className="az-scene-transition-title">{level?.renderer === 'tutorial' ? 'SYSTEM ONLINE' : state.levelName?.toUpperCase() || 'SECTOR LOADING'}</div>
@@ -633,9 +640,9 @@ function CompletionScreen({ state, onLeaderboard }) {
       <main className="az-shell az-debrief-shell">
         <div className="az-debrief-header">
           <span className="az-badge az-badge-success">
-            <span className="az-status-beacon" /> ECHO STATION — DRILL CONCLUDED
+            <span className="az-status-beacon" /> ECHO STATION — GAME COMPLETE
           </span>
-          <h1 className="az-title az-debrief-title">OPERATIVE EVACUATION COMPLETE</h1>
+          <h1 className="az-title az-debrief-title">MISSION COMPLETE</h1>
         </div>
         
         <div className="az-glass-panel az-debrief-card">
@@ -657,6 +664,25 @@ function CompletionScreen({ state, onLeaderboard }) {
             <span className="az-debrief-grid-label az-accent-text" style={{ fontWeight: 700 }}>FINAL EVALUATION SCORE:</span>
             <span className="az-font-mono az-debrief-grid-val az-debrief-score">{state.score.toLocaleString()}</span>
           </div>
+
+          {state.finalReveal && (
+            <div className="az-debrief-psy-grid">
+              <div className="az-debrief-psy-item">
+                <span className="az-debrief-grid-label">PRIMARY TRAIT:</span>
+                <span className="az-font-mono az-debrief-grid-val">{state.finalReveal.primary.replace('_', ' ')}</span>
+              </div>
+              <div className="az-debrief-psy-item">
+                <span className="az-debrief-grid-label">SECONDARY TRAIT:</span>
+                <span className="az-font-mono az-debrief-grid-val">{state.finalReveal.secondary.replace('_', ' ')}</span>
+              </div>
+              <div className="az-debrief-psy-item" style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
+                <span className="az-debrief-grid-label">BEHAVIORAL ANALYSIS:</span>
+                <span className="az-font-mono az-debrief-grid-val" style={{ whiteSpace: 'normal', lineHeight: 1.4, color: 'var(--az-text-bright)' }}>
+                  "{state.finalReveal.line}"
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         <FinalRevealPanel reveal={state.finalReveal} />

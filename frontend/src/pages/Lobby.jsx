@@ -30,8 +30,8 @@ export default function Lobby() {
             <span className="az-status-beacon" />
             MISSION STAGING AREA
           </span>
-          <h2 className="az-title az-lobby-title">SQUAD DEPLOYMENT BAY</h2>
-          <p className="az-hint az-lobby-hint">Echo Station infiltration link is initialized and awaiting squad launch command.</p>
+          <h2 className="az-title az-lobby-title">TEAM LOBBY</h2>
+          <p className="az-hint az-lobby-hint">You are connected to Echo Station. Waiting for team leader to start the game.</p>
         </div>
 
         <div className="az-glass-panel az-lobby-panel">

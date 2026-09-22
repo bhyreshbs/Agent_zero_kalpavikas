@@ -23,8 +23,8 @@ export default function Landing() {
             <span className="az-sigil-tag">OPS</span>
           </div>
           <div className="az-brand-meta">
-            <div className="az-brand-title">AGENTIC AI</div>
-            <div className="az-brand-subtitle">SURVIVAL PROTOCOL // ECHO STATION</div>
+            <div className="az-brand-title">AGENT ZERO</div>
+            <div className="az-brand-subtitle">ESCAPE ROOM // ECHO STATION</div>
           </div>
         </div>
 
@@ -40,8 +40,8 @@ export default function Landing() {
               <IconUser size={13} color="#00f0ff" />
             </div>
             <div className="az-badge-intel">
-              <div className="az-badge-callsign">{loggedIn ? "SQUAD OPERATIVE" : "GUEST OPERATIVE"}</div>
-              <div className="az-badge-clearance">CLEARANCE: TIER-1 ACTIVE</div>
+              <div className="az-badge-callsign">{loggedIn ? "PLAYER PROFILE" : "GUEST PLAYER"}</div>
+              <div className="az-badge-clearance">STATUS: READY TO PLAY</div>
             </div>
           </Link>
           <div className="az-hud-actions">
@@ -66,48 +66,73 @@ export default function Landing() {
             <div className="az-console-header">
               <div className="az-console-badge">
                 <span className="az-pulse-beacon" />
-                <span className="az-console-title">ECHO COMMAND</span>
+                <span className="az-console-title">MAIN MENU</span>
               </div>
               <div className="az-console-code">SEC-v4.2</div>
             </div>
 
-            <Link to={loggedIn ? "/map" : "/register"} className="az-console-primary-link">
-              <button
-                className="az-btn-tactical-play"
-                onClick={() => sfx.click()}
-                onMouseEnter={() => sfx.hover()}
-              >
-                <div className="az-tactical-play-content">
-                  <span className="az-tactical-play-label">{loggedIn ? "RESUME MISSION" : "PLAY MISSION"}</span>
-                  <span className="az-tactical-play-sub">ECHO SECTOR INFILTRATION</span>
-                </div>
-                <div className="az-tactical-play-chevron">
-                  <IconPlay size={16} />
-                </div>
-              </button>
+            <Link
+              to={loggedIn ? "/map" : "/register"}
+              className="az-btn-tactical-play az-console-primary-link"
+              onClick={() => sfx.click()}
+              onMouseEnter={() => sfx.hover()}
+            >
+              <div className="az-tactical-play-content">
+                <span className="az-tactical-play-label">{loggedIn ? "RESUME GAME" : "START GAME"}</span>
+                <span className="az-tactical-play-sub">ENTER ECHO STATION</span>
+              </div>
+              <div className="az-tactical-play-chevron">
+                <IconPlay size={16} />
+              </div>
             </Link>
 
             <nav className="az-console-nav">
               <Link to={loggedIn ? "/play" : "/login"} className="az-console-item" onClick={() => sfx.click()} onMouseEnter={() => sfx.hover()}>
                 <span className="az-item-index">01</span>
-                <span className="az-item-name">TRAINING SIMULATOR</span>
+                <span className="az-item-name">How to Play (Tutorial)</span>
                 <span className="az-item-arrow">›</span>
               </Link>
               <Link to="/map" className="az-console-item" onClick={() => sfx.click()} onMouseEnter={() => sfx.hover()}>
                 <span className="az-item-index">02</span>
-                <span className="az-item-name">SECTOR MAP</span>
+                <span className="az-item-name">Level Map</span>
                 <span className="az-item-arrow">›</span>
               </Link>
               <Link to="/leaderboard" className="az-console-item" onClick={() => sfx.click()} onMouseEnter={() => sfx.hover()}>
                 <span className="az-item-index">03</span>
-                <span className="az-item-name">SURVIVOR ARCHIVE</span>
+                <span className="az-item-name">Leaderboard</span>
                 <span className="az-item-arrow">›</span>
               </Link>
-              <button className="az-console-item" onClick={() => { sfx.click(); setShowBriefing(true); }} onMouseEnter={() => sfx.hover()}>
+              <a
+                href="#protocol-dossier"
+                role="button"
+                className="az-console-item"
+                onClick={(e) => { e.preventDefault(); sfx.click(); setShowBriefing(true); }}
+                onMouseEnter={() => sfx.hover()}
+              >
                 <span className="az-item-index">04</span>
-                <span className="az-item-name">PROTOCOL DOSSIER</span>
+                <span className="az-item-name">Game Rules</span>
                 <span className="az-item-arrow">›</span>
-              </button>
+              </a>
+              {loggedIn && (
+                <a
+                  href="#logout"
+                  role="button"
+                  className="az-console-item"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    sfx.click();
+                    localStorage.removeItem('az_token');
+                    localStorage.removeItem('az_team_id');
+                    localStorage.removeItem('az_team_secret');
+                    window.location.reload();
+                  }}
+                  onMouseEnter={() => sfx.hover()}
+                >
+                  <span className="az-item-index">05</span>
+                  <span className="az-item-name">Log Out</span>
+                  <span className="az-item-arrow">›</span>
+                </a>
+              )}
             </nav>
           </aside>
 
@@ -115,14 +140,14 @@ export default function Landing() {
           <div className="az-standalone-directive">
             <div className="az-directive-header">
               <span className="az-directive-pulse" />
-              <span className="az-directive-label">DIRECTIVE // ALPHA</span>
+              <span className="az-directive-label">YOUR MISSION</span>
             </div>
             <p className="az-directive-msg">
-              &ldquo;Infiltrate Echo Station, secure the AI Core, and neutralize containment breach.&rdquo;
+              &ldquo;Enter the station, find the missing AI Core, and escape before time runs out.&rdquo;
             </p>
             <div className="az-directive-meta">
-              <span>COMM: ENCRYPTED</span>
-              <span>TARGET: OVERSEER</span>
+              <span>STATUS: SECURE</span>
+              <span>TARGET: AGENT ZERO</span>
             </div>
           </div>
         </div>
@@ -136,7 +161,7 @@ export default function Landing() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span className="az-status-beacon" />
                 <h3 style={{ margin: 0, fontFamily: 'var(--az-font-display)', letterSpacing: '0.12em' }}>
-                  ECHO STATION // OPERATION PROTOCOLS
+                  ECHO STATION // GAME RULES
                 </h3>
               </div>
               <button className="az-admin-modal-close" onClick={() => setShowBriefing(false)}>✕</button>
@@ -153,7 +178,8 @@ export default function Landing() {
             <ol className="az-protocols-list" style={{ fontSize: '0.94rem' }}>
               <li><strong>Assemble Operatives:</strong> Squad of 2–3 players under shared telemetry (₹100 squad verification).</li>
               <li><strong>Facility Infiltration:</strong> 15-minute countdown starts upon entering the facility.</li>
-              <li><strong>Navigate 5 Sectors:</strong> Solve interactive physical and communicative puzzles.</li>
+              <li><strong>Talk to Survive:</strong> Use the chat box to communicate. You must negotiate, lie, or reassure the AI to open new paths.</li>
+              <li><strong>Navigate 5 Sectors:</strong> Solve interactive physical and social puzzles.</li>
               <li><strong>Emergency Recovery:</strong> Failures cost lives; enter emergency AI chamber to restore shields.</li>
               <li><strong>Unmask Agent Zero:</strong> Face the autonomous facility overseer in the central core.</li>
               <li><strong>Tactical Leaderboard:</strong> Fastest surviving teams win the operation.</li>

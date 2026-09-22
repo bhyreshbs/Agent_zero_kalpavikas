@@ -51,6 +51,22 @@ export default function Leaderboard() {
           </div>
         </div>
 
+        <div className="az-leaderboard-rules-banner" style={{
+          background: 'rgba(6, 11, 22, 0.6)',
+          border: '1px solid rgba(56, 189, 248, 0.2)',
+          padding: '12px 16px',
+          borderRadius: '4px',
+          marginBottom: '16px',
+          display: 'flex',
+          gap: '12px',
+          alignItems: 'center'
+        }}>
+          <span style={{ color: '#00f0ff', fontWeight: 'bold' }}>ℹ️ SCORING SYSTEM:</span>
+          <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>
+            Rank is determined by <strong>Total Score</strong>. Score = Base Points (Levels Cleared) + Time Bonus (If Escaped) + Shields Remaining − Recovery Penalties.
+          </span>
+        </div>
+
         {error && <p className="az-error az-leaderboard-error">{error}</p>}
 
         <div className="az-glass-panel az-leaderboard-table-panel">
@@ -118,7 +134,7 @@ export default function Leaderboard() {
                             <IconShield key={i} size={13} color="#10b981" fill />
                           ))
                         ) : (
-                          <span style={{ color: 'var(--az-danger)', fontSize: '0.75rem', fontWeight: 700 }}>OFFLINE</span>
+                          <span style={{ color: 'var(--az-danger)', fontSize: '0.92rem', fontWeight: 700 }}>OFFLINE</span>
                         )}
                       </span>
                     </td>

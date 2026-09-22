@@ -255,7 +255,16 @@ const level2 = {
           completed: false,
         };
       }
-      return { levelState, result: { ok: false, message: 'Looks the same to you.' }, lifeLost: false, completed: false };
+      return { 
+        levelState, 
+        result: { 
+          ok: false, 
+          message: 'Looks the same to you.', 
+          agentLine: levelState.pressed ? "See? I told you nothing happened. You're losing your mind." : undefined 
+        }, 
+        lifeLost: false, 
+        completed: false 
+      };
     }
 
     if (action === 'GO_TO_EXIT') {
@@ -409,7 +418,7 @@ const level3 = {
       }
       const hint = !levelState.pathKnown
         ? 'Something is still unresolved. Nobody has actually confirmed a way out yet.'
-        : 'Not everyone is ready to go. Someone still needs a reason to move.';
+        : 'Not everyone is ready to go. You might need to use the comms channel to give them a reason to move.';
       return { levelState, result: { ok: false, message: 'MISSION FAILED', hint: failureHint(3, hint) }, lifeLost: true, completed: false };
     }
 
