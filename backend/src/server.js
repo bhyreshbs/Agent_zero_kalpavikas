@@ -20,6 +20,7 @@ for (const key of requiredEnv) {
 }
 
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy (Vercel) for rate limiting IP extraction
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(express.json());
 
