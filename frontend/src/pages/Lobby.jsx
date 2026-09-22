@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useGame } from '../hooks/useGame.js';
 import TopNav from '../components/TopNav.jsx';
-import { api, setToken } from '../api/client.js';
 import { sfx } from '../sound.js';
 
 export default function Lobby() {
@@ -44,29 +43,9 @@ export default function Lobby() {
             <div style={{ textAlign: 'center', padding: '16px 0' }}>
               <p className="az-error az-lobby-error">{error}</p>
               <p className="az-hint" style={{ marginBottom: 18 }}>
-                Initialize clearance with a guest operative profile or authorize with registered squad credentials.
+                Please authorize with your assigned squad credentials.
               </p>
               <div className="az-actions" style={{ justifyContent: 'center' }}>
-                <button
-                  className="az-btn-primary"
-                  onClick={async () => {
-                    sfx.click();
-                    const guestId = Math.floor(1000 + Math.random() * 9000);
-                    const res = await api.register({
-                      teamName: `SQUAD-${guestId}`,
-                      member1: 'Operative 1',
-                      member2: 'Operative 2',
-                      contact: `squad${guestId}@echo-station.net`,
-                      password: `squadpass-${guestId}`,
-                    });
-                    setToken(res.token);
-                    await start();
-                    nav('/play');
-                  }}
-                  onMouseEnter={() => sfx.hover()}
-                >
-                  LAUNCH GUEST OPERATIVE ▸
-                </button>
                 <button className="az-btn-secondary" onClick={() => nav('/login')}>
                   Squad Login
                 </button>
@@ -116,4 +95,3 @@ export default function Lobby() {
     </div>
   );
 }
-

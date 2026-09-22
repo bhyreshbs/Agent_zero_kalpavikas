@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { api, setToken } from '../api/client.js';
+import { api, setSession } from '../api/client.js';
 import TopNav from '../components/TopNav.jsx';
 import { sfx } from '../sound.js';
 
@@ -17,8 +17,8 @@ export default function Login() {
     setLoading(true);
     sfx.click();
     try {
-      const { token } = await api.login({ teamName, password });
-      setToken(token);
+      const { session } = await api.login({ teamName, password });
+      await setSession(session);
       sfx.success();
       nav('/lobby');
     } catch (err) {
@@ -74,44 +74,8 @@ export default function Login() {
           >
             {loading ? 'AUTHENTICATING ACCESS…' : 'AUTHORIZE ENTRY ▸'}
           </button>
-
-          <div style={{ marginTop: 14, textAlign: 'center' }}>
-            <button
-              type="button"
-              className="az-btn-secondary"
-              style={{ width: '100%' }}
-              disabled={loading}
-              onClick={async () => {
-                setLoading(true);
-                try {
-                  const guestId = Math.floor(1000 + Math.random() * 9000);
-                  const res = await api.register({
-                    teamName: `SQUAD-${guestId}`,
-                    member1: 'Operative 1',
-                    member2: 'Operative 2',
-                    contact: `squad${guestId}@echo-station.net`,
-                    password: `squadpass-${guestId}`,
-                  });
-                  setToken(res.token);
-                  sfx.success();
-                  nav('/lobby');
-                } catch (err) {
-                  setError(err.message);
-                } finally {
-                  setLoading(false);
-                }
-              }}
-              onMouseEnter={() => sfx.hover()}
-            >
-              LAUNCH GUEST OPERATIVE ▸
-            </button>
-          </div>
         </form>
-        <p className="az-hint az-auth-footer-link" style={{ textAlign: 'center', marginTop: 18 }}>
-          No registered squad profile? <Link to="/register" className="az-link-highlight">Register Squad</Link>
-        </p>
       </main>
     </div>
   );
 }
-

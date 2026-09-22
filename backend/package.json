@@ -7,19 +7,17 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "seed": "node src/db/seed.js",
     "test": "node test/engine.test.mjs && node test/behaviourProfile.test.mjs && node test/discoverability.test.mjs && node test/adaptation.test.mjs && node test/scoring.test.mjs && node test/scoringCollisions.test.mjs && node test/recoveryPuzzle.property.test.mjs && node test/security.test.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.16.0",
-    "bcryptjs": "^2.4.3",
+    "@supabase/supabase-js": "^2.45.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.0",
-    "jsonwebtoken": "^9.0.2",
     "nanoid": "^5.0.7",
-    "ws": "^8.18.0",
-    "node-sqlite3-wasm": "^0.8.12"
+    "pg": "^8.13.0",
+    "ws": "^8.18.0"
   }
 }

@@ -2,9 +2,10 @@ import { Link, useLocation } from 'react-router-dom';
 import { IconTrophy, IconMap, IconKey } from './GameIcons.jsx';
 import { sfx } from '../sound.js';
 import MuteToggle from './MuteToggle.jsx';
+import { isLoggedIn } from '../api/client.js';
 
 export default function TopNav({ showLeaderboard = true }) {
-  const loggedIn = !!localStorage.getItem('az_token');
+  const loggedIn = isLoggedIn();
   const location = useLocation();
 
   return (

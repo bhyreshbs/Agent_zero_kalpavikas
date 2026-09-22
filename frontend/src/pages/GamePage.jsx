@@ -106,6 +106,15 @@ export default function GamePage() {
     }
   }, [state?.currentLevel]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Automatically resume the timer when entering a sector from the transition/lobby state.
+  useEffect(() => {
+    if (state?.isTransition && !levelCompleteCard) {
+      // We are on the active game view, but the server is paused in transition.
+      // Tell the server we have entered the sector so the timer resumes.
+      sendAction('ENTER_SECTOR').catch(console.error);
+    }
+  }, [state?.isTransition, levelCompleteCard, sendAction]);
+
   function completeTutorialOverlay() {
     sessionStorage.setItem('az_tutorial_seen', 'true');
     setTutorialStep(null);
@@ -221,29 +230,6 @@ export default function GamePage() {
     state.status !== 'failed';
   const idleHint = useIdleHint(level, flash, idleHintEnabled);
 
-  const [guestDeploying, setGuestDeploying] = useState(false);
-
-  async function handleQuickDeploy() {
-    setGuestDeploying(true);
-    try {
-      const guestId = Math.floor(1000 + Math.random() * 9000);
-      const res = await api.register({
-        teamName: `SQUAD-${guestId}`,
-        member1: `Operative 1`,
-        member2: `Operative 2`,
-        contact: `squad${guestId}@echo-station.net`,
-        password: `squadpass-${guestId}`,
-      });
-      localStorage.setItem('az_token', res.token);
-      await start();
-      sfx.success();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setGuestDeploying(false);
-    }
-  }
-
   if (!state) {
     return (
       <div className="az-game-unauth-screen">
@@ -254,28 +240,13 @@ export default function GamePage() {
           </span>
           <h2 className="az-title az-unauth-title">ECHO STATION // ACCESS DENIED</h2>
           <p className="az-hint az-unauth-hint">
-            Direct operational telemetry link requires an authorized operative profile or emergency guest clearance.
+            Direct operational telemetry link requires an authorized operative profile.
           </p>
 
           <div className="az-actions az-unauth-actions">
-            <button
-              className="az-btn-primary az-btn-large"
-              disabled={guestDeploying}
-              onClick={handleQuickDeploy}
-              onMouseEnter={() => sfx.hover()}
-            >
-              {guestDeploying ? 'INITIALIZING GUEST CLEARANCE…' : 'QUICK DEPLOY (GUEST OPERATIVE) ▸'}
-            </button>
-
             <Link to="/login">
-              <button className="az-btn-secondary az-btn-large" onMouseEnter={() => sfx.hover()}>
+              <button className="az-btn-primary az-btn-large" onMouseEnter={() => sfx.hover()}>
                 Squad Login
-              </button>
-            </Link>
-
-            <Link to="/register">
-              <button className="az-btn-secondary az-btn-large" onMouseEnter={() => sfx.hover()}>
-                Register Squad
               </button>
             </Link>
           </div>

@@ -4,10 +4,11 @@ import HeroCanvas from '../components/three/HeroCanvas.jsx';
 import MuteToggle from '../components/MuteToggle.jsx';
 import { IconPlay, IconBook, IconTrophy, IconKey, IconMap, IconGear, IconStar, IconUser } from '../components/GameIcons.jsx';
 import { sfx } from '../sound.js';
+import { isLoggedIn, logout } from '../api/client.js';
 
 export default function Landing() {
   const nav = useNavigate();
-  const loggedIn = !!localStorage.getItem('az_token');
+  const loggedIn = isLoggedIn();
   const [showBriefing, setShowBriefing] = useState(false);
 
   return (
@@ -72,7 +73,7 @@ export default function Landing() {
             </div>
 
             <Link
-              to={loggedIn ? "/map" : "/register"}
+              to={loggedIn ? "/map" : "/login"}
               className="az-btn-tactical-play az-console-primary-link"
               onClick={() => sfx.click()}
               onMouseEnter={() => sfx.hover()}
@@ -118,12 +119,10 @@ export default function Landing() {
                   href="#logout"
                   role="button"
                   className="az-console-item"
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.preventDefault();
                     sfx.click();
-                    localStorage.removeItem('az_token');
-                    localStorage.removeItem('az_team_id');
-                    localStorage.removeItem('az_team_secret');
+                    await logout();
                     window.location.reload();
                   }}
                   onMouseEnter={() => sfx.hover()}

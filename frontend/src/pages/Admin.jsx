@@ -16,6 +16,14 @@ export default function Admin() {
   const [detailData, setDetailData] = useState(null); // { breakdown, security } once loaded
   const [detailError, setDetailError] = useState(null);
 
+  // New Team Form State
+  const [newTeam, setNewTeam] = useState({
+    teamName: '', password: '', member1: '', member2: '', member3: '', contact: ''
+  });
+  const [creatingTeam, setCreatingTeam] = useState(false);
+  const [createError, setCreateError] = useState(null);
+  const [createSuccess, setCreateSuccess] = useState(null);
+
   async function tryAuth(s) {
     try {
       const [{ teams }, config] = await Promise.all([adminApi.teams(s), adminApi.config(s)]);
@@ -94,6 +102,26 @@ export default function Admin() {
       setDetailData({ breakdown, security });
     } catch (err) {
       setDetailError(err.message);
+    }
+  }
+
+  async function handleCreateTeam(e) {
+    e.preventDefault();
+    setCreateError(null);
+    setCreateSuccess(null);
+    setCreatingTeam(true);
+    sfx.click();
+    try {
+      const res = await adminApi.createTeam(newTeam, secret);
+      setCreateSuccess(`Team created successfully: ${res.team.teamName}`);
+      setNewTeam({ teamName: '', password: '', member1: '', member2: '', member3: '', contact: '' });
+      sfx.success();
+      refresh();
+    } catch (err) {
+      setCreateError(err.message);
+      sfx.fail();
+    } finally {
+      setCreatingTeam(false);
     }
   }
 
@@ -177,61 +205,86 @@ export default function Admin() {
           </div>
         )}
 
-        {config && (
+        <div className="az-admin-config-container" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }}>
+          {/* Create Team Form */}
           <div className="az-glass-panel az-admin-config-panel">
             <div className="az-admin-section-header">
-              <h3 className="az-admin-section-title">Event Configuration</h3>
-            </div>
-            <div className="az-admin-config-grid">
-              <ConfigField label="Duration (s)" value={config.game_duration_seconds} onSave={(v) => saveConfig({ game_duration_seconds: v })} />
-              <ConfigField label="Initial Lives" value={config.initial_lives} onSave={(v) => saveConfig({ initial_lives: v })} />
-              <ConfigField label="Max Recoveries" value={config.max_recoveries} onSave={(v) => saveConfig({ max_recoveries: v })} />
-              <ConfigField label="Recovery Window (s)" value={config.recovery_window_seconds} onSave={(v) => saveConfig({ recovery_window_seconds: v })} />
-              <div className="az-admin-toggle-wrap">
-                <label className="az-hint">Squad Registration</label>
-                <button
-                  className={config.registration_open === 'true' ? 'az-btn-primary' : 'az-btn-danger'}
-                  onClick={() => saveConfig({ registration_open: config.registration_open === 'true' ? 'false' : 'true' })}
-                  onMouseEnter={() => sfx.hover()}
-                >
-                  Registration: {config.registration_open === 'true' ? 'OPEN' : 'CLOSED'}
-                </button>
-              </div>
-            </div>
-
-            <div className="az-admin-section-header" style={{ marginTop: 24 }}>
-              <h3 className="az-admin-section-title">Security &amp; Surveillance Mode</h3>
+              <h3 className="az-admin-section-title">Create Team</h3>
             </div>
             <p className="az-hint" style={{ marginTop: 4, marginBottom: 14 }}>
-              Secure Game Mode detects a team leaving the game (tab switch, minimized window, fullscreen exit).
+              Register a new team into the Supabase authentication pool.
             </p>
-            <div className="az-admin-config-grid">
-              <div className="az-admin-toggle-wrap">
-                <label className="az-hint">Secure Game Mode</label>
-                <button
-                  className={config.secure_mode_enabled === 'false' ? 'az-btn-secondary' : 'az-btn-primary'}
-                  onClick={() => saveConfig({ secure_mode_enabled: config.secure_mode_enabled === 'false' ? 'true' : 'false' })}
-                  onMouseEnter={() => sfx.hover()}
-                >
-                  Secure Mode: {config.secure_mode_enabled === 'false' ? 'OFF' : 'ON'}
-                </button>
-              </div>
-              <div className="az-admin-toggle-wrap">
-                <label className="az-hint">Fullscreen Requirement</label>
-                <button
-                  className={config.fullscreen_required === 'false' ? 'az-btn-secondary' : 'az-btn-primary'}
-                  onClick={() => saveConfig({ fullscreen_required: config.fullscreen_required === 'false' ? 'true' : 'false' })}
-                  onMouseEnter={() => sfx.hover()}
-                >
-                  Fullscreen: {config.fullscreen_required === 'false' ? 'OFF' : 'ON'}
-                </button>
-              </div>
-              <ConfigField label="Violation Cooldown (s)" value={config.violation_cooldown_seconds} onSave={(v) => saveConfig({ violation_cooldown_seconds: v })} />
-            </div>
+            <form onSubmit={handleCreateTeam} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <input required className="az-input" placeholder="Team Name (e.g. ALPHA SQUAD)" value={newTeam.teamName} onChange={e => setNewTeam({...newTeam, teamName: e.target.value})} />
+              <input required className="az-input" placeholder="Password (min 6 chars)" value={newTeam.password} onChange={e => setNewTeam({...newTeam, password: e.target.value})} />
+              <input required className="az-input" placeholder="Member 1 Name" value={newTeam.member1} onChange={e => setNewTeam({...newTeam, member1: e.target.value})} />
+              <input required className="az-input" placeholder="Member 2 Name" value={newTeam.member2} onChange={e => setNewTeam({...newTeam, member2: e.target.value})} />
+              <input className="az-input" placeholder="Member 3 Name (Optional)" value={newTeam.member3} onChange={e => setNewTeam({...newTeam, member3: e.target.value})} />
+              <input required className="az-input" placeholder="Contact (Phone / Email)" value={newTeam.contact} onChange={e => setNewTeam({...newTeam, contact: e.target.value})} />
+              
+              {createError && <p className="az-error">{createError}</p>}
+              {createSuccess && <p style={{ color: 'var(--az-accent)' }}>{createSuccess}</p>}
+              
+              <button type="submit" className="az-btn-primary" disabled={creatingTeam} onMouseEnter={() => sfx.hover()}>
+                {creatingTeam ? 'Creating...' : 'Register Team'}
+              </button>
+            </form>
           </div>
-        )}
 
-        <div className="az-admin-toolbar">
+          {/* Config Panel */}
+          {config && (
+            <div className="az-glass-panel az-admin-config-panel">
+              <div className="az-admin-section-header">
+                <h3 className="az-admin-section-title">Event Configuration</h3>
+              </div>
+              <div className="az-admin-config-grid" style={{ gridTemplateColumns: '1fr', gap: '12px' }}>
+                <ConfigField label="Duration (s)" value={config.game_duration_seconds} onSave={(v) => saveConfig({ game_duration_seconds: v })} />
+                <ConfigField label="Initial Lives" value={config.initial_lives} onSave={(v) => saveConfig({ initial_lives: v })} />
+                <ConfigField label="Max Recoveries" value={config.max_recoveries} onSave={(v) => saveConfig({ max_recoveries: v })} />
+                <ConfigField label="Recovery Window (s)" value={config.recovery_window_seconds} onSave={(v) => saveConfig({ recovery_window_seconds: v })} />
+                <div className="az-admin-toggle-wrap">
+                  <label className="az-hint">Squad Registration</label>
+                  <button
+                    className={config.registration_open === 'true' ? 'az-btn-primary' : 'az-btn-danger'}
+                    onClick={() => saveConfig({ registration_open: config.registration_open === 'true' ? 'false' : 'true' })}
+                    onMouseEnter={() => sfx.hover()}
+                  >
+                    Registration: {config.registration_open === 'true' ? 'OPEN' : 'CLOSED'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="az-admin-section-header" style={{ marginTop: 24 }}>
+                <h3 className="az-admin-section-title">Security &amp; Surveillance Mode</h3>
+              </div>
+              <div className="az-admin-config-grid" style={{ gridTemplateColumns: '1fr', gap: '12px' }}>
+                <div className="az-admin-toggle-wrap">
+                  <label className="az-hint">Secure Game Mode</label>
+                  <button
+                    className={config.secure_mode_enabled === 'false' ? 'az-btn-secondary' : 'az-btn-primary'}
+                    onClick={() => saveConfig({ secure_mode_enabled: config.secure_mode_enabled === 'false' ? 'true' : 'false' })}
+                    onMouseEnter={() => sfx.hover()}
+                  >
+                    Secure Mode: {config.secure_mode_enabled === 'false' ? 'OFF' : 'ON'}
+                  </button>
+                </div>
+                <div className="az-admin-toggle-wrap">
+                  <label className="az-hint">Fullscreen Requirement</label>
+                  <button
+                    className={config.fullscreen_required === 'false' ? 'az-btn-secondary' : 'az-btn-primary'}
+                    onClick={() => saveConfig({ fullscreen_required: config.fullscreen_required === 'false' ? 'true' : 'false' })}
+                    onMouseEnter={() => sfx.hover()}
+                  >
+                    Fullscreen: {config.fullscreen_required === 'false' ? 'OFF' : 'ON'}
+                  </button>
+                </div>
+                <ConfigField label="Violation Cooldown (s)" value={config.violation_cooldown_seconds} onSave={(v) => saveConfig({ violation_cooldown_seconds: v })} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="az-admin-toolbar" style={{ marginTop: '24px' }}>
           <div className="az-actions">
             <button className="az-btn-primary" onClick={refresh} onMouseEnter={() => sfx.hover()}>
               <IconRefresh size={14} style={{ marginRight: 6 }} /> Refresh Telemetry
@@ -404,4 +457,3 @@ function ConfigField({ label, value, onSave }) {
     </div>
   );
 }
-

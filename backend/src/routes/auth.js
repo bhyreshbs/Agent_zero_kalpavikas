@@ -1,62 +1,66 @@
+/**
+ * Auth routes — team login only.
+ *
+ * Registration has been removed. Teams are created exclusively by admins
+ * via POST /api/admin/teams/create. Teams can only log in here.
+ *
+ * Login flow:
+ *   1. Look up team by team_name → get the auth email used at creation
+ *   2. supabase.auth.signInWithPassword({ email, password })
+ *   3. Return Supabase session tokens to the frontend
+ */
 import { Router } from 'express';
-import bcrypt from 'bcryptjs';
-import { nanoid } from 'nanoid';
-import { db, getConfig, logAudit } from '../db/index.js';
-import { signTeamToken } from '../middleware/auth.js';
+import { dbGet, logAudit } from '../db/index.js';
+import { supabaseAdmin } from '../db/supabaseClient.js';
 
 export const authRouter = Router();
 
-authRouter.post('/register', async (req, res) => {
-  if (getConfig('registration_open') !== 'true') {
-    return res.status(403).json({ error: 'Registration is closed.' });
-  }
-
-  const { teamName, member1, member2, member3, contact, password } = req.body || {};
-
-  if (!teamName || !member1 || !member2 || !contact || !password) {
-    return res.status(400).json({ error: 'teamName, member1, member2, contact, and password are required.' });
-  }
-  if (teamName.trim().length < 2) {
-    return res.status(400).json({ error: 'Invalid team size / name.' });
-  }
-  // Team size 2-3: member1 + member2 required, member3 optional (spec section 16).
-
-  const existing = db.prepare('SELECT id FROM teams WHERE team_name = ?').get(teamName.trim());
-  if (existing) {
-    return res.status(409).json({ error: 'A team with that name is already registered.' });
-  }
-
-  const id = nanoid();
-  const passwordHash = await bcrypt.hash(password, 10);
-
-  db.prepare(
-    `INSERT INTO teams (id, team_name, member1, member2, member3, contact, password_hash)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`
-  ).run(id, teamName.trim(), member1, member2, member3 || null, contact, passwordHash);
-
-  logAudit(id, 'team_registered', { teamName });
-
-  const team = db.prepare('SELECT * FROM teams WHERE id = ?').get(id);
-  res.status(201).json({
-    team: publicTeam(team),
-    token: signTeamToken(team),
-  });
-});
+// Team name → deterministic email used for Supabase Auth
+// (teams never see or use this email; they log in with team name + password)
+function teamEmail(teamName) {
+  return `${teamName.trim().toLowerCase().replace(/[^a-z0-9]/g, '-')}@agentzero.internal`;
+}
 
 authRouter.post('/login', async (req, res) => {
   const { teamName, password } = req.body || {};
-  if (!teamName || !password) return res.status(400).json({ error: 'teamName and password are required.' });
-
-  const team = db.prepare('SELECT * FROM teams WHERE team_name = ?').get(teamName.trim());
-  if (!team) return res.status(401).json({ error: 'Invalid credentials.' });
-
-  const valid = await bcrypt.compare(password, team.password_hash);
-  if (!valid) return res.status(401).json({ error: 'Invalid credentials.' });
-  if (team.registration_status === 'disqualified') {
-    return res.status(403).json({ error: 'Team disqualified.' });
+  if (!teamName || !password) {
+    return res.status(400).json({ error: 'teamName and password are required.' });
   }
 
-  res.json({ team: publicTeam(team), token: signTeamToken(team) });
+  try {
+    // Look up team to confirm it exists and is not disqualified
+    const team = await dbGet(
+      'SELECT * FROM teams WHERE team_name = $1',
+      [teamName.trim()]
+    );
+    if (!team) return res.status(401).json({ error: 'Invalid credentials.' });
+    if (team.registration_status === 'disqualified') {
+      return res.status(403).json({ error: 'Team disqualified.' });
+    }
+
+    // Authenticate with Supabase using the team's auto-generated email
+    const { data, error } = await supabaseAdmin.auth.signInWithPassword({
+      email: teamEmail(teamName.trim()),
+      password,
+    });
+    if (error) {
+      return res.status(401).json({ error: 'Invalid credentials.' });
+    }
+
+    logAudit(team.id, 'team_login', { teamName: team.team_name }).catch(() => {});
+
+    return res.json({
+      team: publicTeam(team),
+      session: {
+        access_token:  data.session.access_token,
+        refresh_token: data.session.refresh_token,
+        expires_in:    data.session.expires_in,
+      },
+    });
+  } catch (err) {
+    console.error('[auth/login] Error:', err.message);
+    return res.status(500).json({ error: 'Login failed. Please try again.' });
+  }
 });
 
 function publicTeam(team) {
