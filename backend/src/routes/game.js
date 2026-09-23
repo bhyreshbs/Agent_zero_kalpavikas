@@ -14,6 +14,7 @@ import {
   chat,
   requestHint,
   reportSecurityViolation,
+  exitSession,
 } from '../engine/gameEngine.js';
 
 export const gameRouter = Router();
@@ -71,6 +72,18 @@ gameRouter.post('/start', async (req, res) => {
     res.json(await getClientState(session));
   } catch (err) {
     console.error('[game/start]', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+gameRouter.post('/exit', actionLimiter, async (req, res) => {
+  try {
+    let session = await getSessionByTeam(req.team.id);
+    if (!session) return res.status(400).json({ error: 'No session found.' });
+    session = await exitSession(session);
+    res.json(await getClientState(session));
+  } catch (err) {
+    console.error('[game/exit]', err);
     res.status(500).json({ error: 'Internal server error.' });
   }
 });

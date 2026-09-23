@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import Robot from './Robot.jsx';
 
 const MOVE_INTERVAL_MS = 2200;
 
@@ -32,11 +31,7 @@ export default function FloatingCatchBot({ onCaught }) {
       >
         <span className="az-catchbot-radar-ring" />
         <span className="az-catchbot-radar-ring-outer" />
-        <div className="az-catchbot-robot-wrap">
-          <svg viewBox="-8 -11 16 17" className="az-catchbot-svg">
-            <Robot walking />
-          </svg>
-        </div>
+        <div className="az-catchbot-core" style={{ width: 12, height: 12, background: '#00f0ff', borderRadius: '50%', boxShadow: '0 0 10px #00f0ff' }} />
       </div>
       <div className="az-catchbot-prompt">
         <span className="az-status-beacon" /> 📡 Facility comms are unstable — catch the drifting signal to open a channel.

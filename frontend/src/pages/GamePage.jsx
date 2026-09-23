@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useGame } from '../hooks/useGame.js';
 import { useIdleHint } from '../hooks/useIdleHint.js';
 import { useSecurityMonitor } from '../hooks/useSecurityMonitor.js';
-import { api } from '../api/client.js';
+import { api, getToken } from '../api/client.js';
 import EnvironmentBackdrop from '../components/EnvironmentBackdrop.jsx';
 import { AICore } from '../components/facility/Facility.jsx';
 import GameHUD from '../components/GameHUD.jsx';
@@ -19,8 +19,7 @@ import Level2Scene from '../components/scenes3d/Level2Scene3D.jsx';
 import Level3Scene from '../components/scenes3d/Level3Scene3D.jsx';
 import Level4Scene from '../components/scenes3d/Level4Scene3D.jsx';
 import Level5Scene from '../components/scenes3d/Level5Scene3D.jsx';
-import Robot from '../components/Robot.jsx';
-import { IconCheck, IconStar, IconCoin, IconTrophy, IconShield, IconChrono, IconWarning } from '../components/GameIcons.jsx';
+import { IconCheck, IconStar, IconCoin, IconTrophy, IconShield, IconChrono, IconWarning, IconRobot } from '../components/GameIcons.jsx';
 import { sfx } from '../sound.js';
 
 function playFeedbackSound(action, outcome) {
@@ -42,7 +41,7 @@ const SCENES = {
 
 export default function GamePage() {
   const nav = useNavigate();
-  const { state, error, sendAction, syncStateFrom, start } = useGame();
+  const { state, error, sendAction, syncStateFrom, start, exitGame } = useGame();
   const [flash, setFlash] = useState(null);
   const [busy, setBusy] = useState(false);
   const [levelCompleteCard, setLevelCompleteCard] = useState(null); // {title, message, timeLeft} while the reward screen shows, before handing off to the map
@@ -88,6 +87,30 @@ export default function GamePage() {
       document.body.classList.remove('az-game-active');
     };
   }, []);
+
+  useEffect(() => {
+    const handleUnload = async () => {
+      try {
+        const token = await getToken();
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        
+        fetch(`${import.meta.env.VITE_API_BASE || '/api'}/game/exit`, {
+          method: 'POST',
+          headers,
+          keepalive: true
+        });
+      } catch (err) {
+        console.warn('Exit beacon failed:', err);
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+      exitGame(); // Normal navigation unmount
+    };
+  }, [exitGame]);
 
   useEffect(() => {
     if (!flash?.lifeLost) return;
@@ -307,8 +330,8 @@ export default function GamePage() {
             <div className="az-celebration-portal-frame">
               <div className="az-celebration-exit-sign">EXIT</div>
               <div className="az-celebration-portal-vortex" />
-              <div className="az-celebration-robot">
-                <Robot walking={false} size={90} color="#ffffff" />
+              <div className="az-celebration-robot" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <IconRobot size={80} color="#00f0ff" />
               </div>
             </div>
 

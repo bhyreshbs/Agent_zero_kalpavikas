@@ -5,7 +5,6 @@ import { FacilityPanel } from '../facility/Facility.jsx';
 import SceneCanvas from '../three/SceneCanvas.jsx';
 import Core3D from '../three/Core3D.jsx';
 import Door3D from '../three/Door3D.jsx';
-import Robot3D from '../three/Robot3D.jsx';
 import { IconCheck } from '../GameIcons.jsx';
 
 export default function Level5Scene({ level, onAction, busy, flash, onChatReply, chatUnlocked }) {
@@ -18,10 +17,6 @@ export default function Level5Scene({ level, onAction, busy, flash, onChatReply,
   return (
     <div className="az-scene3d-stage">
       <SceneCanvas tone="white" height="100%">
-        {/* Hero Character standing before the Core */}
-        <group position={[0, 0.40, 0.4]} rotation={[0, 0, 0]} scale={[1.2, 1.2, 1.2]}>
-          <Robot3D walking={false} color="#eaf6ff" />
-        </group>
 
         <Core3D position={[0, 2, -2.6]} active={justSpoke || env.planAccepted} />
         <Door3D

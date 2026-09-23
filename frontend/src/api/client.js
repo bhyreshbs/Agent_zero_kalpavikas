@@ -20,7 +20,7 @@ export async function setSession(session) {
 }
 
 /** Get the current Supabase access token (auto-refreshed by the client). */
-async function getToken() {
+export async function getToken() {
   const { data } = await supabase.auth.getSession();
   return data?.session?.access_token ?? null;
 }
@@ -75,6 +75,7 @@ export const api = {
   login:    (payload)         => request('/auth/login', { method: 'POST', body: payload }),
   getState: ()                => request('/game/state'),
   startGame: ()               => request('/game/start', { method: 'POST' }),
+  exit: ()                    => request('/game/exit', { method: 'POST' }),
   sendAction: (action, payload) => request('/game/action', { method: 'POST', body: { action, payload } }),
   recoveryStart: ()           => request('/game/recovery/start', { method: 'POST' }),
   recoverySubmit: (answer)    => request('/game/recovery/submit', { method: 'POST', body: { answer } }),

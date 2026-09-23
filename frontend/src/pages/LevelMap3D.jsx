@@ -4,12 +4,12 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Sparkles, ContactShadows } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { useGame } from '../hooks/useGame.js';
-import Robot3D from '../components/three/Robot3D.jsx';
+import { Html } from '@react-three/drei';
 import Gate3D from '../components/three/Gate3D.jsx';
 import { toneColor } from '../components/three/SceneCanvas.jsx';
 import { CHAPTERS } from '../story.js';
 import { sfx } from '../sound.js';
-import { IconTrophy, IconPlay, IconCheck } from '../components/GameIcons.jsx';
+import { IconTrophy, IconPlay, IconCheck, IconRobot } from '../components/GameIcons.jsx';
 
 // The facility hub as a real 3D corridor: one archway per chapter, spaced
 // along -Z, a 3D robot that actually walks between them, and a camera that
@@ -57,7 +57,14 @@ function RobotRig({ startIndex, targetIndex, onArrive, robotZRef }) {
 
   return (
     <group ref={groupRef} position={[0, 0, initialZRef.current]}>
-      <Robot3D walking={walking} color="#eaf6ff" />
+      {/* Positioned slightly up to match Robot3D's visual center */}
+      <group position={[0, 0.40, 0]} scale={[1.2, 1.2, 1.2]}>
+        <Html transform center distanceFactor={8}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <IconRobot size={120} color="#00f0ff" />
+          </div>
+        </Html>
+      </group>
     </group>
   );
 }

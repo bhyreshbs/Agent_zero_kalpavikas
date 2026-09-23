@@ -34,6 +34,15 @@ export function useGame() {
     setState(s);
   }, []);
 
+  const exitGame = useCallback(async () => {
+    try {
+      const s = await api.exit();
+      setState(s);
+    } catch (err) {
+      console.warn('exitGame failed:', err);
+    }
+  }, []);
+
   const sendAction = useCallback(async (action, payload) => {
     try {
       const outcome = await api.sendAction(action, payload);
@@ -64,5 +73,5 @@ export function useGame() {
     if (clientState) setState(clientState);
   }, []);
 
-  return { state, loading, error, lastResult, refresh, start, sendAction, recoveryStart, recoverySubmit, syncStateFrom };
+  return { state, loading, error, lastResult, refresh, start, exitGame, sendAction, recoveryStart, recoverySubmit, syncStateFrom };
 }

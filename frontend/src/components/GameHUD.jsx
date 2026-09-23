@@ -27,7 +27,7 @@ function useTickingClock(state) {
   }, [state?.timeRemainingSeconds]);
 
   useEffect(() => {
-    const running = state && ['active', 'critical', 'recovering'].includes(state.status);
+    const running = state && ['active', 'critical', 'recovering', 'tutorial'].includes(state.status);
     if (!running) return;
     const id = setInterval(() => {
       const elapsedSinceSync = Math.floor((Date.now() - lastSynced.current.at) / 1000);
@@ -63,7 +63,7 @@ export default function GameHUD({ state }) {
   // -- not a repeating alarm, just a single nudge that time is getting tight.
   useEffect(() => {
     if (!state) return;
-    const running = ['active', 'critical', 'recovering'].includes(state.status);
+    const running = ['active', 'critical', 'recovering', 'tutorial'].includes(state.status);
     if (running && displaySeconds <= 60 && displaySeconds > 0 && !warnedLowTime.current) {
       warnedLowTime.current = true;
       sfx.warning();
@@ -79,7 +79,7 @@ export default function GameHUD({ state }) {
   const recoveryCount = Math.max(0, (state.maxLives ?? initial) - initial);
   const recoveryHearts = Array.from({ length: recoveryCount }, (_, i) => lives > initial + i);
 
-  const low = displaySeconds <= 60 && ['active', 'critical', 'recovering'].includes(state.status);
+  const low = displaySeconds <= 60 && ['active', 'critical', 'recovering', 'tutorial'].includes(state.status);
   const chapter = chapterFor(state.currentLevel ?? 0);
 
   return (
@@ -130,7 +130,7 @@ export default function GameHUD({ state }) {
         >
           <span className="az-timer-label"><IconChrono size={16} style={{ marginRight: 6 }} /> CHRONO</span>
           <strong className="az-timer-digits">
-            {state.status === 'tutorial' ? '--:--' : fmtTime(displaySeconds)}
+            {fmtTime(displaySeconds)}
           </strong>
         </div>
         <MuteToggle />

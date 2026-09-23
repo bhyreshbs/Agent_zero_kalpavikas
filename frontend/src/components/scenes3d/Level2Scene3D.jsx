@@ -3,7 +3,6 @@ import AgentDialogue from '../AgentDialogue.jsx';
 import SceneCanvas from '../three/SceneCanvas.jsx';
 import Inspectable3D from '../three/Inspectable3D.jsx';
 import Button3D from '../three/Button3D.jsx';
-import Robot3D from '../three/Robot3D.jsx';
 
 const SHAPES = { north_wall: 'wall', east_door: 'door', loose_tile: 'floor', old_lamp: 'lamp' };
 const GLYPHS = { north_wall: '▦', east_door: '▤', loose_tile: '▫', old_lamp: '○' };
@@ -24,10 +23,6 @@ export default function Level2Scene({ level, onAction, busy, flash, onChatReply,
   return (
     <div className="az-scene3d-stage">
       <SceneCanvas tone="amber" height="100%">
-        {/* Hero Character in Room */}
-        <group position={[-0.8, 0.39, 0.8]} rotation={[0, 0.35, 0]} scale={[1.15, 1.15, 1.15]}>
-          <Robot3D walking={false} color="#ffb84d" />
-        </group>
         <Button3D position={[0, 0, 1.8]} pressed={pressed} onClick={() => onAction('PRESS_BUTTON')} disabled={busy} />
         {level.inspectTargets.map((obj) => (
           <Inspectable3D

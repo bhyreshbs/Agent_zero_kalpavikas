@@ -1,7 +1,6 @@
 import AgentChat from '../AgentChat.jsx';
 import SceneCanvas, { toneColor } from '../three/SceneCanvas.jsx';
 import Door3D from '../three/Door3D.jsx';
-import Robot3D from '../three/Robot3D.jsx';
 
 export default function TutorialScene({ level, onAction, busy, flash, onChatReply, chatUnlocked }) {
   const exitLetter = level.environment.exit;
@@ -11,10 +10,6 @@ export default function TutorialScene({ level, onAction, busy, flash, onChatRepl
   return (
     <div className="az-scene3d-stage">
       <SceneCanvas tone="cyan" height="100%">
-        {/* Hero Character standing on the floor in orientation bay */}
-        <group position={[0, 0.39, 1.3]} rotation={[0, 0, 0]} scale={[1.15, 1.15, 1.15]}>
-          <Robot3D walking={false} color="#00f0ff" />
-        </group>
         <Door3D
           position={[-1.7, 0, -1.6]}
           color={exitLetter === 'A' ? toneColor('cyan') : '#2a323c'}

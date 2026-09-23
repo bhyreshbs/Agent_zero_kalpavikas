@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import Robot from './Robot.jsx';
 import { IconTouch, IconRobot, IconHeart, IconChrono, IconWarning, IconPlay, IconCheck } from './GameIcons.jsx';
 import { sfx } from '../sound.js';
 
@@ -40,7 +39,7 @@ export const STEPS = [
       'Speed and precision grant bonus XP',
       'Security violations trigger time penalties'
     ],
-    dialogue: "The clock starts the moment you enter Sector 01. Stay sharp!"
+    dialogue: "The clock starts right now. Stay sharp and move quickly!"
   },
   {
     mode: 'modal',
@@ -80,8 +79,8 @@ export default function TutorialOverlay({ step, onAdvance, onComplete }) {
         {/* Left Character Capsule matching Screen 3 */}
         <div className="az-briefing-character-frame">
           <div className="az-briefing-holo-glow" />
-          <div className="az-briefing-robot-display">
-            <Robot walking={false} size={110} color="#eaf6ff" />
+          <div className="az-briefing-robot-display" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '140px', width: '140px' }}>
+            <IconRobot size={80} color="#00f0ff" />
           </div>
           <div className="az-briefing-agent-tag">
             <span className="az-agent-live-dot" /> AGENT ZERO TACTICAL HUD

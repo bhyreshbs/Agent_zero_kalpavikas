@@ -201,6 +201,49 @@ export async function finalizeRun(session, finalStatus) {
   return session;
 }
 
+export async function exitSession(session) {
+  if (TERMINAL_STATUSES.has(session.status)) return session;
+  if (!['active', 'tutorial'].includes(session.status) || !session.paused_at) return session;
+
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+    
+    // Fetch latest to prevent race condition double-counting
+    const res = await client.query('SELECT * FROM game_sessions WHERE id = $1 FOR UPDATE', [session.id]);
+    const latest = res.rows[0];
+    
+    if (['active', 'tutorial'].includes(latest.status) && latest.paused_at && !TERMINAL_STATUSES.has(latest.status)) {
+      const pAt = latest.paused_at instanceof Date ? latest.paused_at : new Date(latest.paused_at + (latest.paused_at.endsWith('Z') ? '' : 'Z'));
+      const start = pAt.getTime();
+      const elapsed = Math.floor((Date.now() - start) / 1000);
+      
+      const newTimePaused = (latest.time_paused_seconds || 0) + elapsed;
+      
+      await client.query(
+        `UPDATE game_sessions SET status = 'paused', paused_at = NULL, time_paused_seconds = $1 WHERE id = $2`,
+        [newTimePaused, session.id]
+      );
+      
+      // Update our local session object so getClientState returns correct info
+      session.status = 'paused';
+      session.paused_at = null;
+      session.time_paused_seconds = newTimePaused;
+      
+      await logAudit(session.team_id, 'game_exited', { level: session.current_level });
+    }
+    
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+  
+  return session;
+}
+
 export async function reconcileTimerExpiry(session) {
   if (isExpired(session) && !TERMINAL_STATUSES.has(session.status)) {
     await finalizeRun(session, 'failed');
@@ -273,6 +316,8 @@ export async function getClientState(session) {
 export async function startSession(session) {
   if (session.status !== 'not_started') return session;
   session.status = 'tutorial';
+  session.started_at = new Date().toISOString();
+  session.paused_at = session.started_at;
 
   const levelStates    = parseJson(session.level_states);
   const memory         = parseJson(session.agent_memory);
@@ -308,7 +353,7 @@ export async function applyAction(session, action, payload) {
     const client = await getClient();
     try {
       await client.query('BEGIN');
-      session.status = 'active';
+      session.status = session.current_level === 0 ? 'tutorial' : 'active';
       session.paused_at = new Date().toISOString();
       await client.query(
         `UPDATE game_sessions SET status = $1, paused_at = $2 WHERE id = $3`,

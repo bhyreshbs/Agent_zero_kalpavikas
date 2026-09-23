@@ -6,7 +6,6 @@ import SceneCanvas, { toneColor } from '../three/SceneCanvas.jsx';
 import Door3D from '../three/Door3D.jsx';
 import Agent3D from '../three/Agent3D.jsx';
 import Camera3D from '../three/Camera3D.jsx';
-import Robot3D from '../three/Robot3D.jsx';
 
 export default function Level3Scene({ level, onAction, busy, flash, onChatReply, chatUnlocked }) {
   const [focusRequest, setFocusRequest] = useState(null);
@@ -20,10 +19,6 @@ export default function Level3Scene({ level, onAction, busy, flash, onChatReply,
   return (
     <div className="az-scene3d-stage">
       <SceneCanvas tone="violet" flashColor={flash?.result?.ok === false ? '#ff3b5c' : null} height="100%">
-        {/* Hero Character in Junction */}
-        <group position={[0, 0.39, 0.2]} rotation={[0, 0, 0]} scale={[1.15, 1.15, 1.15]}>
-          <Robot3D walking={false} color="#9678ff" />
-        </group>
 
         <Camera3D position={[0, 5, -3]} color={toneColor('violet')} reacting={!!flash} />
 

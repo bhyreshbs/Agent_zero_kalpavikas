@@ -4,7 +4,6 @@ import SceneCanvas, { toneColor } from '../three/SceneCanvas.jsx';
 import Door3D from '../three/Door3D.jsx';
 import KeyCard3D from '../three/KeyCard3D.jsx';
 import Scanner3D from '../three/Scanner3D.jsx';
-import Robot3D from '../three/Robot3D.jsx';
 
 export default function Level1Scene({ level, onAction, busy, flash, onChatReply, chatUnlocked }) {
   const hasKey = level.environment.hasKey;
@@ -15,10 +14,6 @@ export default function Level1Scene({ level, onAction, busy, flash, onChatReply,
   return (
     <div className="az-scene3d-stage">
       <SceneCanvas tone="cyan" flashColor={failed ? '#ff3b5c' : null} height="100%">
-        {/* Hero Character in Room */}
-        <group position={[-0.8, 0.39, 0.7]} rotation={[0, 0.4, 0]} scale={[1.15, 1.15, 1.15]}>
-          <Robot3D walking={false} color="#00f0ff" />
-        </group>
         <Scanner3D position={[0, 0, -2.6]} hasKey={hasKey} color={toneColor('cyan')} />
         <KeyCard3D
           position={[-2.6, 1.3, -1]}

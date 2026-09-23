@@ -538,22 +538,12 @@ tr:hover td {
 }
 .az-map-node.completed .az-map-node-label { color: var(--az-text); }
 
-/* --- Robot (SVG, drawn in the 0-100 map viewBox — see components/Robot.jsx) --- */
-.az-robot { filter: drop-shadow(0 0 2px rgba(53,242,194,0.9)); }
-.az-robot.is-idle { animation: az-robot-bob 1.6s ease-in-out infinite; }
-.az-robot-eye { animation: az-robot-blink 3.2s ease-in-out infinite; transform-origin: center; }
-.az-robot-eye:nth-of-type(2) { animation-delay: 0.1s; }
-.az-robot-light { animation: az-robot-light-pulse 1.2s ease-in-out infinite; }
-.is-walking .az-robot-light { animation-duration: 0.4s; }
-.az-robot-leg { transform-origin: top center; }
-.is-walking .az-robot-leg-l { animation: az-robot-leg-l 0.35s ease-in-out infinite; }
-.is-walking .az-robot-leg-r { animation: az-robot-leg-r 0.35s ease-in-out infinite; }
-
-@keyframes az-robot-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.6px); } }
-@keyframes az-robot-blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.15); } }
-@keyframes az-robot-light-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-@keyframes az-robot-leg-l { 0%, 100% { transform: rotate(-18deg); } 50% { transform: rotate(18deg); } }
-@keyframes az-robot-leg-r { 0%, 100% { transform: rotate(18deg); } 50% { transform: rotate(-18deg); } }
+/* --- Spline Robot Wrapper --- */
+.spline-robot-wrapper {
+  overflow: hidden;
+  pointer-events: auto;
+  border-radius: 8px; /* Optional, makes it blend better if needed */
+}
 
 .az-map-toast {
   position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
@@ -2998,6 +2988,43 @@ tr:hover td {
   width: 100% !important;
   height: 100% !important;
   display: block;
+}
+
+/* Spline robot: fixed-size DOM element positioned in the right-center hero area.
+   pointer-events: auto so cursor-follow works; the parent .az-hero-canvas-wrap
+   has pointer-events: none so only this container captures mouse events. */
+.az-hero-spline-robot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(calc(-50% + 15px), -50%);
+  width: 450px;
+  height: 500px;
+  z-index: 2;
+  pointer-events: auto;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+@media (max-width: 900px) {
+  .az-hero-spline-robot {
+    right: 5%;
+    width: 200px;
+    height: 240px;
+  }
+}
+
+@media (max-width: 600px) {
+  .az-hero-spline-robot {
+    /* On mobile, tuck it to bottom-center behind the menu */
+    right: 50%;
+    transform: translate(50%, 0);
+    top: auto;
+    bottom: 60px;
+    width: 160px;
+    height: 190px;
+    opacity: 0.6;
+  }
 }
 
 .az-gamemenu-topbar {

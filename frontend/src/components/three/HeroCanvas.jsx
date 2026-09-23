@@ -1,37 +1,10 @@
-import { Suspense, useRef } from 'react';
+import { Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Sparkles, ContactShadows, Float } from '@react-three/drei';
-import Robot3D from './Robot3D.jsx';
-// ============================================================================
-// 1. HERO ROBOT CHARACTER (Centered Staged Protagonist)
-// ============================================================================
-function HeroRobotCharacter() {
-  const robotRef = useRef();
-
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (robotRef.current) {
-      // Alert idle breathing & organic micro-bobbing (faster active cycle)
-      robotRef.current.position.y = Math.sin(t * 2.6) * 0.005;
-      robotRef.current.rotation.y = -0.04 + Math.sin(t * 2.2) * 0.03;
-    }
-  });
-
-  return (
-    <group position={[0.19, -0.27, -0.20]}>
-      {/* HERO ROBOT CHARACTER — Standing in the center of the platform circle */}
-      <group ref={robotRef} rotation={[0, -0.04, 0]} scale={[0.87, 0.87, 0.87]}>
-        <Robot3D color="#ffffff" walking={false} />
-      </group>
-
-      {/* Ground Contact Shadow inside the platform circle */}
-      <ContactShadows position={[0, -0.30, 0]} opacity={0.95} scale={2.0} blur={1.1} far={1.0} color="#000000" />
-    </group>
-  );
-}
+import { Sparkles } from '@react-three/drei';
+import SplineRobot from '../SplineRobot.jsx';
 
 // ============================================================================
-// 2. CINEMATIC CAMERA RIG
+// 1. CINEMATIC CAMERA RIG
 // ============================================================================
 function CinematicCameraRig() {
   useFrame((state) => {
@@ -45,7 +18,7 @@ function CinematicCameraRig() {
 }
 
 // ============================================================================
-// 3. MAIN HERO CANVAS (Transparent Stage Over Sci-Fi Hangar Backdrop)
+// 2. MAIN HERO CANVAS (Transparent Stage Over Sci-Fi Hangar Backdrop)
 // ============================================================================
 export default function HeroCanvas() {
   return (
@@ -59,28 +32,44 @@ export default function HeroCanvas() {
         {/* Soft Ambient Space Fill Light */}
         <ambientLight intensity={0.9} color="#172554" />
 
-        {/* Crisp White Keylight Focused Directly on Hero Robot */}
+        {/* Crisp White Keylight */}
         <pointLight position={[0.2, 1.4, 2.8]} intensity={3.4} color="#ffffff" distance={8} decay={2} />
 
-        {/* Warm Amber Ceiling Light Match (from hangar rafters above-left) */}
+        {/* Warm Amber Ceiling Light */}
         <pointLight position={[-3.2, 3.0, 1.0]} intensity={2.2} color="#f59e0b" distance={9} />
 
-        {/* Cool Cyan Accent from Gantry Rings */}
+        {/* Cool Cyan Accent */}
         <pointLight position={[0.08, -1.0, 1.2]} intensity={2.4} color="#00f0ff" distance={6} />
 
-        {/* Magenta Rim Light from Hangar Lower Right Conduits */}
+        {/* Magenta Rim Light */}
         <directionalLight position={[4.2, 1.5, -1.8]} intensity={2.2} color="#ec4899" />
 
         <Suspense fallback={null}>
           <CinematicCameraRig />
-
-          {/* Staged Hero Robot Protagonist */}
-          <HeroRobotCharacter />
-
           {/* Floating Ambient Starlight / Digital Telemetry */}
           <Sparkles count={55} scale={[10, 6, 8]} size={1.8} speed={0.35} opacity={0.45} color="#38bdf8" />
         </Suspense>
       </Canvas>
+
+      {/*
+        Spline Robot — rendered as a plain DOM element OUTSIDE the R3F Canvas.
+
+        SIZING: Rendered as a fixed-size DOM absolute element (az-hero-spline-robot CSS).
+        This avoids the R3F <Html transform> projection issue where even a small
+        iframe appears full-screen due to perspective distanceFactor math.
+
+        SCENE URL: Uses the correct official Spline embed ID z0qCkDOpEe2kJNA1qZ4eCxgm
+        as published by Spline.
+
+        NOTE ON spline-viewer web component:
+        Spline's <spline-viewer> web component requires a prod.spline.design/…/scene.splinecode
+        URL, which differs from the my.spline.design share/embed URL. Since the user only
+        has the iframe embed code, we use the official Spline iframe embed format here.
+        If you export the scene from Spline as "Spline Viewer" and get a .splinecode URL,
+        replace the iframe below with: <spline-viewer url="..." /> after installing
+        @splinetool/viewer.
+      */}
+      <SplineRobot className="az-hero-spline-robot" />
     </div>
   );
 }

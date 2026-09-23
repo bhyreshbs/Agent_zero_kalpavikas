@@ -3,11 +3,17 @@ import AgentDialogue from '../AgentDialogue.jsx';
 import SceneCanvas, { toneColor } from '../three/SceneCanvas.jsx';
 import Inspectable3D from '../three/Inspectable3D.jsx';
 import Camera3D from '../three/Camera3D.jsx';
-import Robot3D from '../three/Robot3D.jsx';
 
 const SHAPES = { terminal: 'wall', vent: 'floor', panel: 'wall', maintenance_log: 'door', keypad: 'wall' };
 const GLYPHS = { terminal: '▮', vent: '≋', panel: '⌗', maintenance_log: '▤', keypad: '▦' };
 const LABELS = { terminal: 'Terminal', vent: 'Vent', panel: 'Panel', maintenance_log: 'Maintenance Log', keypad: 'Old Keypad' };
+
+const POSITIONS = {
+  north_wall: [-1.6, 1.2, -3.4],
+  east_door: [2.9, 0.9, -1],
+  loose_tile: [0.4, 0.03, 1],
+  old_lamp: [-2.6, 0, -0.5],
+};
 
 function layoutFor(count) {
   const spots = [
@@ -28,10 +34,6 @@ export default function Level4Scene({ level, onAction, busy, flash, onChatReply,
   return (
     <div className="az-scene3d-stage">
       <SceneCanvas tone="blue" flashColor={flash?.result?.ok === false ? '#ff3b5c' : null} height="100%">
-        {/* Hero Character in Room */}
-        <group position={[0, 0.39, 0.6]} rotation={[0, 0, 0]} scale={[1.15, 1.15, 1.15]}>
-          <Robot3D walking={false} color="#408cff" />
-        </group>
 
         <Camera3D position={[0, 5, -3]} color={toneColor('blue')} reacting={!!flash} />
         {objects.map((obj, i) => (

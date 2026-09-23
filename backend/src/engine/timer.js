@@ -15,7 +15,7 @@ export function elapsedSeconds(session) {
   
   // If the timer is actively running in a sector, add the time since this sector started.
   // The 'paused_at' field acts as the 'activeStartedAt' timestamp.
-  if (session.status === 'active' && session.paused_at) {
+  if (['active', 'tutorial'].includes(session.status) && session.paused_at) {
     const pAt = session.paused_at instanceof Date ? session.paused_at : new Date(session.paused_at + (session.paused_at.endsWith('Z') ? '' : 'Z'));
     const start = pAt.getTime();
     elapsed += Math.floor((Date.now() - start) / 1000);
