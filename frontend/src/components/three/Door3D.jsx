@@ -31,8 +31,8 @@ export default function Door3D({ position = [0, 0, 0], color = '#35f2c2', label,
         <mesh
           position={[0.65, 0, 0]}
           onClick={(e) => { e.stopPropagation(); if (!disabled && onClick) onClick(); }}
-          onPointerOver={(e) => { e.stopPropagation(); if (!disabled) setHovered(true); }}
-          onPointerOut={() => setHovered(false)}
+          onPointerOver={(e) => { e.stopPropagation(); if (!disabled) { setHovered(true); document.body.style.cursor = 'pointer'; } }}
+          onPointerOut={() => { setHovered(false); document.body.style.cursor = 'auto'; }}
         >
           <boxGeometry args={[1.3, 2.6, 0.08]} />
           <meshStandardMaterial
@@ -44,14 +44,19 @@ export default function Door3D({ position = [0, 0, 0], color = '#35f2c2', label,
           />
         </mesh>
       </group>
+      
+      {/* Door identification title (above the door) */}
       {label && (
-        <Html position={[0, 3.05, 0]} center distanceFactor={9} occlude>
-          <div className="az-3d-label" style={{ '--label-tone': color }}>{label}</div>
+        <Html position={[0, 3.2, 0]} center distanceFactor={10}>
+          <div style={{ color: color, textShadow: `0 0 8px ${color}`, fontSize: '0.55rem', fontWeight: 'bold', letterSpacing: '0.25em', fontFamily: 'var(--az-font-mono)', textTransform: 'uppercase' }}>
+            {label}
+          </div>
         </Html>
       )}
+
       {state === 'open' && (
-        <Html position={[0, -0.15, 0.4]} center distanceFactor={10}>
-          <div className="az-3d-tag">OPEN</div>
+        <Html position={[0, 1.4, 0.2]} center distanceFactor={10}>
+          <div className="az-3d-tag" style={{ '--label-tone': color, fontSize: '0.65rem', letterSpacing: '0.1em' }}>[ OPEN ]</div>
         </Html>
       )}
     </group>

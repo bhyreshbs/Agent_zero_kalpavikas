@@ -18,11 +18,6 @@ export default function Scanner3D({ position = [0, 0, 0], hasKey, color = '#35f2
           emissiveIntensity={hasKey ? 1.2 : 0}
         />
       </mesh>
-      <Html position={[0, 0.75, 0]} center distanceFactor={11}>
-        <div className="az-3d-tag" style={{ '--label-tone': color, opacity: 0.85 }}>
-          {hasKey ? 'ACCESS OK' : 'AWAITING KEY'}
-        </div>
-      </Html>
     </group>
   );
 }

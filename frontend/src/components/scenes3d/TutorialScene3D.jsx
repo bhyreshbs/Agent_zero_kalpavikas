@@ -1,8 +1,7 @@
-import AgentChat from '../AgentChat.jsx';
 import SceneCanvas, { toneColor } from '../three/SceneCanvas.jsx';
 import Door3D from '../three/Door3D.jsx';
 
-export default function TutorialScene({ level, onAction, busy, flash, onChatReply, chatUnlocked }) {
+export default function TutorialScene({ level, onAction, busy, flash }) {
   const exitLetter = level.environment.exit;
   const lastAction = flash?.action;
   const opened = flash?.result?.ok === true ? lastAction : null;
@@ -41,10 +40,6 @@ export default function TutorialScene({ level, onAction, busy, flash, onChatRepl
         <div className="az-scene-prompt-pill">
           Click the glowing exit in the 3D room to navigate out of the orientation bay.
         </div>
-      </div>
-
-      <div className="az-comms-dock">
-        <AgentChat onReply={onChatReply} locked={!chatUnlocked} />
       </div>
     </div>
   );

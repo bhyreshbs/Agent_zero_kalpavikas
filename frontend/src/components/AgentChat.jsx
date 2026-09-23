@@ -23,7 +23,7 @@ import { sfx } from '../sound.js';
 // re-applied even if the same terminal is clicked twice in a row.
 const TYPE_SPEED_MS = 14; // per character -- fast enough not to make anyone wait
 
-export default function AgentChat({ targets, onReply, locked, focusRequest }) {
+export default function AgentChat({ targets, onReply, locked, focusRequest, onUnlock }) {
   const [expanded, setExpanded] = useState(false);
   const [log, setLog] = useState([]);
   const [input, setInput] = useState('');
@@ -31,6 +31,8 @@ export default function AgentChat({ targets, onReply, locked, focusRequest }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [revealedCount, setRevealedCount] = useState(0);
+  const [unlocking, setUnlocking] = useState(false);
+  const [unlockStage, setUnlockStage] = useState('STANDBY');
   const typeTimer = useRef(null);
   const logEndRef = useRef(null);
 
@@ -90,11 +92,37 @@ export default function AgentChat({ targets, onReply, locked, focusRequest }) {
 
   if (locked) {
     return (
-      <div className="az-terminal-lock az-glass-panel">
-        <div className="az-terminal-lock-badge">
-          <span className="az-danger-dot" /> COMMS CHANNEL // OFFLINE
+      <div className="az-chat-collapsed az-glass-panel" style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="az-terminal-lock-badge" style={{ color: 'var(--az-text)', fontSize: '0.8rem', letterSpacing: '0.1em' }}>
+           AGENT COMMUNICATION <br/>
+           <span style={{ color: unlocking ? 'var(--az-accent)' : 'var(--az-text-muted)'}}>
+             SIGNAL: {unlockStage}
+           </span>
         </div>
-        <p className="az-hint">Signal offline — intercept the drifting signal beacon to restore comms channel.</p>
+        <button
+          className="az-chat-talk-btn az-btn-primary"
+          onClick={() => {
+            sfx.click();
+            setUnlocking(true);
+            setUnlockStage('ESTABLISHING SECURE CHANNEL...');
+            setTimeout(() => {
+                setUnlockStage('SIGNAL ACQUIRED...');
+            }, 600);
+            setTimeout(() => {
+                setUnlockStage('COMMUNICATION CHANNEL OPEN');
+                if (sfx.agentActivate) sfx.agentActivate();
+            }, 1200);
+            setTimeout(() => {
+              setUnlocking(false);
+              setUnlockStage('STANDBY');
+              onUnlock?.();
+              setExpanded(true);
+            }, 1500);
+          }}
+          disabled={unlocking}
+        >
+          {unlocking ? 'CONNECTING...' : 'ESTABLISH CONNECTION ▸'}
+        </button>
       </div>
     );
   }

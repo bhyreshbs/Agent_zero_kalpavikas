@@ -1,4 +1,3 @@
-import AgentChat from '../AgentChat.jsx';
 import AgentDialogue from '../AgentDialogue.jsx';
 import SceneCanvas, { toneColor } from '../three/SceneCanvas.jsx';
 import Inspectable3D from '../three/Inspectable3D.jsx';
@@ -26,7 +25,7 @@ function layoutFor(count) {
   return spots.slice(0, count);
 }
 
-export default function Level4Scene({ level, onAction, busy, flash, onChatReply, chatUnlocked }) {
+export default function Level4Scene({ level, onAction, busy, flash }) {
   const objects = level.environment.objects || [];
   const objectClues = level.environment.objectClues || {};
   const positions = layoutFor(objects.length);
@@ -84,10 +83,6 @@ export default function Level4Scene({ level, onAction, busy, flash, onChatReply,
         <div className="az-tactical-actions-bar">
           <button disabled={busy} onClick={() => onAction('ASK_AGENT')}>Ask Agent Zero</button>
         </div>
-      </div>
-
-      <div className="az-comms-dock">
-        <AgentChat onReply={onChatReply} locked={!chatUnlocked} />
       </div>
     </div>
   );

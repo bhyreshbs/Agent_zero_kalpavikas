@@ -11,7 +11,7 @@ import GameHUD from '../components/GameHUD.jsx';
 import ObjectiveHUD from '../components/ObjectiveHUD.jsx';
 import RecoveryModal from '../components/RecoveryModal.jsx';
 import TutorialOverlay, { STEPS as TUTORIAL_STEPS } from '../components/TutorialOverlay.jsx';
-import FloatingCatchBot from '../components/FloatingCatchBot.jsx';
+import AgentChat from '../components/AgentChat.jsx';
 import { SecureGameGate, SecurityViolationModal, tryEnterFullscreen } from '../components/SecureGameMode.jsx';
 import TutorialScene from '../components/scenes3d/TutorialScene3D.jsx';
 import Level1Scene from '../components/scenes3d/Level1Scene3D.jsx';
@@ -48,8 +48,9 @@ export default function GamePage() {
   const [showEntry, setShowEntry] = useState(true); // brief "SYSTEM ONLINE" flash on arriving at a level, purely cosmetic
   // null once the guided intro is done/skipped; otherwise an index into TUTORIAL_STEPS.
   const [tutorialStep, setTutorialStep] = useState(() => (sessionStorage.getItem('az_tutorial_seen') === 'true' ? null : 0));
-  const [chatUnlocked, setChatUnlocked] = useState(false); // must catch the floating signal first, each level
+  const [chatUnlocked, setChatUnlocked] = useState(false);
   const [chatUnlockedForLevel, setChatUnlockedForLevel] = useState(null);
+  const [chatFocusRequest, setChatFocusRequest] = useState(null);
   const [hintText, setHintText] = useState(null);
   const [hintBusy, setHintBusy] = useState(false);
   const [hintPanelOpen, setHintPanelOpen] = useState(false);
@@ -120,10 +121,9 @@ export default function GamePage() {
     return () => clearTimeout(t);
   }, [flash]);
 
-  // Fresh level -> the signal has to be caught again, and any shown hint text clears.
+  // Fresh level -> hint text clears. (Chat unlock now persists)
   useEffect(() => {
     if (state && state.currentLevel !== chatUnlockedForLevel) {
-      setChatUnlocked(false);
       setChatUnlockedForLevel(state.currentLevel);
       setHintText(null);
     }
@@ -479,12 +479,11 @@ export default function GamePage() {
       {tutorialStepDef?.mode === 'banner' && (
         <TutorialOverlay step={tutorialStep} onAdvance={() => setTutorialStep((s) => s + 1)} onComplete={completeTutorialOverlay} />
       )}
-      {isRealLevel && !chatUnlocked && !showEntry && <FloatingCatchBot onCaught={() => setChatUnlocked(true)} />}
 
       {/* Fullscreen 3D World Stage */}
       <div className="az-game-world-stage">
         {Scene ? (
-          <Scene level={level} onAction={handleAction} busy={busy} flash={flash} onChatReply={handleChatReply} chatUnlocked={isRealLevel ? chatUnlocked : true} />
+          <Scene level={level} onAction={handleAction} busy={busy} flash={flash} setChatFocusRequest={setChatFocusRequest} />
         ) : (
           <div className="az-panel" style={{ margin: 40, textAlign: 'center' }}>Loading sector telemetry…</div>
         )}
@@ -532,6 +531,18 @@ export default function GamePage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {isRealLevel && (
+          <div className="az-comms-dock">
+            <AgentChat 
+              targets={state?.currentLevel === 3 ? ['A', 'B'] : undefined}
+              focusRequest={chatFocusRequest}
+              onReply={handleChatReply} 
+              locked={!chatUnlocked} 
+              onUnlock={() => setChatUnlocked(true)} 
+            />
           </div>
         )}
       </div>

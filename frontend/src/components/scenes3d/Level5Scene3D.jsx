@@ -1,4 +1,3 @@
-import AgentChat from '../AgentChat.jsx';
 import { useState } from 'react';
 import AgentDialogue from '../AgentDialogue.jsx';
 import { FacilityPanel } from '../facility/Facility.jsx';
@@ -7,7 +6,7 @@ import Core3D from '../three/Core3D.jsx';
 import Door3D from '../three/Door3D.jsx';
 import { IconCheck } from '../GameIcons.jsx';
 
-export default function Level5Scene({ level, onAction, busy, flash, onChatReply, chatUnlocked }) {
+export default function Level5Scene({ level, onAction, busy, flash }) {
   const [code, setCode] = useState('');
   const agent = level.agent;
   const env = level.environment || {};
@@ -66,10 +65,6 @@ export default function Level5Scene({ level, onAction, busy, flash, onChatReply,
             </button>
           </div>
         </div>
-      </div>
-
-      <div className="az-comms-dock">
-        <AgentChat onReply={onChatReply} locked={!chatUnlocked} />
       </div>
     </div>
   );

@@ -1,5 +1,3 @@
-import AgentChat from '../AgentChat.jsx';
-import { useState } from 'react';
 import AgentDialogue from '../AgentDialogue.jsx';
 import { agentIdentity } from '../../story.js';
 import SceneCanvas, { toneColor } from '../three/SceneCanvas.jsx';
@@ -7,8 +5,7 @@ import Door3D from '../three/Door3D.jsx';
 import Agent3D from '../three/Agent3D.jsx';
 import Camera3D from '../three/Camera3D.jsx';
 
-export default function Level3Scene({ level, onAction, busy, flash, onChatReply, chatUnlocked }) {
-  const [focusRequest, setFocusRequest] = useState(null);
+export default function Level3Scene({ level, onAction, busy, flash, setChatFocusRequest }) {
   const log = level.log || [];
   const env = level.environment || {};
   const revealedPath = env.revealedPath || null;
@@ -46,7 +43,7 @@ export default function Level3Scene({ level, onAction, busy, flash, onChatReply,
           label="UNIT A"
           known={cooperative.A !== null}
           sublabel={cooperative.A !== null ? (cooperative.A ? 'With you' : 'Uncertain') : null}
-          onClick={() => setFocusRequest({ target: 'A', key: Date.now() })}
+          onClick={() => setChatFocusRequest?.({ target: 'A', key: Date.now() })}
         />
         <Agent3D
           position={[1.3, 0, 1.6]}
@@ -55,7 +52,7 @@ export default function Level3Scene({ level, onAction, busy, flash, onChatReply,
           label="UNIT B"
           known={cooperative.B !== null}
           sublabel={cooperative.B !== null ? (cooperative.B ? 'With you' : 'Uncertain') : null}
-          onClick={() => setFocusRequest({ target: 'B', key: Date.now() })}
+          onClick={() => setChatFocusRequest?.({ target: 'B', key: Date.now() })}
         />
       </SceneCanvas>
 
@@ -83,10 +80,6 @@ export default function Level3Scene({ level, onAction, busy, flash, onChatReply,
             </div>
           </div>
         )}
-      </div>
-
-      <div className="az-comms-dock">
-        <AgentChat targets={['A', 'B']} onReply={onChatReply} locked={!chatUnlocked} focusRequest={focusRequest} />
       </div>
     </div>
   );

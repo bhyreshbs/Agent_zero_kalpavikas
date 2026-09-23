@@ -27,15 +27,15 @@ export default function KeyCard3D({ position = [0, 0, 0], color = '#35f2c2', col
       <mesh
         ref={ref}
         onClick={(e) => { e.stopPropagation(); onClick && onClick(); }}
-        onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }}
-        onPointerOut={() => setHovered(false)}
+        onPointerOver={(e) => { e.stopPropagation(); setHovered(true); document.body.style.cursor = 'pointer'; }}
+        onPointerOut={() => { setHovered(false); document.body.style.cursor = 'auto'; }}
       >
         <boxGeometry args={[0.5, 0.32, 0.04]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={hovered ? 1.1 : 0.6} metalness={0.5} roughness={0.3} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={hovered ? 1.4 : 0.6} metalness={0.5} roughness={0.3} />
       </mesh>
-      {label && (
-        <Html position={[0, 0.55, 0]} center distanceFactor={10}>
-          <div className="az-3d-tag" style={{ '--label-tone': color }}>{label}</div>
+      {hovered && !collected && (
+        <Html position={[0, 0.45, 0]} center distanceFactor={10}>
+          <div className="az-3d-tag" style={{ '--label-tone': color, fontSize: '0.65rem', letterSpacing: '0.1em' }}>[ KEY ]</div>
         </Html>
       )}
     </group>

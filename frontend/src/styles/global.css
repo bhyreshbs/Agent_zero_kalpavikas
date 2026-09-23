@@ -830,48 +830,6 @@ tr:hover td {
 .az-hint-text { font-style: italic; color: var(--az-accent); margin-top: 8px; }
 
 /* ===========================================================================
-   FLOATING CATCH-BOT (in-level chat unlock)
-   =========================================================================== */
-.az-catchbot-layer { position: fixed; inset: 0; z-index: 50; pointer-events: none; }
-.az-catchbot {
-  position: absolute;
-  width: 46px; height: 46px;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  pointer-events: auto;
-  transition: left 1.3s ease-in-out, top 1.3s ease-in-out;
-  filter: drop-shadow(0 0 8px rgba(53,242,194,0.7));
-}
-.az-catchbot svg { width: 100%; height: 100%; overflow: visible; }
-.az-catchbot-prompt {
-  position: fixed; 
-  bottom: 250px; 
-  right: 28px;
-  z-index: 35; 
-  pointer-events: none;
-  background: rgba(10, 18, 36, 0.94); 
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(0, 240, 255, 0.4);
-  border-radius: 9999px;
-  padding: 8px 18px; 
-  font-size: 0.74rem; 
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #38bdf8;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 240, 255, 0.2);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 380px;
-  animation: azCatchbotPulse 2s ease-in-out infinite alternate;
-}
-@keyframes azCatchbotPulse {
-  0% { transform: translateY(0); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 12px rgba(0, 240, 255, 0.2); }
-  100% { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 240, 255, 0.4); }
-}
-
-/* ===========================================================================
    AGENT DIALOGUE — Tactical holographic speaker identity card
    =========================================================================== */
 .az-agent-line {
@@ -2127,41 +2085,6 @@ tr:hover td {
 .az-terminal-input:focus {
   outline: none;
   box-shadow: none;
-}
-
-/* Catchbot Radar Animation */
-.az-catchbot {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  cursor: pointer;
-}
-.az-catchbot-radar-ring {
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  border: 1px solid var(--az-accent);
-  opacity: 0.7;
-  animation: az-radar-pulse 2s infinite cubic-bezier(0.16, 1, 0.3, 1);
-}
-.az-catchbot-radar-ring-outer {
-  position: absolute;
-  inset: -14px;
-  border-radius: 50%;
-  border: 1px dashed var(--az-cyan-bright);
-  opacity: 0.4;
-  animation: az-radar-spin 6s linear infinite;
-}
-@keyframes az-radar-pulse {
-  0% { transform: scale(0.6); opacity: 0.9; }
-  100% { transform: scale(1.6); opacity: 0; }
-}
-@keyframes az-radar-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 
 /* Debriefing & Final Reveal */
@@ -5123,4 +5046,107 @@ tr:hover td {
   0% { transform: scale(1); box-shadow: 0 0 10px rgba(53, 242, 194, 0.4); }
   50% { transform: scale(1.05); box-shadow: 0 0 25px rgba(53, 242, 194, 0.8); }
   100% { transform: scale(1); box-shadow: 0 0 10px rgba(53, 242, 194, 0.4); }
+}
+
+/* ===========================================================================
+   LEVEL 2 ANOMALY PUZZLE UX
+   =========================================================================== */
+.az-scene3d-stage.az-glitch-active {
+  animation: az-glitch-anim 0.25s ease infinite alternate;
+}
+
+@keyframes az-glitch-anim {
+  0% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+  25% { transform: translate(-3px, 2px); filter: hue-rotate(90deg) contrast(150%); }
+  50% { transform: translate(2px, -3px); filter: hue-rotate(180deg) invert(10%); }
+  75% { transform: translate(-2px, -2px); filter: hue-rotate(270deg) contrast(150%); }
+  100% { transform: translate(3px, 3px); filter: hue-rotate(360deg); }
+}
+
+.az-anomaly-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background: rgba(255, 59, 92, 0.15);
+  pointer-events: none;
+}
+
+.az-anomaly-text {
+  font-family: var(--az-font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ff3b5c;
+  letter-spacing: 0.1em;
+  background: rgba(10, 18, 36, 0.9);
+  padding: 12px 24px;
+  border: 1px solid #ff3b5c;
+  text-transform: uppercase;
+  box-shadow: 0 0 30px rgba(255, 59, 92, 0.7);
+  animation: az-pulse 1s infinite alternate;
+}
+
+.az-inspect-card-desc-diff {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 0.8rem;
+}
+
+.az-diff-archived {
+  color: #64748b;
+  margin: 0;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.03);
+  border-left: 2px solid #475569;
+  border-radius: 0 4px 4px 0;
+}
+
+.az-diff-current {
+  color: #e2e8f0;
+  margin: 0;
+  padding: 6px 8px;
+  background: rgba(0, 240, 255, 0.05);
+  border-left: 2px solid var(--az-accent);
+  border-radius: 0 4px 4px 0;
+}
+
+.az-diff-tag {
+  font-weight: 700;
+  font-family: var(--az-font-mono);
+  font-size: 0.65rem;
+  margin-right: 6px;
+  opacity: 0.8;
+  letter-spacing: 0.05em;
+}
+
+/* Minimal Objective HUD */
+.az-objective-minimal {
+  padding: 10px 14px;
+  background: rgba(9, 14, 21, 0.85);
+  border: 1px solid var(--az-panel-border);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  width: auto;
+  min-width: 200px;
+}
+.az-objective-minimal-header {
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  padding-bottom: 4px;
+}
+.az-objective-minimal-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.az-objective-status-tag {
+  font-family: var(--az-font-mono);
+  font-size: 0.65rem;
+  color: var(--az-text-dim);
+  letter-spacing: 0.1em;
 }

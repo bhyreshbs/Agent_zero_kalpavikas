@@ -1,4 +1,4 @@
-import AgentChat from '../AgentChat.jsx';
+import { useState, useEffect } from 'react';
 import AgentDialogue from '../AgentDialogue.jsx';
 import SceneCanvas from '../three/SceneCanvas.jsx';
 import Inspectable3D from '../three/Inspectable3D.jsx';
@@ -15,15 +15,39 @@ const POSITIONS = {
   old_lamp: [-2.6, 0, -0.5],
 };
 
-export default function Level2Scene({ level, onAction, busy, flash, onChatReply, chatUnlocked }) {
+export default function Level2Scene({ level, onAction, busy, flash }) {
   const objectDetails = level.environment.objectDetails;
   const noticed = level.environment.noticed;
   const pressed = level.environment.buttonPressed;
 
+  const [initialDetails, setInitialDetails] = useState(null);
+  const [transitioning, setTransitioning] = useState(false);
+
+  useEffect(() => {
+    if (objectDetails && !initialDetails && !pressed) {
+      setInitialDetails(objectDetails);
+    }
+  }, [objectDetails, initialDetails, pressed]);
+
+  const isAnomalyActive = initialDetails && JSON.stringify(initialDetails) !== JSON.stringify(objectDetails);
+
+  useEffect(() => {
+    if (isAnomalyActive) {
+      setTransitioning(true);
+      const timer = setTimeout(() => setTransitioning(false), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isAnomalyActive]);
+
   return (
-    <div className="az-scene3d-stage">
-      <SceneCanvas tone="amber" height="100%">
-        <Button3D position={[0, 0, 1.8]} pressed={pressed} onClick={() => onAction('PRESS_BUTTON')} disabled={busy} />
+    <div className={`az-scene3d-stage ${transitioning ? 'az-glitch-active' : ''}`}>
+      {transitioning && (
+        <div className="az-anomaly-overlay">
+          <span className="az-anomaly-text">CONTROL ACTIVATED // ENVIRONMENTAL STATE CHANGED</span>
+        </div>
+      )}
+      <SceneCanvas tone={transitioning ? 'red' : 'amber'} height="100%">
+        <Button3D position={[0, 0, 0.5]} pressed={pressed} onClick={() => onAction('PRESS_BUTTON')} disabled={busy} />
         {level.inspectTargets.map((obj) => (
           <Inspectable3D
             key={obj}
@@ -43,24 +67,24 @@ export default function Level2Scene({ level, onAction, busy, flash, onChatReply,
           <AgentDialogue name="ECHO" line={flash?.result?.agentLine || level.agent?.lastLine} />
         )}
 
-        <div className="az-tactical-console-card">
-          <div className="az-console-header-row">
-            <div className="az-console-status-badge">
-              <span className="az-console-beacon-dot" />
-              <span className="az-console-status-text">
-                {pressed ? 'Button triggered. Look around to confirm anomalies.' : 'Click objects in the room to inspect, or proceed to the exit.'}
-              </span>
-            </div>
+        <div className="az-scene-prompt-pill">
+          {pressed 
+            ? (noticed ? 'ANOMALY CONFIRMED — SELECT EXIT' : 'CONTROL ACTIVATED — IDENTIFY ANOMALY')
+            : 'INVESTIGATE THE CHAMBER'}
+        </div>
 
-            <button 
-              className="az-exit-action-btn"
-              disabled={busy} 
-              onClick={() => onAction('GO_TO_EXIT')}
-            >
-              Proceed to Exit ▸
-            </button>
-          </div>
+        <div className="az-tactical-actions-bar">
+          <button 
+            className="az-exit-action-btn"
+            disabled={busy || !noticed} 
+            onClick={() => onAction('GO_TO_EXIT')}
+            style={{ opacity: noticed ? 1 : 0.3 }}
+          >
+            Proceed to Exit ▸
+          </button>
+        </div>
 
+        <div className="az-tactical-console-card" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
           <div className="az-inspect-details-row">
             {level.inspectTargets.map((obj) => (
               <div 
@@ -75,7 +99,20 @@ export default function Level2Scene({ level, onAction, busy, flash, onChatReply,
                   <span className="az-inspect-card-glyph">{GLYPHS[obj]}</span>
                   <span className="az-inspect-card-label">{LABELS[obj]}</span>
                 </div>
-                <p className="az-inspect-card-desc">{objectDetails[obj]}</p>
+                {isAnomalyActive ? (
+                  <div className="az-inspect-card-desc-diff">
+                    <p className="az-diff-archived">
+                      <span className="az-diff-tag">[ARCHIVED]</span> {initialDetails[obj]}
+                    </p>
+                    <p className="az-diff-current">
+                      <span className="az-diff-tag">[CURRENT]</span> {objectDetails[obj]}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="az-inspect-card-desc">
+                    <span className="az-diff-tag">[TELEMETRY]</span> {objectDetails[obj]}
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -86,10 +123,6 @@ export default function Level2Scene({ level, onAction, busy, flash, onChatReply,
             </div>
           )}
         </div>
-      </div>
-
-      <div className="az-comms-dock">
-        <AgentChat onReply={onChatReply} locked={!chatUnlocked} />
       </div>
     </div>
   );

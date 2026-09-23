@@ -26,47 +26,20 @@ export default function ObjectiveHUD({ objective }) {
   const allDone = activeIndex < 0;
 
   return (
-    <section className={`az-game-objectives-card ${justCompleted ? 'az-objective-just-done' : ''}`} aria-label="Mission Objectives">
-      <div className="az-objectives-card-header">
-        <div className="az-objectives-title-group">
-          <span className="az-objectives-badge-icon"><IconCheck size={18} color="#00f0ff" /></span>
-          <span className="az-objectives-title-text">Mission Objectives</span>
+    <section className={`az-game-objectives-card az-objective-minimal ${justCompleted ? 'az-objective-just-done' : ''}`} aria-label="Current Objective">
+      <div className="az-objective-minimal-header">
+        <span className="az-objectives-title-text" style={{ letterSpacing: '0.15em', fontSize: '0.65rem', opacity: 0.7 }}>OBJECTIVE</span>
+      </div>
+      
+      {allDone ? (
+        <div className="az-objective-minimal-content">
+          <span className="az-objective-item-text" style={{ color: '#10b981' }}>EXIT CONFIRMED</span>
+          <span className="az-objective-status-tag" style={{ color: '#10b981' }}>[UNLOCKED]</span>
         </div>
-        <span className="az-objectives-counter-pill">
-          {doneCount} / {steps.length}
-        </span>
-      </div>
-
-      <div className="az-objectives-list">
-        {steps.map((step, idx) => {
-          const isDone = step.done;
-          const isActive = idx === activeIndex;
-          return (
-            <div
-              key={idx}
-              className={`az-objective-item ${isDone ? 'is-done' : isActive ? 'is-active' : 'is-pending'}`}
-            >
-              <div className="az-objective-status-icon">
-                {isDone ? (
-                  <span className="az-status-check-circle"><IconCheck size={14} color="#10b981" /></span>
-                ) : isActive ? (
-                  <span className="az-status-active-bullet" />
-                ) : (
-                  <span className="az-status-pending-ring" />
-                )}
-              </div>
-              <div className="az-objective-item-content">
-                <span className="az-objective-item-text">{step.text}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {allDone && (
-        <div className="az-objectives-complete-banner">
-          <IconCheck size={16} color="#00f0ff" style={{ marginRight: 8 }} />
-          <span>ALL DIRECTIVES VERIFIED — REACH EXIT PORTAL</span>
+      ) : (
+        <div className="az-objective-minimal-content">
+          <span className="az-objective-item-text">{steps[activeIndex].text}</span>
+          <span className="az-objective-status-tag">[PENDING]</span>
         </div>
       )}
     </section>

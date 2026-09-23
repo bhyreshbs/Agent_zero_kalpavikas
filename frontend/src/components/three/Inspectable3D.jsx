@@ -43,7 +43,7 @@ export default function Inspectable3D({ position = [0, 0, 0], shape = 'wall', co
           <meshStandardMaterial color={color} emissive={color} emissiveIntensity={hovered ? 1.4 : 0.8} />
         </mesh>
       )}
-      {label && (
+      {label && hovered && (
         <Html position={[0, shape === 'lamp' ? 1.05 : 0.55, 0]} center distanceFactor={11}>
           <div className="az-3d-tag" style={{ '--label-tone': color }}>{icon} {label}</div>
         </Html>
