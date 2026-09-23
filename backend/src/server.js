@@ -21,7 +21,33 @@ for (const key of requiredEnv) {
 
 const app = express();
 app.set('trust proxy', 1); // Trust first proxy (Vercel) for rate limiting IP extraction
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://agent-zero-rvu.vercel.app'
+];
+
+if (process.env.CORS_ORIGIN) {
+  process.env.CORS_ORIGIN.split(',').forEach(o => {
+    const trimmed = o.trim();
+    if (trimmed && !allowedOrigins.includes(trimmed)) {
+      allowedOrigins.push(trimmed);
+    }
+  });
+}
+
+app.use(cors({ 
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-secret'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Global rate limit — same ceiling as before (2000 req/min across all IPs)
