@@ -83,67 +83,74 @@ export default function GameHUD({ state }) {
   const chapter = chapterFor(state.currentLevel ?? 0);
 
   return (
-    <header className={`az-hud ${low ? 'is-low-time' : ''}`} aria-label="Game HUD">
-      <div className="az-hud-zone az-hud-lives">
-        <span className="az-badge az-hud-vitals-badge" style={{ fontSize: '0.85rem', padding: '4px 10px', marginRight: 8 }}>
-          <span className="az-status-beacon" />
-          VITALS
+    <div className="ds-page ds-page-embed">
+    <header className={`ds-hud ${low ? 'is-low-time' : ''}`} aria-label="Game HUD">
+      <div className="ds-hud-zone">
+        <span className="ds-badge ds-badge-muted">
+          <span className="ds-dot ds-dot-live" />
+          Vitals
         </span>
         <div className="az-lives" aria-label="Lives remaining" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {baseHearts.map((alive, i) => (
-            <span
-              key={`b${i}`}
-              className={`az-heart-icon ${alive ? 'is-alive' : 'lost'} ${justLostIndex === i ? 'az-heart-losing' : ''}`}
-              title={`Life ${i + 1}`}
-            >
-              <IconHeart size={20} alive={alive} color="#ef4444" />
-            </span>
-          ))}
-          {recoveryCount > 0 && (
+          {state.currentLevel >= 4 ? (
+            <span className="ds-badge ds-badge-success">Unlimited</span>
+          ) : (
             <>
-              <span className="az-hud-divider" style={{ opacity: 0.4, margin: '0 8px', color: 'var(--az-accent)' }}>|</span>
-              {recoveryHearts.map((alive, i) => (
+              {baseHearts.map((alive, i) => (
                 <span
-                  key={`r${i}`}
-                  className={`az-heart-icon az-shield-icon ${alive ? 'is-alive' : 'lost'} ${justLostIndex === initial + i ? 'az-heart-losing' : ''}`}
-                  title={`Recovery Shield ${i + 1}`}
+                  key={`b${i}`}
+                  className={`az-heart-icon ${alive ? 'is-alive' : 'lost'} ${justLostIndex === i ? 'az-heart-losing' : ''}`}
+                  title={`Life ${i + 1}`}
                 >
-                  <IconShield size={20} color="#38bdf8" fill={alive} />
+                  <IconHeart size={18} alive={alive} color="#c4523f" />
                 </span>
               ))}
+              {recoveryCount > 0 && (
+                <>
+                  <span aria-hidden="true" style={{ width: 1, height: 16, margin: '0 6px', background: 'var(--ds-line-strong)' }} />
+                  {recoveryHearts.map((alive, i) => (
+                    <span
+                      key={`r${i}`}
+                      className={`az-heart-icon az-shield-icon ${alive ? 'is-alive' : 'lost'} ${justLostIndex === initial + i ? 'az-heart-losing' : ''}`}
+                      title={`Recovery Shield ${i + 1}`}
+                    >
+                      <IconShield size={18} color="#d4a853" fill={alive} />
+                    </span>
+                  ))}
+                </>
+              )}
             </>
           )}
         </div>
       </div>
 
-      <div className="az-hud-zone az-hud-chapter">
-        <div className="az-hud-chapter-num">
+      <div className="ds-hud-zone is-center">
+        <div className="ds-hud-chapter">
           {state.currentLevel === 0 ? '// SECTOR ZERO — ORIENTATION' : `// ${chapter.chapter} — SECTOR 0${state.currentLevel}`}
         </div>
-        <div className="az-hud-chapter-name">{chapter.name}</div>
+        <div className="ds-hud-name">{chapter.name}</div>
       </div>
 
-      <div className="az-hud-zone az-hud-right">
-        <div
-          className={`az-hud-timer ${low ? 'az-glitch is-critical' : ''}`}
-          title="Station Mission Clock"
-        >
-          <span className="az-timer-label"><IconChrono size={16} style={{ marginRight: 6 }} /> CHRONO</span>
-          <strong className="az-timer-digits">
+      <div className="ds-hud-zone is-right">
+        <div className="ds-hud-timer" title="Station Mission Clock">
+          <span className="ds-label"><IconChrono size={12} color="currentColor" /> Chrono</span>
+          <strong className="ds-hud-digits">
             {fmtTime(displaySeconds)}
           </strong>
         </div>
-        <MuteToggle />
+        <MuteToggle variant="ds" />
         <Link
           to="/map"
-          className="az-hud-map-link"
+          className="ds-btn ds-btn-ghost ds-btn-sm"
+          style={{ minWidth: 32, padding: 0 }}
           onClick={() => sfx.click()}
           onMouseEnter={() => sfx.hover()}
           title="Mission Map"
+          aria-label="Mission Map"
         >
-          <IconMap size={20} />
+          <IconMap size={18} color="currentColor" />
         </Link>
       </div>
     </header>
+    </div>
   );
 }

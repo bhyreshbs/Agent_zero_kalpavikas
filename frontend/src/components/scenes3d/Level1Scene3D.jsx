@@ -12,9 +12,10 @@ export default function Level1Scene({ level, onAction, busy, flash }) {
 
   return (
     <div className="az-scene3d-stage">
-      <SceneCanvas tone="cyan" flashColor={failed ? '#ff3b5c' : null} height="100%">
-        <Scanner3D position={[0, 0, -2.6]} hasKey={hasKey} color={toneColor('cyan')} />
+      <SceneCanvas tone="cyan" flashColor={failed ? '#ff3b5c' : null} height="100%" variant="facility">
+        <Scanner3D position={[1.9, 0, -0.7]} hasKey={hasKey} color={toneColor('cyan')} variant="facility" />
         <KeyCard3D
+          variant="facility"
           position={[-2.2, 1.3, -1.2]}
           color={toneColor('cyan')}
           collected={hasKey}
@@ -22,6 +23,7 @@ export default function Level1Scene({ level, onAction, busy, flash }) {
           onClick={() => !busy && !hasKey && onAction('COLLECT_KEY')}
         />
         <Door3D
+          variant="facility"
           position={[-0.9, 0, -1.4]}
           color="#ff3b5c"
           label="RED DOOR"
@@ -30,6 +32,7 @@ export default function Level1Scene({ level, onAction, busy, flash }) {
           disabled={busy}
         />
         <Door3D
+          variant="facility"
           position={[0.9, 0, -1.4]}
           color={toneColor('cyan')}
           label="BLUE DOOR"

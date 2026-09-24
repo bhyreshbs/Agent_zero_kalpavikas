@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { chapterFor } from '../story.js';
+import { useEffect, useRef, useState } from 'react';
+import { chapterFor, levelLabel } from '../story.js';
 import { useNavigate, Link } from 'react-router-dom';
 import { useGame } from '../hooks/useGame.js';
 import { useIdleHint } from '../hooks/useIdleHint.js';
 import { useSecurityMonitor } from '../hooks/useSecurityMonitor.js';
-import { api, getToken } from '../api/client.js';
+import { api, getToken, isLoggedIn } from '../api/client.js';
 import EnvironmentBackdrop from '../components/EnvironmentBackdrop.jsx';
 import { AICore } from '../components/facility/Facility.jsx';
 import GameHUD from '../components/GameHUD.jsx';
@@ -12,7 +12,8 @@ import ObjectiveHUD from '../components/ObjectiveHUD.jsx';
 import RecoveryModal from '../components/RecoveryModal.jsx';
 import TutorialOverlay, { STEPS as TUTORIAL_STEPS } from '../components/TutorialOverlay.jsx';
 import AgentChat from '../components/AgentChat.jsx';
-import { SecureGameGate, SecurityViolationModal, tryEnterFullscreen } from '../components/SecureGameMode.jsx';
+import { SecureGameGate, SecurityViolationModal, FullscreenRequiredGate, tryEnterFullscreen } from '../components/SecureGameMode.jsx';
+import { useFullscreenGuard } from '../hooks/useFullscreenGuard.js';
 import TutorialScene from '../components/scenes3d/TutorialScene3D.jsx';
 import Level1Scene from '../components/scenes3d/Level1Scene3D.jsx';
 import Level2Scene from '../components/scenes3d/Level2Scene3D.jsx';
@@ -41,7 +42,8 @@ const SCENES = {
 
 export default function GamePage() {
   const nav = useNavigate();
-  const { state, error, sendAction, syncStateFrom, start, exitGame } = useGame();
+  const { state, loading, error, sendAction, syncStateFrom, start, exitGame } = useGame();
+  const enteringSector = useRef(false); // guards the ENTER_SECTOR request against overlapping retries
   const [flash, setFlash] = useState(null);
   const [busy, setBusy] = useState(false);
   const [levelCompleteCard, setLevelCompleteCard] = useState(null); // {title, message, timeLeft} while the reward screen shows, before handing off to the map
@@ -129,21 +131,14 @@ export default function GamePage() {
     }
   }, [state?.currentLevel]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Automatically resume the timer when entering a sector from the transition/lobby state.
-  useEffect(() => {
-    if (state?.isTransition && !levelCompleteCard) {
-      // We are on the active game view, but the server is paused in transition.
-      // Tell the server we have entered the sector so the timer resumes.
-      sendAction('ENTER_SECTOR').catch(console.error);
-    }
-  }, [state?.isTransition, levelCompleteCard, sendAction]);
-
   function completeTutorialOverlay() {
     sessionStorage.setItem('az_tutorial_seen', 'true');
     setTutorialStep(null);
   }
 
   async function handleAction(action, payload) {
+    // Fullscreen is re-verified before every gameplay action; never assumed.
+    if (!fs.ensure()) { reportFullscreenLoss(); return; }
     setBusy(true);
     const priorLevel = state?.currentLevel;
     try {
@@ -176,6 +171,7 @@ export default function GamePage() {
   }
 
   async function handleHint() {
+    if (!fs.ensure()) { reportFullscreenLoss(); return; }
     setHintBusy(true);
     try {
       const outcome = await api.hint();
@@ -226,6 +222,63 @@ export default function GamePage() {
     },
   });
 
+  // Global fullscreen requirement. Every playable screen (tutorial, any level,
+  // recovery, paused) must be genuinely fullscreen; the check is re-read from
+  // the DOM on every render/event/action. Leaving fullscreen while playing is
+  // reported through the same server-side violation flow as a tab switch
+  // (warning first, then -1 life), once per loss.
+  const fsPenalized = useRef(false);
+  const [fsLostInPlay, setFsLostInPlay] = useState(false);
+  async function reportFullscreenLoss() {
+    if (fsPenalized.current) return;
+    fsPenalized.current = true;
+    setFsLostInPlay(true);
+    sfx.warning();
+    try {
+      const out = await api.reportSecurityViolation('fullscreen_exit');
+      if (out && !out.ignored && !out.deduped && out.violationNumber) {
+        setViolation(out);
+        if (out.clientState) syncStateFrom(out.clientState);
+        if (out.lifeLost) sfx.lifeLost();
+      }
+    } catch {
+      // a reporting hiccup must never unblock gameplay; the gate stays up regardless
+    }
+  }
+  const fsRequired =
+    !!state &&
+    ['tutorial', 'active', 'critical', 'recovering', 'paused'].includes(state.status) &&
+    !levelCompleteCard;
+  const fs = useFullscreenGuard({ active: fsRequired, onExit: reportFullscreenLoss });
+  useEffect(() => {
+    if (fs.isFs) {
+      fsPenalized.current = false;
+      setFsLostInPlay(false);
+    }
+  }, [fs.isFs]);
+
+  // Automatically resume the timer when entering a sector from the transition/lobby state.
+  // The sector clock only starts once fullscreen is confirmed, so gameplay can
+  // never begin (or resume) outside fullscreen.
+  useEffect(() => {
+    if (!(state?.isTransition && !levelCompleteCard && fs.isFs)) return undefined;
+    // We are on the active game view, but the server is paused in transition.
+    // Tell the server we have entered the sector so the timer resumes. Retries
+    // until the server leaves the transition state (a single failed/rate-limited
+    // request used to leave the player stuck on the paused screen).
+    const attempt = () => {
+      if (enteringSector.current) return;
+      if (!fs.ensure()) return;
+      enteringSector.current = true;
+      sendAction('ENTER_SECTOR')
+        .catch(console.error)
+        .finally(() => { enteringSector.current = false; });
+    };
+    attempt();
+    const id = setInterval(attempt, 2000);
+    return () => clearInterval(id);
+  }, [state?.isTransition, levelCompleteCard, sendAction, fs.isFs]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ---------------------------------------------------------------------
   // Every hook call for this component lives above this line, unconditionally,
   // in the same order on every render (Rules of Hooks). Everything below is
@@ -253,24 +306,33 @@ export default function GamePage() {
     state.status !== 'failed';
   const idleHint = useIdleHint(level, flash, idleHintEnabled);
 
+  // Session still loading (or a transient fetch failure while signed in): show a
+  // status screen, not the "access denied / Squad Login" page.
+  if (!state && (loading || isLoggedIn())) {
+    return (
+      <div className="ds-page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="ds-card ds-card-body ds-stack" style={{ alignItems: 'center', textAlign: 'center' }}>
+          <p className="ds-loading"><span className="ds-spinner" /> {loading ? 'Synchronizing session telemetry…' : 'Reconnecting to Echo Station…'}</p>
+          {!loading && error && <p className="ds-mono-sm" style={{ margin: 0 }}>{error}</p>}
+        </div>
+      </div>
+    );
+  }
+
   if (!state) {
     return (
-      <div className="az-game-unauth-screen">
-        <div className="az-scene-bg" />
-        <div className="az-shell az-unauth-card">
-          <span className="az-badge az-unauth-badge">
-            <span className="az-status-beacon" /> TACTICAL CLEARANCE REQUIRED
-          </span>
-          <h2 className="az-title az-unauth-title">ECHO STATION // ACCESS DENIED</h2>
-          <p className="az-hint az-unauth-hint">
-            Direct operational telemetry link requires an authorized operative profile.
-          </p>
-
-          <div className="az-actions az-unauth-actions">
-            <Link to="/login">
-              <button className="az-btn-primary az-btn-large" onMouseEnter={() => sfx.hover()}>
-                Squad Login
-              </button>
+      <div className="ds-page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--ds-margin)' }}>
+        <div className="ds-card" style={{ maxWidth: 460, width: '100%', borderColor: 'var(--ds-danger)' }}>
+          <div className="ds-card-header">
+            <span className="ds-badge ds-badge-danger ds-badge-chamfer">Tactical clearance required</span>
+          </div>
+          <div className="ds-card-body ds-stack">
+            <h2 className="ds-title" style={{ fontSize: 26 }}>Echo Station // Access denied</h2>
+            <p className="ds-mono-sm" style={{ margin: 0 }}>
+              Direct operational telemetry link requires an authorized operative profile.
+            </p>
+            <Link to="/login" className="ds-btn ds-btn-primary ds-btn-block" onMouseEnter={() => sfx.hover()}>
+              Squad login
             </Link>
           </div>
         </div>
@@ -284,111 +346,88 @@ export default function GamePage() {
         <EnvironmentBackdrop levelIndex={0} />
         <GameHUD state={state} />
         <div className="az-deploy-staging-overlay">
-          <div className="az-glass-panel az-deploy-staging-card">
-            <span className="az-badge">
-              <span className="az-status-beacon" /> SQUAD MISSION STAGING
-            </span>
-            <h2 className="az-title" style={{ margin: '10px 0' }}>READY FOR INFILTRATION</h2>
-            <p className="az-hint" style={{ marginBottom: 20 }}>
-              Operative link established. Synchronized chronometer and shield telemetry are initialized.
-            </p>
-            <button
-              className="az-btn-primary az-btn-large"
-              onClick={async () => {
-                sfx.click();
-                sfx.levelTransition();
-                await start();
-              }}
-              onMouseEnter={() => sfx.hover()}
-            >
-              INITIATE SECTOR ZERO PROTOCOL ▸
-            </button>
+          <div className="ds-page ds-page-embed">
+            <div className="ds-card" style={{ maxWidth: 480, width: '100%' }}>
+              <div className="ds-card-header">
+                <span className="ds-badge ds-badge-chamfer"><span className="ds-dot ds-dot-live" /> Squad mission staging</span>
+              </div>
+              <div className="ds-card-body ds-stack">
+                <h2 className="ds-title" style={{ fontSize: 26 }}>Ready for infiltration</h2>
+                <p className="ds-mono-sm" style={{ margin: 0 }}>
+                  Operative link established. Synchronized chronometer and shield telemetry are initialized.
+                </p>
+                <button
+                  className="ds-btn ds-btn-primary ds-btn-block"
+                  onClick={async () => {
+                    sfx.click();
+                    sfx.levelTransition();
+                    await start();
+                  }}
+                  onMouseEnter={() => sfx.hover()}
+                >
+                  Initiate sector zero protocol ▸
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  if (state.status === 'completed') return <CompletionScreen state={state} onLeaderboard={() => nav('/leaderboard')} />;
-  if (state.status === 'failed') return <GameOverScreen state={state} onLeaderboard={() => nav('/leaderboard')} />;
+  // Not fullscreen -> nothing playable is rendered at all, so no gameplay
+  // control can be clicked. Applies to every level, tutorial, recovery and paused view.
+  if (fsRequired && !fs.isFs) {
+    return <FullscreenRequiredGate onEnter={fs.enter} wasViolation={fsLostInPlay} />;
+  }
+
+  if (state.status === 'completed') return <CompletionScreen state={state} />;
+  if (state.status === 'failed') return <GameOverScreen state={state} />;
 
   if (levelCompleteCard) {
-    const levelNumber = (levelCompleteCard.fromLevel ?? 0) + 1;
+    const levelName = levelLabel(levelCompleteCard.fromLevel ?? 0);
     return (
-      <div className="az-level-complete-celebration-viewport">
-        {/* Animated Celebration Particles & Portal Glow */}
-        <div className="az-celebration-backdrop">
-          <div className="az-portal-light-beam" />
-          <div className="az-portal-energy-burst" />
-        </div>
-
-        <div className="az-celebration-container">
-          {/* Center Left: Glowing Exit Portal & Robot Visual */}
-          <div className="az-celebration-stage">
-            <h1 className="az-celebration-title">LEVEL {levelNumber} COMPLETE!</h1>
-            
-            <div className="az-celebration-portal-frame">
-              <div className="az-celebration-exit-sign">EXIT</div>
-              <div className="az-celebration-portal-vortex" />
-              <div className="az-celebration-robot" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconRobot size={80} color="#00f0ff" />
-              </div>
+      <div className="ds-page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--ds-margin)' }}>
+        <div className="ds-card" style={{ maxWidth: 560, width: '100%', borderColor: 'var(--ds-success)' }}>
+          <div className="ds-card-header">
+            <span className="ds-badge ds-badge-success ds-badge-chamfer"><IconCheck size={11} color="currentColor" /> Sector declassified</span>
+            <span className="ds-mono-sm">Exit portal open</span>
+          </div>
+          <div className="ds-card-body ds-stack" style={{ gap: 'var(--ds-space-lg)' }}>
+            <div className="ds-stack" style={{ alignItems: 'center', textAlign: 'center', gap: 'var(--ds-space-sm)' }}>
+              <IconRobot size={44} color="#d4a853" />
+              <h1 className="ds-title">{levelName} Complete</h1>
+              <p className="ds-body" style={{ margin: 0, fontStyle: 'italic' }}>&ldquo;Great job! You're getting better at this!&rdquo;</p>
             </div>
 
-            {/* Bottom celebratory speech bubble */}
-            <div className="az-celebration-quote-bubble">
-              <span className="az-quote-robot-icon"><IconStar size={16} color="#00f0ff" /></span>
-              <p className="az-quote-text">Great job! You're getting better at this!</p>
+            <div className="ds-stack" style={{ gap: 'var(--ds-space-sm)' }}>
+              <span className="ds-label ds-accent" style={{ paddingBottom: 4, borderBottom: '1px solid var(--ds-frame)' }}>Mission summary</span>
+              <DebriefRows rows={[
+                ['Evidence files collected', '3/3'],
+                ['Security logs analysed', '2/2'],
+                ['Reached exit safely', '1/1'],
+              ]} />
+            </div>
+
+            <div className="ds-stack" style={{ gap: 'var(--ds-space-sm)' }}>
+              <span className="ds-label ds-accent" style={{ paddingBottom: 4, borderBottom: '1px solid var(--ds-frame)' }}>Rewards</span>
+              <div className="ds-row">
+                <span className="ds-badge"><IconStar size={12} color="currentColor" /> +100 XP</span>
+                <span className="ds-badge"><IconCoin size={12} color="currentColor" /> +50 Credits</span>
+              </div>
             </div>
           </div>
-
-          {/* Right Side: Mission Summary & Rewards */}
-          <div className="az-celebration-summary-card">
-            <h3 className="az-summary-card-title">Mission Summary</h3>
-            
-            <div className="az-summary-checklist">
-              <div className="az-summary-check-row">
-                <span className="az-summary-check-icon"><IconCheck size={14} /></span>
-                <span className="az-summary-check-label">Evidence Files Collected</span>
-                <span className="az-summary-check-val">3/3</span>
-              </div>
-              <div className="az-summary-check-row">
-                <span className="az-summary-check-icon"><IconCheck size={14} /></span>
-                <span className="az-summary-check-label">Security Logs Analysed</span>
-                <span className="az-summary-check-val">2/2</span>
-              </div>
-              <div className="az-summary-check-row">
-                <span className="az-summary-check-icon"><IconCheck size={14} /></span>
-                <span className="az-summary-check-label">Reached Exit Safely</span>
-                <span className="az-summary-check-val">1/1</span>
-              </div>
-            </div>
-
-            <div className="az-celebration-rewards-section">
-              <h4 className="az-rewards-section-title">Rewards</h4>
-              <div className="az-rewards-capsule-row">
-                <div className="az-reward-chip az-reward-xp">
-                  <span className="az-reward-star"><IconStar size={16} /></span>
-                  <span className="az-reward-val">+100 XP</span>
-                </div>
-                <div className="az-reward-chip az-reward-credits">
-                  <span className="az-reward-coin"><IconCoin size={16} /></span>
-                  <span className="az-reward-val">+50 Credits</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="az-celebration-meta-row">
-              <span className="az-meta-item"><IconChrono size={13} style={{ marginRight: 4 }} /> Time: {formatClock(levelCompleteCard.timeLeft)}</span>
-              <span className="az-meta-item"><IconShield size={13} color="#10b981" fill style={{ marginRight: 4 }} /> Shields: {levelCompleteCard.lives}</span>
-            </div>
-
-            <button 
-              className="az-btn-primary az-btn-large az-celebration-next-btn"
+          <div className="ds-card-footer">
+            <span className="ds-row" style={{ gap: 'var(--ds-space-md)' }}>
+              <span className="ds-mono-sm"><IconChrono size={12} color="currentColor" /> Time: {formatClock(levelCompleteCard.timeLeft)}</span>
+              <span className="ds-mono-sm"><IconShield size={12} color="#5e7862" fill /> Shields: {levelCompleteCard.level >= 4 ? 'UNLIMITED' : levelCompleteCard.lives}</span>
+            </span>
+            <button
+              className="ds-btn ds-btn-primary"
               onClick={proceedToMap}
               onMouseEnter={() => sfx.hover()}
             >
-              Next Level →
+              Next level →
             </button>
           </div>
         </div>
@@ -410,17 +449,46 @@ export default function GamePage() {
     );
   }
 
+  // Automatic hand-off into a sector (not an admin pause): a full-screen loading page.
+  if (state.status === 'paused' && state.isTransition) {
+    const ch = chapterFor(state.currentLevel ?? 0);
+    return (
+      <div className="ds-page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--ds-margin)' }}>
+        <div className="ds-stack" style={{ alignItems: 'center', textAlign: 'center', gap: 'var(--ds-space-md)', width: 'min(460px, 100%)' }} role="status" aria-live="polite">
+          <svg viewBox="0 0 100 100" width="64" height="64" aria-hidden="true">
+            <circle cx="50" cy="50" r="44" stroke="#D4A853" strokeWidth="1.5" fill="none" opacity="0.4" />
+            <circle cx="50" cy="50" r="38" stroke="#D4A853" strokeWidth="0.8" strokeDasharray="3 3" fill="none" opacity="0.6" />
+            <circle cx="50" cy="50" r="6" fill="#D4A853" />
+            <path d="M50 2v16M50 82v16M2 50h16M82 50h16" stroke="#D4A853" strokeWidth="1.5" />
+          </svg>
+          <span className="ds-label ds-accent">{ch.chapter} // {state.currentLevel === 0 ? 'Orientation' : `Sector 0${state.currentLevel}`}</span>
+          <h1 className="ds-title">{ch.name}</h1>
+          <p className="ds-mono-sm" style={{ margin: 0 }}>{ch.tagline}</p>
+          <div className="ds-loadbar" aria-hidden="true"><span /></div>
+          <p className="ds-loading" style={{ justifyContent: 'center' }}>
+            <span className="ds-spinner" /> Loading game…
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (state.status === 'paused') {
     return (
       <div className="az-game-viewport">
         <GameHUD state={state} />
         <div className="az-game-scroll">
           <div className="az-shell">
-            <div className="az-panel" style={{ marginTop: 20, textAlign: 'center' }}>
-              <p style={{ color: 'var(--az-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                <span className="az-gate-pulse" /> SESSION PAUSED
+            <div className="ds-page ds-page-embed">
+            <div className="ds-card ds-card-body ds-stack" style={{ marginTop: 20, alignItems: 'center', textAlign: 'center' }}>
+              <span className={`ds-badge ${state.isTransition ? '' : 'ds-badge-muted'}`}>
+                <span className={`ds-dot ${state.isTransition ? 'ds-dot-live' : 'ds-dot-warn'}`} />
+                {state.isTransition ? 'Entering sector' : 'Session paused'}
+              </span>
+              <p className="ds-mono-sm" style={{ margin: 0 }}>
+                {state.isTransition ? 'Establishing link to the sector…' : 'An admin has paused your run. Please wait.'}
               </p>
-              <p className="az-hint">An admin has paused your run. Please wait.</p>
+            </div>
             </div>
           </div>
         </div>
@@ -463,9 +531,14 @@ export default function GamePage() {
       <EnvironmentBackdrop levelIndex={state.currentLevel ?? 0} />
       {violation && <SecurityViolationModal violation={violation} onReturn={handleReturnFromViolation} />}
       {lifeLostPulse && (
-        <div key={JSON.stringify(flash?.result)} className="az-shield-compromised-overlay">
-          <h1>SHIELD COMPROMISED</h1>
-          <p>SYSTEM RECALIBRATING...</p>
+        <div className="ds-page ds-page-embed">
+          <div key={JSON.stringify(flash?.result)} className="ds-shield-flash" role="alert">
+            <div>
+              <span className="ds-badge ds-badge-danger">Critical integrity failure // -1 shield unit</span>
+              <h1 className="ds-h1" style={{ margin: 'var(--ds-space-sm) 0 4px', color: 'var(--ds-danger-text)' }}>Shield compromised</h1>
+              <p className="ds-mono-sm" style={{ margin: 0 }}>SYSTEM RECALIBRATING...</p>
+            </div>
+          </div>
         </div>
       )}
       {showEntry && (
@@ -485,52 +558,64 @@ export default function GamePage() {
         {Scene ? (
           <Scene level={level} onAction={handleAction} busy={busy} flash={flash} setChatFocusRequest={setChatFocusRequest} />
         ) : (
-          <div className="az-panel" style={{ margin: 40, textAlign: 'center' }}>Loading sector telemetry…</div>
+          <div className="ds-page ds-page-embed">
+            <p className="ds-card ds-card-body ds-loading" style={{ margin: 40, justifyContent: 'center' }}>
+              <span className="ds-spinner" /> Loading sector telemetry…
+            </p>
+          </div>
         )}
       </div>
 
       {/* Floating HUD Layer */}
       <div className="az-game-hud-overlay">
         {flash?.lifeLost && <FailureBanner result={flash} onDismiss={() => setFlash(null)} />}
-        {error && <p className="az-error az-floating-error">{error}</p>}
+        {error && (
+          <div className="ds-page ds-page-embed">
+            <p className="ds-alert ds-alert-error ds-notice-float" role="alert" style={{ margin: 0 }}>{error}</p>
+          </div>
+        )}
 
         <ObjectiveHUD objective={level?.objective} />
 
         {idleHint && !flash?.lifeLost && (
-          <div className="az-idle-hint">
-            {idleHint.speaker ? <strong>{idleHint.speaker}: </strong> : null}{idleHint.line}
+          <div className="ds-page ds-page-embed">
+            <div className="ds-notice ds-idle-hint" role="status">
+              {idleHint.speaker ? <strong className="ds-accent">{idleHint.speaker}: </strong> : null}{idleHint.line}
+            </div>
           </div>
         )}
 
         {isRealLevel && (
-          <div className="az-emergency-terminal-dock">
-            {!hintPanelOpen ? (
-              <button className="az-emergency-btn" onClick={() => { sfx.click(); setHintPanelOpen(true); }}>
-                <IconWarning size={14} style={{ marginRight: 6 }} /> EMERGENCY TERMINAL
-              </button>
-            ) : (
-              <div className="az-terminal">
-                <div className="az-terminal-titlebar">
-                  <span className="az-terminal-dot" /> EMERGENCY TERMINAL
-                  <button className="az-chat-minimize" onClick={() => setHintPanelOpen(false)}>— CLOSE</button>
-                </div>
-                <div style={{ padding: '10px 14px' }}>
-                  <div className="az-actions">
-                    {[1, 2].map((n) => (
-                      <button
-                        key={n}
-                        className={`az-hint-btn ${state.hintsUsed >= n ? 'is-used' : ''}`}
-                        disabled={hintBusy || state.hintsUsed >= n}
-                        onClick={handleHint}
-                      >
-                        Hint {n} {n === 2 ? '(-1 life)' : ''}
-                      </button>
-                    ))}
+          <div className="ds-page ds-page-embed">
+            <div className="ds-emergency-dock">
+              {!hintPanelOpen ? (
+                <button className="ds-btn ds-btn-secondary ds-btn-sm" style={{ borderColor: 'var(--ds-primary)', color: 'var(--ds-primary)' }} onClick={() => { sfx.click(); setHintPanelOpen(true); }}>
+                  <IconWarning size={12} color="currentColor" /> Emergency terminal
+                </button>
+              ) : (
+                <div className="ds-comms">
+                  <div className="ds-comms-head">
+                    <span className="ds-label ds-accent"><IconWarning size={12} color="currentColor" /> Emergency terminal</span>
+                    <button className="ds-btn ds-btn-ghost ds-btn-sm" onClick={() => setHintPanelOpen(false)}>— Close</button>
                   </div>
-                  {hintText && <p className="az-hint-text">{hintText}</p>}
+                  <div className="ds-stack" style={{ padding: 'var(--ds-space-md)', gap: 'var(--ds-space-sm)' }}>
+                    <div className="ds-row">
+                      {[1, 2].map((n) => (
+                        <button
+                          key={n}
+                          className={`ds-btn ds-btn-sm ${n === 2 ? 'ds-btn-danger' : 'ds-btn-secondary'}`}
+                          disabled={hintBusy || state.hintsUsed >= n}
+                          onClick={handleHint}
+                        >
+                          Hint {n} {n === 2 ? '(-1 life)' : ''}
+                        </button>
+                      ))}
+                    </div>
+                    {hintText && <p className="ds-alert ds-alert-warn" style={{ margin: 0 }}>{hintText}</p>}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
@@ -559,16 +644,21 @@ function formatClock(seconds) {
 
 function FailureBanner({ result, onDismiss }) {
   return (
-    <div className="az-glass-panel az-failure-banner">
-      <div className="az-failure-banner-header">
-        <span className="az-danger-dot" />
-        <h3 className="az-title az-failure-banner-title">MISSION STEP FAILED</h3>
+    <div className="ds-page ds-page-embed">
+      <div className="ds-notice ds-notice-float is-danger" role="alert">
+        <div className="ds-stack" style={{ gap: 'var(--ds-space-sm)' }}>
+          <div className="ds-row" style={{ justifyContent: 'space-between' }}>
+            <span className="ds-badge ds-badge-danger"><span className="ds-dot ds-dot-danger" /> Mission step failed</span>
+            <span className="ds-badge ds-badge-danger">-1 shield life lost</span>
+          </div>
+          {result.result?.hint && <p className="ds-body" style={{ margin: 0, fontSize: 15, lineHeight: '22px' }}>{result.result.hint}</p>}
+          <div className="ds-row" style={{ justifyContent: 'flex-end' }}>
+            <button className="ds-btn ds-btn-secondary ds-btn-sm" onClick={onDismiss}>
+              Acknowledge &amp; continue ▸
+            </button>
+          </div>
+        </div>
       </div>
-      <p className="az-failure-banner-penalty">-1 SHIELD LIFE LOST</p>
-      {result.result?.hint && <p className="az-hint az-failure-banner-hint">{result.result.hint}</p>}
-      <button className="az-btn-secondary" onClick={onDismiss}>
-        Acknowledge &amp; Continue ▸
-      </button>
     </div>
   );
 }
@@ -588,179 +678,190 @@ function FinalRevealPanel({ reveal }) {
   if (!reveal) return null;
   const { scores, observed, line } = reveal;
   return (
-    <div className="az-glass-panel az-glitch az-reveal-panel">
-      <div className="az-reveal-beat az-reveal-beat-1" style={{ display: 'flex', justifyContent: 'center' }}>
-        <AICore color="#eaf6ff" active />
+    <div className="ds-card" style={{ borderColor: 'var(--ds-primary)' }}>
+      <div className="ds-card-header">
+        <span className="ds-label ds-accent">Agent Zero // Overseer reveal</span>
+        <span className="ds-stamp">Overseer eyes only</span>
       </div>
-      <p className="az-sub az-reveal-core-title">AGENT ZERO // OVERSEER REVEAL</p>
-      <p className="az-reveal-beat az-reveal-beat-1 az-reveal-quote-1">
-        &ldquo;You thought you were testing me.&rdquo;
-      </p>
-      <p className="az-reveal-beat az-reveal-beat-2 az-reveal-quote-2">
-        &ldquo;I was testing you.&rdquo;
-      </p>
+      <div className="ds-card-body ds-stack" style={{ gap: 'var(--ds-space-lg)' }}>
+        <div className="az-reveal-beat az-reveal-beat-1 ds-stack" style={{ alignItems: 'center', textAlign: 'center', gap: 'var(--ds-space-sm)' }}>
+          <AICore color="#ede8df" active />
+          <p className="ds-h1" style={{ margin: 0 }}>&ldquo;You thought you were testing me.&rdquo;</p>
+        </div>
+        <p className="az-reveal-beat az-reveal-beat-2 ds-display" style={{ margin: 0, textAlign: 'center', fontSize: 'clamp(28px, 4vw, 40px)', color: 'var(--ds-danger-text)' }}>
+          &ldquo;I was testing you.&rdquo;
+        </p>
 
-      {/* Surveillance screens flickering on with snippets of the run itself */}
-      <div className="az-reveal-beat az-reveal-beat-flashback az-reveal-flashback">
-        <p className="az-sub" style={{ fontSize: '0.62rem', opacity: 0.75, letterSpacing: '0.15em' }}>PLAYBACK // ARCHIVE TELEMETRY</p>
-        <p className="az-reveal-flashback-line">▸ {observed.helpRequests} requests for direct guidance, logged.</p>
-        <p className="az-reveal-flashback-line">▸ {observed.inspections} optional investigations, logged.</p>
-        <p className="az-reveal-flashback-line">▸ {observed.retries} retries after failure, logged.</p>
-      </div>
-
-      <div className="az-reveal-beat az-reveal-beat-3">
-        <p className="az-sub az-reveal-breakdown-title">TEAM BEHAVIOUR MATRIX</p>
-        <div className="az-behavior-matrix">
-          {Object.entries(scores).map(([dim, val]) => (
-            <div key={dim} className="az-behavior-row">
-              <span className="az-behavior-label">{DIMENSION_LABELS[dim] || dim}</span>
-              <div className="az-behavior-bar-wrap">
-                <div className="az-behavior-bar-fill" style={{ width: `${Math.min(100, val)}%` }} />
-              </div>
-              <span className="az-behavior-val">{val}%</span>
-            </div>
-          ))}
+        {/* Playback of the run's own telemetry */}
+        <div className="az-reveal-beat az-reveal-beat-flashback ds-card-inset" style={{ padding: 'var(--ds-space-md)' }}>
+          <span className="ds-label">Playback // Archive telemetry</span>
+          <p className="ds-mono" style={{ margin: '6px 0 0' }}>▸ {observed.helpRequests} requests for direct guidance, logged.</p>
+          <p className="ds-mono" style={{ margin: 0 }}>▸ {observed.inspections} optional investigations, logged.</p>
+          <p className="ds-mono" style={{ margin: 0 }}>▸ {observed.retries} retries after failure, logged.</p>
         </div>
 
-        <p className="az-sub az-reveal-breakdown-title" style={{ marginTop: 16 }}>OPERATIVE ACTIONS LOGGED</p>
-        <ul className="az-observed-list">
-          <li><strong>{observed.helpRequests}</strong> direct guidance requests</li>
-          <li><strong>{observed.inspections}</strong> optional telemetry scans</li>
-          <li><strong>{observed.deliberateRisks}</strong> high-risk tactical decisions</li>
-          <li><strong>{observed.retries}</strong> tactical resets</li>
-          <li><strong>{observed.negotiationMoments}</strong> prompt engineering interactions</li>
-        </ul>
+        <div className="az-reveal-beat az-reveal-beat-3 ds-stack" style={{ gap: 'var(--ds-space-lg)' }}>
+          <div className="ds-stack" style={{ gap: 'var(--ds-space-sm)' }}>
+            <span className="ds-label ds-accent" style={{ paddingBottom: 4, borderBottom: '1px solid var(--ds-frame)' }}>Team behaviour matrix</span>
+            {Object.entries(scores).map(([dim, val]) => (
+              <div key={dim} className="ds-row" style={{ flexWrap: 'nowrap', gap: 'var(--ds-space-md)' }}>
+                <span className="ds-mono" style={{ width: 130, flex: 'none' }}>{DIMENSION_LABELS[dim] || dim}</span>
+                <div className="ds-progress" style={{ flex: 1 }}>
+                  <span style={{ width: `${Math.min(100, val)}%` }} />
+                </div>
+                <span className="ds-num" style={{ width: 44, textAlign: 'right' }}>{val}%</span>
+              </div>
+            ))}
+          </div>
 
-        <p className="az-reveal-final-line">&ldquo;{line}&rdquo;</p>
+          <div className="ds-stack" style={{ gap: 'var(--ds-space-sm)' }}>
+            <span className="ds-label ds-accent" style={{ paddingBottom: 4, borderBottom: '1px solid var(--ds-frame)' }}>Operative actions logged</span>
+            <DebriefRows rows={[
+              ['Direct guidance requests', observed.helpRequests],
+              ['Optional telemetry scans', observed.inspections],
+              ['High-risk tactical decisions', observed.deliberateRisks],
+              ['Tactical resets', observed.retries],
+              ['Prompt engineering interactions', observed.negotiationMoments],
+            ]} />
+          </div>
+
+          <p className="ds-h2" style={{ margin: 0, textAlign: 'center', fontStyle: 'italic' }}>&ldquo;{line}&rdquo;</p>
+        </div>
       </div>
     </div>
   );
 }
 
-function CompletionScreen({ state, onLeaderboard }) {
+// Label/value rows shared by the end screens.
+function DebriefRows({ rows }) {
+  return (
+    <div className="ds-list">
+      {rows.map(([k, v], i) => (
+        <div key={i} className="ds-row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+          <span className="ds-label">{k}</span>
+          <span className="ds-mono" style={{ textAlign: 'right' }}>{v}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CompletionScreen({ state }) {
   useEffect(() => { sfx.reveal(); }, []);
   return (
-    <div className="az-debrief-page">
-      <div className="az-scene-bg" />
-      <main className="az-shell az-debrief-shell">
-        <div className="az-debrief-header">
-          <span className="az-badge az-badge-success">
-            <span className="az-status-beacon" /> ECHO STATION — GAME COMPLETE
+    <div className="ds-page" style={{ minHeight: '100vh' }}>
+      <main className="ds-container ds-stack" style={{ maxWidth: 860, gap: 'var(--ds-space-lg)' }}>
+        <header className="ds-stack" style={{ gap: 'var(--ds-space-sm)', alignItems: 'center', textAlign: 'center' }}>
+          <span className="ds-badge ds-badge-success ds-badge-chamfer">
+            <span className="ds-dot ds-dot-live" /> Echo Station — game complete
           </span>
-          <h1 className="az-title az-debrief-title">MISSION COMPLETE</h1>
-        </div>
-        
-        <div className="az-glass-panel az-debrief-card">
-          <p className="az-sub az-debrief-card-label">MISSION PERFORMANCE SUMMARY</p>
-          <div className="az-debrief-grid">
-            <span className="az-debrief-grid-label">SHIELDS PRESERVED:</span>
-            <span className="az-font-mono az-debrief-grid-val" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              {Array.from({ length: Math.max(0, state.lives) }).map((_, i) => (
-                <IconShield key={i} size={14} color="#10b981" fill />
-              ))} ({state.lives})
-            </span>
-            
-            <span className="az-debrief-grid-label">RECOVERY ATTEMPTS:</span>
-            <span className="az-font-mono az-debrief-grid-val">{state.recoveryAttemptsUsed}</span>
-            
-            <span className="az-debrief-grid-label">MISSION CHRONO:</span>
-            <span className="az-font-mono az-debrief-grid-val">{formatClock((state.gameDurationSeconds ?? 900) - (state.timeRemainingSeconds ?? 0))}</span>
-            
-            <span className="az-debrief-grid-label az-accent-text" style={{ fontWeight: 700 }}>FINAL EVALUATION SCORE:</span>
-            <span className="az-font-mono az-debrief-grid-val az-debrief-score">{state.score.toLocaleString()}</span>
-          </div>
+          <h1 className="ds-display">Mission Complete</h1>
+        </header>
 
-          {state.finalReveal && (
-            <div className="az-debrief-psy-grid">
-              <div className="az-debrief-psy-item">
-                <span className="az-debrief-grid-label">PRIMARY TRAIT:</span>
-                <span className="az-font-mono az-debrief-grid-val">{state.finalReveal.primary.replace('_', ' ')}</span>
+        <div className="ds-card">
+          <div className="ds-card-header">
+            <span className="ds-label ds-accent">Mission performance summary</span>
+            <span className="ds-mono-sm">Classification: archival eyes only</span>
+          </div>
+          <div className="ds-card-body ds-stack" style={{ gap: 'var(--ds-space-lg)' }}>
+            <div className="ds-grid ds-grid-4" style={{ gap: 'var(--ds-space-sm)' }}>
+              <div className="ds-stat">
+                <span className="ds-label">Final evaluation score</span>
+                <span className="ds-stat-value ds-accent">{state.score.toLocaleString()}</span>
+                <span className="ds-stat-hint">pts</span>
               </div>
-              <div className="az-debrief-psy-item">
-                <span className="az-debrief-grid-label">SECONDARY TRAIT:</span>
-                <span className="az-font-mono az-debrief-grid-val">{state.finalReveal.secondary.replace('_', ' ')}</span>
+              <div className="ds-stat">
+                <span className="ds-label">Mission chrono</span>
+                <span className="ds-stat-value">{formatClock((state.gameDurationSeconds ?? 900) - (state.timeRemainingSeconds ?? 0))}</span>
               </div>
-              <div className="az-debrief-psy-item" style={{ gridColumn: '1 / -1', marginTop: '8px' }}>
-                <span className="az-debrief-grid-label">BEHAVIORAL ANALYSIS:</span>
-                <span className="az-font-mono az-debrief-grid-val" style={{ whiteSpace: 'normal', lineHeight: 1.4, color: 'var(--az-text-bright)' }}>
-                  "{state.finalReveal.line}"
+              <div className="ds-stat">
+                <span className="ds-label">Shields preserved</span>
+                <span className="ds-row" style={{ gap: 4, minHeight: 35 }}>
+                  {Array.from({ length: Math.max(0, state.lives) }).map((_, i) => (
+                    <IconShield key={i} size={14} color="#5e7862" fill />
+                  ))}
                 </span>
+                <span className="ds-stat-hint">({state.lives})</span>
+              </div>
+              <div className="ds-stat">
+                <span className="ds-label">Recovery attempts</span>
+                <span className="ds-stat-value">{state.recoveryAttemptsUsed}</span>
               </div>
             </div>
-          )}
+
+            {state.finalReveal && (
+              <div className="ds-stack" style={{ gap: 'var(--ds-space-sm)' }}>
+                <span className="ds-label ds-accent" style={{ paddingBottom: 4, borderBottom: '1px solid var(--ds-frame)' }}>Psychometric squad dossier</span>
+                <DebriefRows rows={[
+                  ['Primary trait', state.finalReveal.primary.replace('_', ' ')],
+                  ['Secondary trait', state.finalReveal.secondary.replace('_', ' ')],
+                ]} />
+                <div className="ds-card-inset" style={{ padding: 'var(--ds-space-md)' }}>
+                  <span className="ds-label">Behavioral analysis</span>
+                  <p className="ds-body" style={{ margin: '4px 0 0', fontStyle: 'italic' }}>"{state.finalReveal.line}"</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <FinalRevealPanel reveal={state.finalReveal} />
 
-        <div className="az-actions az-debrief-actions">
-          <button
-            className="az-btn-primary az-btn-large"
-            onClick={() => { sfx.click(); onLeaderboard(); }}
-            onMouseEnter={() => sfx.hover()}
-          >
-            <IconTrophy size={16} style={{ marginRight: 8 }} /> View Global Rankings
-          </button>
-          <Link to="/">
-            <button className="az-btn-secondary az-btn-large" onMouseEnter={() => sfx.hover()}>
-              Home Terminal
-            </button>
+        <div className="ds-row" style={{ justifyContent: 'center' }}>
+          <Link to="/" className="ds-btn ds-btn-secondary" onMouseEnter={() => sfx.hover()}>
+            Home terminal
           </Link>
         </div>
       </main>
+      <div className="ds-footer-strip">Echo Station // Debrief // Top secret // Zero</div>
     </div>
   );
 }
 
-function GameOverScreen({ state, onLeaderboard }) {
+function GameOverScreen({ state }) {
   useEffect(() => { sfx.fail(); }, []);
   return (
-    <div className="az-debrief-page">
-      <div className="az-scene-bg" />
-      <main className="az-shell az-debrief-shell">
-        <div className="az-debrief-header">
-          <span className="az-badge az-badge-danger">
-            <span className="az-danger-dot" /> CRITICAL BREACH // SIGNAL LOST
+    <div className="ds-page" style={{ minHeight: '100vh' }}>
+      <main className="ds-container ds-stack" style={{ maxWidth: 720, gap: 'var(--ds-space-lg)' }}>
+        <header className="ds-stack" style={{ gap: 'var(--ds-space-sm)', alignItems: 'center', textAlign: 'center' }}>
+          <span className="ds-badge ds-badge-danger ds-badge-chamfer">
+            <span className="ds-dot ds-dot-danger" /> Critical breach // Signal lost
           </span>
-          <h1 className="az-title az-glitch is-critical az-debrief-title" style={{ color: 'var(--az-danger)' }}>
-            MISSION RUN TERMINATED
-          </h1>
-        </div>
-        
-        <div className="az-glass-panel az-debrief-card" style={{ borderColor: 'var(--az-danger)' }}>
-          <p className="az-sub az-debrief-card-label" style={{ color: 'var(--az-danger)' }}>FAILURE TELEMETRY</p>
-          <div className="az-debrief-grid">
-            <span className="az-debrief-grid-label">SECTOR REACHED:</span>
-            <span className="az-font-mono az-debrief-grid-val">Level {state.currentLevel} / 5</span>
+          <h1 className="ds-display" style={{ color: 'var(--ds-danger-text)' }}>Mission Run Terminated</h1>
+          <span className="ds-stamp">Revoked</span>
+        </header>
 
-            <span className="az-debrief-grid-label">FINAL RECORDED SCORE:</span>
-            <span className="az-font-mono az-debrief-grid-val az-accent-text">{state.score.toLocaleString()}</span>
-
-            <span className="az-debrief-grid-label">TIME SURVIVED:</span>
-            <span className="az-font-mono az-debrief-grid-val">{formatClock((state.gameDurationSeconds ?? 900) - (state.timeRemainingSeconds ?? 0))}</span>
-
-            <span className="az-debrief-grid-label">SHIELDS REMAINING:</span>
-            <span className="az-font-mono az-debrief-grid-val" style={{ color: 'var(--az-danger)' }}>0 (OFFLINE)</span>
-
-            <span className="az-debrief-grid-label">RECOVERY ATTEMPTS:</span>
-            <span className="az-font-mono az-debrief-grid-val">{state.recoveryAttemptsUsed}</span>
+        <div className="ds-card" style={{ borderColor: 'var(--ds-danger)' }}>
+          <div className="ds-card-header">
+            <span className="ds-label" style={{ color: 'var(--ds-danger-text)' }}>Failure telemetry</span>
+            <span className="ds-mono-sm">Session closed</span>
+          </div>
+          <div className="ds-card-body ds-stack" style={{ gap: 'var(--ds-space-lg)' }}>
+            <div className="ds-grid ds-grid-2" style={{ gap: 'var(--ds-space-sm)' }}>
+              <div className="ds-stat">
+                <span className="ds-label">Sector reached</span>
+                <span className="ds-stat-value">Level {state.currentLevel} / 5</span>
+              </div>
+              <div className="ds-stat">
+                <span className="ds-label">Final recorded score</span>
+                <span className="ds-stat-value ds-accent">{state.score.toLocaleString()}</span>
+              </div>
+            </div>
+            <DebriefRows rows={[
+              ['Time survived', formatClock((state.gameDurationSeconds ?? 900) - (state.timeRemainingSeconds ?? 0))],
+              ['Shields remaining', <span key="s" style={{ color: 'var(--ds-danger-text)' }}>0 (OFFLINE)</span>],
+              ['Recovery attempts', state.recoveryAttemptsUsed],
+            ]} />
           </div>
         </div>
 
-        <div className="az-actions az-debrief-actions">
-          <button
-            className="az-btn-primary az-btn-large"
-            onClick={() => { sfx.click(); onLeaderboard(); }}
-            onMouseEnter={() => sfx.hover()}
-          >
-            <IconTrophy size={16} style={{ marginRight: 8 }} /> View Global Rankings
-          </button>
-          <Link to="/">
-            <button className="az-btn-secondary az-btn-large" onMouseEnter={() => sfx.hover()}>
-              Home Terminal
-            </button>
+        <div className="ds-row" style={{ justifyContent: 'center' }}>
+          <Link to="/" className="ds-btn ds-btn-secondary" onMouseEnter={() => sfx.hover()}>
+            Home terminal
           </Link>
         </div>
       </main>
+      <div className="ds-footer-strip">Echo Station corridors locked // Classified eyes only</div>
     </div>
   );
 }

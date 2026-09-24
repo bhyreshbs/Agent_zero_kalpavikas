@@ -71,40 +71,59 @@ export default function RecoveryModal({ initialState }) {
 
   if (loading) {
     return (
-      <div className="az-recovery-shell">
-        <div className="az-glass-panel az-recovery-panel" style={{ textAlign: 'center', padding: '30px 20px' }}>
-          <span className="az-status-beacon" /> Booting emergency AI recovery protocol…
+      <div className="ds-page ds-page-embed">
+        <div className="ds-recovery">
+          <div className="ds-card ds-card-body">
+            <p className="ds-loading" style={{ justifyContent: 'center' }}>
+              <span className="ds-spinner" /> Booting emergency AI recovery protocol…
+            </p>
+          </div>
         </div>
       </div>
     );
   }
-  if (error) return <div className="az-glass-panel az-recovery-panel az-error">{error}</div>;
+  if (error) {
+    return (
+      <div className="ds-page ds-page-embed">
+        <div className="ds-recovery">
+          <p className="ds-alert ds-alert-error" role="alert">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (outcome) {
     return (
-      <div className="az-recovery-shell">
-        <div className={`az-glass-panel az-recovery-outcome ${outcome.correct ? 'is-success' : 'is-fail'}`} style={{ textAlign: 'center' }}>
-          {outcome.correct ? (
-            <>
-              <div className="az-recovery-outcome-icon is-success"><IconCheck size={24} color="#35f2c2" /></div>
-              <h3 className="az-recovery-outcome-title" style={{ color: 'var(--az-accent)' }}>SYSTEM RESTORED</h3>
-              <p className="az-recovery-outcome-sub" style={{ color: 'var(--az-accent)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                +1 RECOVERY SHIELD <IconShield size={14} color="#10b981" fill />
-              </p>
-              <button className="az-btn-primary az-btn-large" onClick={() => window.location.reload()}>
-                Return To Level ▸
-              </button>
-            </>
-          ) : (
-            <>
-              <div className="az-recovery-outcome-icon is-fail">✕</div>
-              <h3 className="az-recovery-outcome-title" style={{ color: 'var(--az-danger)' }}>RECOVERY FAILED</h3>
-              {outcome.expired && <p className="az-hint">Containment time window expired.</p>}
-              <button className="az-btn-secondary az-btn-large" onClick={() => window.location.reload()}>
-                Continue ▸
-              </button>
-            </>
-          )}
+      <div className="ds-page ds-page-embed">
+        <div className="ds-recovery">
+          <div
+            className="ds-card"
+            style={{ textAlign: 'center', borderColor: outcome.correct ? 'var(--ds-success)' : 'var(--ds-danger)' }}
+          >
+            <div className="ds-card-body ds-stack" style={{ alignItems: 'center' }}>
+              {outcome.correct ? (
+                <>
+                  <span className="ds-badge ds-badge-success"><IconCheck size={12} color="currentColor" /> Recovery complete</span>
+                  <h3 className="ds-h1" style={{ color: 'var(--ds-success-text)' }}>System restored</h3>
+                  <p className="ds-mono ds-accent" style={{ margin: 0, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    +1 recovery shield <IconShield size={14} color="#d4a853" fill />
+                  </p>
+                  <button className="ds-btn ds-btn-primary" onClick={() => window.location.reload()}>
+                    Return to level ▸
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="ds-badge ds-badge-danger">✕ Recovery failed</span>
+                  <h3 className="ds-h1" style={{ color: 'var(--ds-danger-text)' }}>Recovery failed</h3>
+                  {outcome.expired && <p className="ds-mono-sm" style={{ margin: 0 }}>Containment time window expired.</p>}
+                  <button className="ds-btn ds-btn-secondary" onClick={() => window.location.reload()}>
+                    Continue ▸
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -114,85 +133,90 @@ export default function RecoveryModal({ initialState }) {
   const stillMemorizing = puzzle.kind === 'memory_sequence' && !memorized;
 
   return (
-    <div className="az-recovery-shell">
-      <RecoveryChamber3D urgent={urgent} />
-      <div className="az-recovery-header">
-        <p className="az-sub az-recovery-warning" style={{ color: 'var(--az-danger)' }}>
-          <span className="az-danger-dot" /> ⚠ SYSTEM FAILURE — ALL LIVES LOST
-        </p>
-        <h2 className={`az-title az-recovery-title ${urgent ? 'az-glitch is-critical' : ''}`} style={{ color: urgent ? 'var(--az-danger)' : 'var(--az-accent)' }}>
-          RECOVERY PROTOCOL — {String(Math.max(0, secondsLeft)).padStart(2, '0')}s
-        </h2>
-      </div>
+    <div className="ds-page ds-page-embed">
+      <div className="ds-recovery">
+        <RecoveryChamber3D urgent={urgent} />
 
-      <div className={`az-glass-panel az-recovery-panel ${urgent ? 'is-urgent' : ''}`}>
-        <p className="az-sub az-recovery-sub">{puzzle.title || 'REPAIR THE AI'}</p>
-        <p className="az-recovery-prompt">
-          {stillMemorizing ? 'Memorize sequence — concealing in moments.' : puzzle.prompt}
-        </p>
+        <div className="ds-stack" style={{ alignItems: 'center', textAlign: 'center', gap: 'var(--ds-space-xs)', marginBottom: 'var(--ds-space-md)', position: 'relative', zIndex: 1 }}>
+          <span className="ds-badge ds-badge-danger"><span className="ds-dot ds-dot-danger" /> System failure — all lives lost</span>
+          <h2 className="ds-title" style={{ color: urgent ? 'var(--ds-danger-text)' : 'var(--ds-primary)' }}>
+            Recovery protocol — {String(Math.max(0, secondsLeft)).padStart(2, '0')}s
+          </h2>
+        </div>
 
-        {puzzle.sequence && (
-          <div className="az-recovery-row">
-            {puzzle.kind === 'memory_sequence' && memorized
-              ? puzzle.sequence.map((_, i) => <span key={i} className="az-recovery-token is-hidden">?</span>)
-              : puzzle.sequence.map((item, i) => <span key={i} className="az-recovery-token">{item}</span>)}
+        <div className="ds-card" style={{ position: 'relative', zIndex: 1, textAlign: 'center', borderColor: urgent ? 'var(--ds-danger)' : undefined }}>
+          <div className="ds-card-header">
+            <span className="ds-label ds-accent">{puzzle.title || 'Repair the AI'}</span>
+            <span className={`ds-badge ${urgent ? 'ds-badge-danger' : 'ds-badge-muted'}`}>{urgent ? 'Urgent' : 'Recovery window'}</span>
           </div>
-        )}
+          <div className="ds-card-body">
+            <p className="ds-body" style={{ margin: 0 }}>
+              {stillMemorizing ? 'Memorize sequence — concealing in moments.' : puzzle.prompt}
+            </p>
 
-        {puzzle.grid && !gridIsClickable && (
-          <div className="az-recovery-grid">
-            {puzzle.grid.map((item, i) => (
-              <span key={i} className="az-recovery-cell">{item}</span>
-            ))}
-          </div>
-        )}
+            {puzzle.sequence && (
+              <div className="ds-recovery-tokens">
+                {puzzle.kind === 'memory_sequence' && memorized
+                  ? puzzle.sequence.map((_, i) => <span key={i} className="ds-token is-hidden">?</span>)
+                  : puzzle.sequence.map((item, i) => <span key={i} className="ds-token">{item}</span>)}
+              </div>
+            )}
 
-        {puzzle.grid && gridIsClickable && (
-          <div className="az-recovery-grid az-recovery-grid-clickable">
-            {puzzle.grid.map((item, i) => (
-              <button
-                key={i}
-                disabled={picked !== null}
-                className={`az-recovery-cell-btn ${picked === item ? 'is-picked' : ''}`}
-                onClick={() => submit(item)}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        )}
+            {puzzle.grid && !gridIsClickable && (
+              <div className="ds-recovery-grid">
+                {puzzle.grid.map((item, i) => (
+                  <span key={i} className="ds-cell">{item}</span>
+                ))}
+              </div>
+            )}
 
-        {!gridIsClickable && memorized && (
-          <div className="az-recovery-options">
-            {puzzle.options.map((opt) => {
-              if (isRotation) {
-                const [symbol, angle] = String(opt).split('@');
-                return (
+            {puzzle.grid && gridIsClickable && (
+              <div className="ds-recovery-grid">
+                {puzzle.grid.map((item, i) => (
                   <button
-                    key={String(opt)}
+                    key={i}
                     disabled={picked !== null}
-                    className={`az-recovery-opt-btn ${picked === opt ? 'is-picked' : ''}`}
-                    onClick={() => submit(opt)}
+                    className={`ds-btn ds-cell-btn ${picked === item ? 'ds-btn-primary' : 'ds-btn-secondary'}`}
+                    onClick={() => submit(item)}
                   >
-                    <span className="az-recovery-rotation-preview" style={{ transform: `rotate(${angle || '0deg'})` }}>{symbol}</span>
+                    {item}
                   </button>
-                );
-              }
-              return (
-                <button
-                  key={String(opt)}
-                  disabled={picked !== null}
-                  className={`az-recovery-opt-btn ${picked === opt ? 'is-picked' : ''}`}
-                  onClick={() => submit(opt)}
-                >
-                  {opt}
-                </button>
-              );
-            })}
+                ))}
+              </div>
+            )}
+
+            {!gridIsClickable && memorized && (
+              <div className="ds-recovery-options">
+                {puzzle.options.map((opt) => {
+                  if (isRotation) {
+                    const [symbol, angle] = String(opt).split('@');
+                    return (
+                      <button
+                        key={String(opt)}
+                        disabled={picked !== null}
+                        className={`ds-btn ds-opt-btn ${picked === opt ? 'ds-btn-primary' : 'ds-btn-secondary'}`}
+                        onClick={() => submit(opt)}
+                      >
+                        <span className="az-recovery-rotation-preview" style={{ transform: `rotate(${angle || '0deg'})` }}>{symbol}</span>
+                      </button>
+                    );
+                  }
+                  return (
+                    <button
+                      key={String(opt)}
+                      disabled={picked !== null}
+                      className={`ds-btn ds-opt-btn ${picked === opt ? 'ds-btn-primary' : 'ds-btn-secondary'}`}
+                      onClick={() => submit(opt)}
+                    >
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
 }
-

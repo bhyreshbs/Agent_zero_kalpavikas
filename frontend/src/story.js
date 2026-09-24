@@ -53,6 +53,22 @@ export function chapterFor(levelIndex) {
   return CHAPTERS[levelIndex] || CHAPTERS[0];
 }
 
+// Level numbering used everywhere in the UI (map, nav, HUD, debrief). It is the engine level
+// index: 0 = orientation, 1-5 = the five levels. Names come from CHAPTERS, never from a
+// second hand-written list, so the number, the name and the gameplay can not drift apart.
+export const LEVEL_COUNT = 5;
+export function levelLabel(index) {
+  if (index <= 0) return 'Orientation';
+  if (index > LEVEL_COUNT) return 'Complete';
+  return `Level ${index}`;
+}
+export function levelCode(index) {
+  return `SEC-0${Math.min(LEVEL_COUNT, Math.max(0, index))}`;
+}
+export function levelTitle(index) {
+  return chapterFor(index).name.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()).replace(/\bAi\b/, 'AI');
+}
+
 // Speaker identity: color + glyph per character, keyed by the `name` passed to
 // <AgentDialogue>. ECHO carries the early "helpful drill assistant" levels;
 // UNIT A / UNIT B are Level 3's companion constructs; AGENT ZERO is the one

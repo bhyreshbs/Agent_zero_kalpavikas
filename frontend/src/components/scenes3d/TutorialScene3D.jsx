@@ -8,8 +8,9 @@ export default function TutorialScene({ level, onAction, busy, flash }) {
 
   return (
     <div className="az-scene3d-stage">
-      <SceneCanvas tone="cyan" height="100%">
+      <SceneCanvas tone="cyan" height="100%" variant="facility">
         <Door3D
+          variant="facility"
           position={[-1.7, 0, -1.6]}
           color={exitLetter === 'A' ? toneColor('cyan') : '#2a323c'}
           label="EXIT A"
@@ -18,6 +19,7 @@ export default function TutorialScene({ level, onAction, busy, flash }) {
           disabled={busy}
         />
         <Door3D
+          variant="facility"
           position={[1.7, 0, -1.6]}
           color={exitLetter === 'B' ? toneColor('cyan') : '#2a323c'}
           label="EXIT B"

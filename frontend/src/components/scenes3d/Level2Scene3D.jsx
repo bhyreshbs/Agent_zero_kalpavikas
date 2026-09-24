@@ -3,6 +3,7 @@ import AgentDialogue from '../AgentDialogue.jsx';
 import SceneCanvas from '../three/SceneCanvas.jsx';
 import Inspectable3D from '../three/Inspectable3D.jsx';
 import Button3D from '../three/Button3D.jsx';
+import { FacilityPartition } from '../three/FacilityRoom3D.jsx';
 
 const SHAPES = { north_wall: 'wall', east_door: 'door', loose_tile: 'floor', old_lamp: 'lamp' };
 const GLYPHS = { north_wall: '▦', east_door: '▤', loose_tile: '▫', old_lamp: '○' };
@@ -46,8 +47,10 @@ export default function Level2Scene({ level, onAction, busy, flash }) {
           <span className="az-anomaly-text">CONTROL ACTIVATED // ENVIRONMENTAL STATE CHANGED</span>
         </div>
       )}
-      <SceneCanvas tone={transitioning ? 'red' : 'amber'} height="100%">
-        <Button3D position={[0, 0, 0.5]} pressed={pressed} onClick={() => onAction('PRESS_BUTTON')} disabled={busy} />
+      <SceneCanvas tone={transitioning ? 'red' : 'amber'} height="100%" variant="facility">
+        {/* wall section the North Wall panel is mounted flush against (visual only) */}
+        <FacilityPartition position={[-1.6, 1.3, -3.54]} />
+        <Button3D position={[0, 0, 0.5]} pressed={pressed} onClick={() => onAction('PRESS_BUTTON')} disabled={busy} variant="facility" />
         {level.inspectTargets.map((obj) => (
           <Inspectable3D
             key={obj}
@@ -57,6 +60,8 @@ export default function Level2Scene({ level, onAction, busy, flash }) {
             icon={GLYPHS[obj]}
             label={LABELS[obj]}
             disabled={busy}
+            variant="facility"
+            mounted={obj === 'north_wall'}
             onClick={() => onAction('INSPECT_OBJECT', { object: obj })}
           />
         ))}

@@ -2,14 +2,18 @@ import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { damp } from './easing.js';
+import { FAC } from './FacilityRoom3D.jsx';
 
-// A collectible object floating in the room. Removed from the scene once the
-// server confirms it's collected (the room's flash/agent-line feedback,
-// handled by the parent scene, is what sells the "you got it" moment).
-export default function KeyCard3D({ position = [0, 0, 0], color = '#35f2c2', collected, onClick, label }) {
+const noRay = () => null;
+
+// A floating key card. variant="facility": same clickable card mesh (same size, same
+// handlers, same float/spin/collect behaviour), presented as an access badge with a
+// magnetic stripe and an amber chip.
+export default function KeyCard3D({ position = [0, 0, 0], color = '#35f2c2', collected, onClick, label, variant = 'legacy' }) {
   const ref = useRef();
   const [hovered, setHovered] = useState(false);
   const t = useRef(0);
+  const facility = variant === 'facility';
 
   useFrame((_, delta) => {
     if (!ref.current) return;
@@ -31,11 +35,32 @@ export default function KeyCard3D({ position = [0, 0, 0], color = '#35f2c2', col
         onPointerOut={() => { setHovered(false); document.body.style.cursor = 'auto'; }}
       >
         <boxGeometry args={[0.5, 0.32, 0.04]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={hovered ? 1.4 : 0.6} metalness={0.5} roughness={0.3} />
+        {facility ? (
+          <meshStandardMaterial color="#d8d3c8" emissive={FAC.amberHi} emissiveIntensity={hovered ? 0.5 : 0.18} metalness={0.5} roughness={0.4} />
+        ) : (
+          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={hovered ? 1.4 : 0.6} metalness={0.5} roughness={0.3} />
+        )}
+        {facility && (
+          <>
+            <mesh position={[0, 0.09, 0.024]} raycast={noRay}>
+              <boxGeometry args={[0.46, 0.06, 0.006]} />
+              <meshStandardMaterial color="#12100f" roughness={0.8} />
+            </mesh>
+            <mesh position={[-0.13, -0.04, 0.024]} raycast={noRay}>
+              <boxGeometry args={[0.1, 0.08, 0.006]} />
+              <meshStandardMaterial color={FAC.amber} emissive={FAC.amber} emissiveIntensity={0.9} />
+            </mesh>
+            <mesh position={[0.08, -0.06, 0.024]} raycast={noRay}>
+              <boxGeometry args={[0.24, 0.02, 0.006]} />
+              <meshStandardMaterial color="#5a5852" />
+            </mesh>
+          </>
+        )}
       </mesh>
+      {facility && !hovered && <pointLight position={[0, 0, 0.3]} intensity={1.6} distance={2.5} decay={2} color={FAC.amberHi} />}
       {hovered && !collected && (
         <Html position={[0, 0.45, 0]} center distanceFactor={10}>
-          <div className="az-3d-tag" style={{ '--label-tone': color, fontSize: '0.65rem', letterSpacing: '0.1em' }}>[ KEY ]</div>
+          <div className={facility ? 'az-3d-tag ds-3d-tag' : 'az-3d-tag'} style={{ '--label-tone': facility ? FAC.amber : color, fontSize: '0.65rem', letterSpacing: '0.1em' }}>[ KEY ]</div>
         </Html>
       )}
     </group>

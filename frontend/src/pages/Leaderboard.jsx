@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { api } from '../api/client.js';
-import TopNav from '../components/TopNav.jsx';
+import { adminApi } from '../api/client.js';
+import AdminNav from '../components/AdminNav.jsx';
 import { IconShield, IconTrophy } from '../components/GameIcons.jsx';
+import { useNavigate } from 'react-router-dom';
 import { sfx } from '../sound.js';
 
 function fmtTime(seconds) {
@@ -14,12 +15,19 @@ function fmtTime(seconds) {
 export default function Leaderboard() {
   const [rows, setRows] = useState([]);
   const [error, setError] = useState(null);
+  const nav = useNavigate();
 
   useEffect(() => {
     let active = true;
+    const adminSecret = sessionStorage.getItem('az_admin_secret');
+    if (!adminSecret) {
+      nav('/');
+      return;
+    }
+
     async function poll() {
       try {
-        const { leaderboard } = await api.leaderboard();
+        const { leaderboard } = await adminApi.leaderboard(adminSecret);
         if (active) setRows(leaderboard);
       } catch (err) {
         if (active) setError(err.message);
@@ -34,50 +42,37 @@ export default function Leaderboard() {
   }, []);
 
   return (
-    <div className="az-leaderboard-page">
-      <div className="az-scene-bg" />
-      <TopNav showLeaderboard={false} />
-      <main className="az-shell az-leaderboard-shell">
-        <div className="az-leaderboard-header">
-          <div>
-            <span className="az-badge az-leaderboard-badge">
-              <span className="az-status-beacon" /> GLOBAL AGENT DEPLOYMENT
-            </span>
-            <h2 className="az-title az-leaderboard-title">AGENT ZERO — LIVE RANKINGS</h2>
+    <div className="ds-page" style={{ minHeight: '100vh' }}>
+      <AdminNav active="leaderboard" />
+      <main className="ds-container ds-stack" style={{ gap: 'var(--ds-space-lg)' }}>
+        <header className="ds-row" style={{ justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div className="ds-stack" style={{ gap: 4 }}>
+            <span className="ds-label">Global agent deployment</span>
+            <h1 className="ds-title">Agent Zero — Live Rankings</h1>
           </div>
-          <div className="az-telemetry-badge">
-            <span className="az-telemetry-dot" />
-            <span className="az-telemetry-text">LIVE TELEMETRY // 5s SYNC</span>
-          </div>
-        </div>
-
-        <div className="az-leaderboard-rules-banner" style={{
-          background: 'rgba(6, 11, 22, 0.6)',
-          border: '1px solid rgba(56, 189, 248, 0.2)',
-          padding: '12px 16px',
-          borderRadius: '4px',
-          marginBottom: '16px',
-          display: 'flex',
-          gap: '12px',
-          alignItems: 'center'
-        }}>
-          <span style={{ color: '#00f0ff', fontWeight: 'bold' }}>ℹ️ SCORING SYSTEM:</span>
-          <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>
-            Rank is determined by <strong>Total Score</strong>. Score = Base Points (Levels Cleared) + Time Bonus (If Escaped) + Shields Remaining − Recovery Penalties.
+          <span className="ds-badge ds-badge-success">
+            <span className="ds-dot ds-dot-live" /> Live telemetry // 5s sync
           </span>
+        </header>
+
+        <div className="ds-card-inset" style={{ padding: 'var(--ds-space-md) var(--ds-space-lg)' }}>
+          <span className="ds-label ds-accent">Scoring system</span>
+          <p className="ds-mono-sm" style={{ margin: '4px 0 0', lineHeight: '20px' }}>
+            Rank is determined by <strong style={{ color: 'var(--ds-text)' }}>Total Score</strong>. Score = Base Points (Levels Cleared) + Time Bonus (If Escaped) + Shields Remaining − Recovery Penalties.
+          </p>
         </div>
 
-        {error && <p className="az-error az-leaderboard-error">{error}</p>}
+        {error && <p className="ds-alert ds-alert-error" role="alert" style={{ margin: 0 }}>{error}</p>}
 
-        <div className="az-glass-panel az-leaderboard-table-panel">
-          <table className="az-table">
+        <div className="ds-table-wrap ds-table-scroll">
+          <table className="ds-table">
             <thead>
               <tr>
                 <th>Rank</th>
-                <th>Operative Unit</th>
+                <th>Operative unit</th>
                 <th>Status</th>
                 <th>Sector</th>
-                <th>Score</th>
+                <th style={{ textAlign: 'right' }}>Score</th>
                 <th>Elapsed</th>
                 <th>Shields</th>
                 <th>Recoveries</th>
@@ -86,59 +81,50 @@ export default function Leaderboard() {
             <tbody>
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="az-table-empty">
-                    <span className="az-status-beacon" /> Awaiting initial operative telemetries…
+                  <td colSpan={8} className="ds-table-empty">
+                    <span className="ds-loading" style={{ justifyContent: 'center' }}>
+                      <span className="ds-spinner" /> Awaiting initial operative telemetries…
+                    </span>
                   </td>
                 </tr>
               )}
               {rows.map((r) => {
                 const isTop3 = r.rank <= 3;
-                const statusColor = r.status === 'failed' ? 'var(--az-danger)' : r.status === 'completed' ? 'var(--az-accent)' : '#00f0ff';
+                const statusBadge = r.status === 'failed' ? 'ds-badge-danger' : r.status === 'completed' ? 'ds-badge-success' : '';
                 return (
                   <tr
                     key={r.teamName}
-                    className={`az-table-row ${isTop3 ? 'is-top-rank' : ''}`}
+                    className={isTop3 ? 'is-active' : ''}
                     onMouseEnter={() => sfx.hover()}
                   >
-                    <td className="az-table-cell-rank">
-                      <span className={`az-rank-badge ${isTop3 ? `is-medal rank-${r.rank}` : ''}`}>
-                        {isTop3 && <IconTrophy size={11} style={{ marginRight: 4 }} />}#{r.rank}
-                      </span>
-                    </td>
-                    <td className="az-table-cell-team">
-                      <span className="az-team-name">{r.teamName}</span>
-                    </td>
                     <td>
-                      <span
-                        className={`az-status-chip az-status-${r.status || 'active'}`}
-                        style={{
-                          color: statusColor,
-                          background: `rgba(${r.status === 'failed' ? '255, 59, 92' : r.status === 'completed' ? '53, 242, 194' : '0, 240, 255'}, 0.12)`,
-                          borderColor: `rgba(${r.status === 'failed' ? '255, 59, 92' : r.status === 'completed' ? '53, 242, 194' : '0, 240, 255'}, 0.35)`,
-                        }}
-                      >
-                        {r.status === 'completed' || r.status === 'failed' ? r.status.toUpperCase() : 'ACTIVE RUN'}
+                      <span className={`ds-badge ${isTop3 ? '' : 'ds-badge-muted'}`}>
+                        {isTop3 && <IconTrophy size={11} color="currentColor" />}#{r.rank}
                       </span>
                     </td>
-                    <td className="az-font-mono">{r.level}/5</td>
-                    <td className="az-table-cell-score">
+                    <td className="ds-cell-name">{r.teamName}</td>
+                    <td>
+                      <span className={`ds-badge ${statusBadge}`}>
+                        {r.status === 'completed' || r.status === 'failed' ? r.status : 'Active run'}
+                      </span>
+                    </td>
+                    <td className="ds-num">{r.level}/5</td>
+                    <td className="ds-num ds-accent" style={{ textAlign: 'right', fontSize: 14 }}>
                       {r.score.toLocaleString()}
                     </td>
-                    <td className="az-font-mono">
-                      {r.timeSeconds != null ? fmtTime(r.timeSeconds) : '—'}
-                    </td>
-                    <td className="az-table-cell-shields">
-                      <span style={{ display: 'inline-flex', gap: 2, alignItems: 'center' }}>
+                    <td className="ds-num">{r.timeSeconds != null ? fmtTime(r.timeSeconds) : '—'}</td>
+                    <td>
+                      <span className="ds-row" style={{ gap: 2, flexWrap: 'nowrap' }}>
                         {r.lives > 0 ? (
                           Array.from({ length: Math.min(5, r.lives) }).map((_, i) => (
-                            <IconShield key={i} size={13} color="#10b981" fill />
+                            <IconShield key={i} size={13} color="#5e7862" fill />
                           ))
                         ) : (
-                          <span style={{ color: 'var(--az-danger)', fontSize: '0.92rem', fontWeight: 700 }}>OFFLINE</span>
+                          <span className="ds-badge ds-badge-danger">Offline</span>
                         )}
                       </span>
                     </td>
-                    <td className="az-font-mono">{r.recoveryAttempts}</td>
+                    <td className="ds-num">{r.recoveryAttempts}</td>
                   </tr>
                 );
               })}
@@ -146,7 +132,7 @@ export default function Leaderboard() {
           </table>
         </div>
       </main>
+      <div className="ds-footer-strip">Echo Station // Live rankings // Authorized eyes only</div>
     </div>
   );
 }
-

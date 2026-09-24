@@ -12,7 +12,7 @@ import { initializeDatabase } from './db/index.js';
 import { aiConfigured }       from './engine/agentEngine.js';
 
 // Validate required secrets at startup
-const requiredEnv = ['ADMIN_SECRET', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'DATABASE_URL'];
+const requiredEnv = ['ADMIN_SECRET', 'INSFORGE_URL', 'INSFORGE_API_KEY', 'DATABASE_URL'];
 for (const key of requiredEnv) {
   if (!process.env[key] || process.env[key].startsWith('change_me') || process.env[key].startsWith('your-')) {
     console.warn(`[WARN] ${key} is unset or still a placeholder — set a real value before the event.`);
@@ -84,7 +84,7 @@ async function start() {
     await initializeDatabase();
   } catch (err) {
     console.error('[startup] Database initialization failed:', err.message);
-    console.error('Check DATABASE_URL and Supabase connection.');
+    console.error('Check DATABASE_URL and the InsForge database connection.');
     process.exit(1);
   }
 

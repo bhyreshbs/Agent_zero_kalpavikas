@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { damp } from './easing.js';
+import { FAC, facilityTint } from './FacilityRoom3D.jsx';
 
 // A standing companion-construct figure (Level 3's UNIT A / UNIT B, also
 // reusable anywhere else an agent needs a physical presence in the room)
@@ -9,7 +10,9 @@ import { damp } from './easing.js';
 // above. Rounded sphere joints at the neck/shoulders give it a less
 // "stacked boxes" read; damped (not linear) motion for the idle sway and
 // hover response.
-export default function Agent3D({ position = [0, 0, 0], color = '#35f2c2', glyph, label, sublabel, known, onClick }) {
+export default function Agent3D({ position = [0, 0, 0], color: colorProp = '#35f2c2', glyph, label, sublabel, known, onClick, variant = 'legacy' }) {
+  const fac = variant === 'facility';
+  const color = fac ? facilityTint(colorProp) : colorProp;
   const bodyRef = useRef();
   const headRef = useRef();
   const glowRef = useRef();
@@ -45,7 +48,7 @@ export default function Agent3D({ position = [0, 0, 0], color = '#35f2c2', glyph
         <group ref={headRef} position={[0, 1.5, 0]}>
           <mesh>
             <sphereGeometry args={[0.22, 20, 20]} />
-            <meshPhysicalMaterial color="#151b22" emissive={color} emissiveIntensity={hovered ? 0.55 : 0.2} metalness={0.45} roughness={0.35} clearcoat={0.5} />
+            <meshPhysicalMaterial color={fac ? '#2a2826' : '#151b22'} emissive={color} emissiveIntensity={hovered ? 0.55 : 0.2} metalness={0.45} roughness={0.35} clearcoat={0.5} />
           </mesh>
           <mesh ref={glowRef} position={[0, 0, 0.2]}>
             <circleGeometry args={[0.09, 16]} />
@@ -55,26 +58,38 @@ export default function Agent3D({ position = [0, 0, 0], color = '#35f2c2', glyph
         {/* Neck joint */}
         <mesh position={[0, 1.28, 0]}>
           <sphereGeometry args={[0.09, 12, 12]} />
-          <meshStandardMaterial color="#10151b" metalness={0.5} roughness={0.4} />
+          <meshStandardMaterial color={fac ? '#33312e' : '#10151b'} metalness={0.5} roughness={0.4} />
         </mesh>
         <mesh position={[0, 0.9, 0]}>
           <capsuleGeometry args={[0.24, 0.9, 4, 12]} />
-          <meshPhysicalMaterial color="#1c242e" emissive={color} emissiveIntensity={hovered ? 0.35 : 0.1} metalness={0.5} roughness={0.35} clearcoat={0.35} />
+          <meshPhysicalMaterial color={fac ? '#302e2b' : '#1c242e'} emissive={color} emissiveIntensity={hovered ? 0.35 : 0.1} metalness={0.5} roughness={0.35} clearcoat={0.35} />
         </mesh>
         {/* Simple arm nubs, resting close to the body */}
         <mesh position={[-0.3, 0.85, 0]}>
           <capsuleGeometry args={[0.07, 0.55, 4, 8]} />
-          <meshStandardMaterial color="#151b22" metalness={0.45} roughness={0.4} />
+          <meshStandardMaterial color={fac ? '#2a2826' : '#151b22'} metalness={0.45} roughness={0.4} />
         </mesh>
         <mesh position={[0.3, 0.85, 0]}>
           <capsuleGeometry args={[0.07, 0.55, 4, 8]} />
-          <meshStandardMaterial color="#151b22" metalness={0.45} roughness={0.4} />
+          <meshStandardMaterial color={fac ? '#2a2826' : '#151b22'} metalness={0.45} roughness={0.4} />
         </mesh>
       </group>
+      {fac && (
+        <>
+          <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]} raycast={() => null}>
+            <ringGeometry args={[0.42, 0.5, 40]} />
+            <meshStandardMaterial color={FAC.amber} emissive={FAC.amber} emissiveIntensity={known ? 0.9 : 0.4} />
+          </mesh>
+          <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} raycast={() => null}>
+            <circleGeometry args={[0.42, 40]} />
+            <meshStandardMaterial color="#12100f" roughness={0.8} metalness={0.4} />
+          </mesh>
+        </>
+      )}
       <Html position={[0, 2.05, 0]} center distanceFactor={10}>
-        <div className="az-3d-agent-label" style={{ '--label-tone': color }}>
+        <div className={fac ? 'ds-3d-agent-label' : 'az-3d-agent-label'} style={{ '--label-tone': color }}>
           <div>{glyph} {label}</div>
-          {sublabel && <div className="az-3d-agent-sub">{sublabel}</div>}
+          {sublabel && <div className={fac ? 'ds-3d-agent-sub' : 'az-3d-agent-sub'}>{sublabel}</div>}
         </div>
       </Html>
     </group>

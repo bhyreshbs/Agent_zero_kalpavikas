@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>AGENT ZERO // ECHO STATION PROTOCOL</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"primary":"#f2c36b","surface-bright":"#3b3937","on-secondary-fixed":"#1d1c16","surface-dim":"#141312","on-secondary-fixed-variant":"#494740","on-error":"#690005","surface-container-low":"#1d1b1a","surface-container-high":"#2b2a28","inverse-on-surface":"#32302f","surface-container":"#211f1e","secondary-fixed":"#e7e2d9","surface-container-highest":"#363433","on-tertiary-fixed-variant":"#4c463c","error-container":"#93000a","on-tertiary-fixed":"#201b13","on-error-container":"#ffdad6","on-tertiary":"#353027","secondary":"#cac6bd","secondary-container":"#494740","primary-container":"#d4a853","inverse-primary":"#7b5804","outline":"#9b8f7e","error":"#ffb4ab","on-primary-fixed-variant":"#5d4200","on-background":"#e6e1df","surface":"#141312","on-primary-fixed":"#271900","on-secondary":"#32302a","on-secondary-container":"#b9b5ac","on-primary-container":"#573d00","primary-fixed-dim":"#eec068","surface-container-lowest":"#0f0e0d","secondary-fixed-dim":"#cac6bd","on-surface":"#e6e1df","surface-tint":"#eec068","primary-fixed":"#ffdea6","tertiary-container":"#b7ada1","tertiary-fixed-dim":"#cfc5b8","inverse-surface":"#e6e1df","background":"#141312","surface-variant":"#363433","tertiary-fixed":"#ece1d3","on-tertiary-container":"#474137","on-primary":"#412d00","outline-variant":"#4e4637","tertiary":"#d3c8bb","on-surface-variant":"#d2c5b2"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter":"1.5rem","space-sm":"0.5rem","space-xl":"2.5rem","margin-mobile":"1rem","margin-tablet":"2rem","gutter-lg":"2rem","gutter-sm":"0.75rem","margin":"2rem","space-lg":"1.5rem","space-md":"1rem","margin-desktop":"3.5rem","space-xxl":"4rem","space-xs":"0.25rem"},"fontFamily":{"display-hero":["Playfair Display"],"body-dossier":["Playfair Display"],"dossier-title":["Playfair Display"],"dossier-title-mobile":["Playfair Display"],"ui-micro":["Space Grotesk"],"editorial-h2":["Playfair Display"],"telemetry-badge":["JetBrains Mono"],"editorial-h1":["Playfair Display"],"telemetry-data":["JetBrains Mono"],"ui-action-lg":["Space Grotesk"],"display-hero-mobile":["Playfair Display"],"telemetry-timestamp":["JetBrains Mono"],"ui-nav":["Space Grotesk"]},"fontSize":{"display-hero":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"600"}],"body-dossier":["16px",{"lineHeight":"26px","fontWeight":"400"}],"dossier-title":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"500"}],"dossier-title-mobile":["26px",{"lineHeight":"32px","fontWeight":"500"}],"ui-micro":["10px",{"lineHeight":"14px","letterSpacing":"0.12em","fontWeight":"500"}],"editorial-h2":["22px",{"lineHeight":"28px","letterSpacing":"0.01em","fontWeight":"400"}],"telemetry-badge":["10px",{"lineHeight":"12px","letterSpacing":"0.05em","fontWeight":"600"}],"editorial-h1":["28px",{"lineHeight":"36px","fontWeight":"500"}],"telemetry-data":["12px",{"lineHeight":"18px","letterSpacing":"0.02em","fontWeight":"400"}],"ui-action-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.08em","fontWeight":"600"}],"display-hero-mobile":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"600"}],"telemetry-timestamp":["11px",{"lineHeight":"16px","fontWeight":"400"}],"ui-nav":["12px",{"lineHeight":"16px","letterSpacing":"0.1em","fontWeight":"500"}]}}}}</script></head><body class="bg-surface text-on-surface antialiased selection:bg-primary selection:text-on-primary min-h-screen flex flex-col"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant/40"><div class="h-16 w-full px-margin-mobile md:px-margin-tablet lg:px-margin-desktop flex items-center justify-between"><div class="flex flex-col justify-center"><div class="flex items-center gap-space-xs pb-0.5 border-b border-primary-container/30"><span class="text-primary font-editorial-h1 text-editorial-h1 leading-none select-none">◉</span><span class="font-editorial-h1 text-editorial-h1 tracking-tight text-on-surface uppercase">AGENT ZERO</span></div><span class="font-telemetry-badge text-telemetry-badge tracking-widest text-outline uppercase mt-0.5">ECHO STATION PROTOCOL // SEC-0</span></div><nav class="hidden md:flex items-center gap-gutter" data-active-classes="text-primary font-semibold border-b border-primary"><a class="font-ui-nav text-ui-nav uppercase text-on-surface-variant hover:text-primary transition-colors py-space-xs" data-path="home" href="#">HOME</a><span class="text-outline-variant text-ui-micro select-none">·</span><a class="font-ui-nav text-ui-nav uppercase text-on-surface-variant hover:text-primary transition-colors py-space-xs" data-path="missions" href="#">MISSIONS</a><span class="text-outline-variant text-ui-micro select-none">·</span><a class="font-ui-nav text-ui-nav uppercase text-on-surface-variant hover:text-primary transition-colors py-space-xs" data-path="protocols" href="#">PROTOCOLS</a><span class="text-outline-variant text-ui-micro select-none">·</span><a class="font-ui-nav text-ui-nav uppercase text-on-surface-variant hover:text-primary transition-colors py-space-xs" data-path="archive" href="#">ARCHIVE</a></nav><div class="flex items-center gap-gutter-sm"><div class="hidden sm:flex items-center gap-space-xs bg-surface-container-low border border-outline-variant/50 px-space-md py-1 rounded-full shadow-inner"><span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span><span class="font-telemetry-badge text-telemetry-badge text-secondary tracking-wider uppercase">OPERATIVE: S-719 // LINK ACTIVE</span></div><button aria-label="Toggle Audio Waveform" class="p-1.5 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center" type="button"><span class="material-symbols-outlined text-[20px]">graphic_eq</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 flex-1 bg-surface"><div class="flex flex-col w-full">
+<!-- Archival Reticle / HUD Grid Background Overlays -->
+<div class="relative w-full overflow-hidden px-margin-mobile md:px-margin-tablet lg:px-margin-desktop py-space-xl flex flex-col gap-space-lg">
+<!-- Ambient Blueprint Accent Lines & Radial Lighting -->
+<div class="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(212,168,83,0.08)_0%,transparent_70%)]"></div>
+<div class="pointer-events-none absolute -right-24 -top-24 w-96 h-96 rounded-full bg-primary/5 blur-3xl"></div>
+<div class="pointer-events-none absolute -left-20 top-1/2 w-80 h-80 rounded-full bg-primary/5 blur-3xl"></div>
+<!-- 1. Header Area: Operations Title & Broadcast Telemetry Deck -->
+<header class="relative z-10 w-full flex flex-col lg:flex-row items-start lg:items-end justify-between gap-space-lg">
+<div class="flex flex-col gap-space-xs max-w-3xl">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-telemetry-badge text-telemetry-badge tracking-widest uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+            GLOBAL AGENT DEPLOYMENT
+          </span>
+<span class="text-outline text-telemetry-badge font-telemetry-badge tracking-wider uppercase">
+            // PROTOCOL [BERLIN-SEC-09]
+          </span>
+<span class="px-2 py-0.5 rounded-full bg-error-container/30 text-error font-telemetry-badge text-telemetry-badge uppercase">
+            LIVE BROADCAST MATRIX
+          </span>
+</div>
+<h1 class="font-editorial-h1 text-editorial-h1 md:text-display-hero text-on-surface uppercase tracking-tight leading-none mt-1">
+          AGENT ZERO <span class="text-primary italic font-serif font-normal">—</span> LIVE RANKINGS
+        </h1>
+<p class="font-ui-nav text-ui-nav uppercase text-on-surface-variant tracking-wider flex items-center gap-2">
+<span>Active sector telemetry</span>
+<span class="text-outline select-none">/</span>
+<span>Neural containment synchronizations</span>
+<span class="text-outline select-none">/</span>
+<span class="text-primary font-semibold">Tactical field standings</span>
+</p>
+</div>
+<!-- Real-Time Sync & Projection Control Widget -->
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-space-sm w-full lg:w-auto">
+<div class="bg-surface-container-low p-space-md rounded-xl flex items-center gap-space-md shadow-xl backdrop-blur-md">
+<div class="relative flex items-center justify-center w-10 h-10 rounded-lg bg-surface-container-high text-primary">
+<!-- Archival Target Sight Glyph -->
+<svg class="w-6 h-6 animate-spin text-primary opacity-80" fill="none" stroke="currentColor" stroke-width="1.5" style="animation-duration: 18s;" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="9" stroke-dasharray="2 4"></circle>
+<circle cx="12" cy="12" r="4"></circle>
+<line x1="12" x2="12" y1="1" y2="5"></line>
+<line x1="12" x2="12" y1="19" y2="23"></line>
+<line x1="1" x2="5" y1="12" y2="12"></line>
+<line x1="19" x2="23" y1="12" y2="12"></line>
+</svg>
+<span class="absolute w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-telemetry-badge text-telemetry-badge text-primary tracking-widest uppercase">LIVE TELEMETRY // 5s SYNC</span>
+<span class="text-[9px] font-telemetry-badge px-1 rounded bg-primary-container/20 text-primary" id="sync-cadence-pill">CADENCE: 5s</span>
+</div>
+<div class="flex items-baseline gap-2 mt-0.5">
+<span class="font-telemetry-data text-telemetry-data font-semibold text-on-surface" id="utc-clock">14:32:08 UTC</span>
+<span class="text-outline-variant font-telemetry-badge text-[10px]">CONNECTED: 24 SQUADS</span>
+</div>
+</div>
+</div>
+<button class="bg-primary hover:bg-secondary-fixed text-on-primary font-ui-action-lg text-ui-action-lg uppercase px-space-md py-space-sm rounded-lg flex items-center justify-center gap-2 transition-all shadow-md active:scale-95" id="projector-mode-toggle" title="Switch to Full-Screen Projector Display">
+<span class="material-symbols-outlined text-[18px]">aspect_ratio</span>
+<span>PROJECTOR</span>
+</button>
+</div>
+</header>
+<!-- 2. Scoring Formula & Mission Directive Rule Strip -->
+<section class="relative z-10 w-full bg-surface-container-low rounded-xl p-space-md shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm overflow-x-auto">
+<span class="px-2 py-1 rounded bg-surface-container-high text-primary font-telemetry-badge text-telemetry-badge tracking-widest uppercase whitespace-nowrap">
+          SYSTEM ALGORITHM
+        </span>
+<div class="font-telemetry-data text-telemetry-data text-on-surface-variant tracking-normal whitespace-nowrap flex items-center gap-1.5">
+<span>RANK TOTAL =</span>
+<span class="text-primary font-medium">[Base Points]</span>
+<span class="text-outline">+</span>
+<span class="text-primary font-medium">[Time Bonus]</span>
+<span class="text-outline">+</span>
+<span class="text-primary font-medium">[Shield Units]</span>
+<span class="text-error font-medium">− [Penalties]</span>
+</div>
+</div>
+<div class="flex items-center gap-space-md self-end md:self-auto flex-wrap">
+<div class="flex items-center gap-2 font-telemetry-badge text-telemetry-badge text-outline uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+          EVENT CHRONO: <span class="text-on-surface font-semibold tracking-wider">38:42 REMAINING</span>
+</div>
+<div class="h-4 w-px bg-outline-variant/60 hidden sm:block"></div>
+<div class="font-telemetry-badge text-telemetry-badge text-primary uppercase tracking-wider bg-surface-container-high px-2.5 py-1 rounded-full">
+          OBJECTIVE: SEC-05 CONTAINMENT
+        </div>
+</div>
+</section>
+<!-- Filter & View Controls -->
+<div class="relative z-10 flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-1 bg-surface-container-low p-1 rounded-lg">
+<button class="filter-btn bg-surface-container-high text-primary font-ui-nav text-ui-nav uppercase px-3 py-1.5 rounded-md transition-colors" data-filter="all">
+          ALL SQUADS (6)
+        </button>
+<button class="filter-btn text-on-surface-variant hover:text-on-surface font-ui-nav text-ui-nav uppercase px-3 py-1.5 rounded-md transition-colors" data-filter="active">
+          ACTIVE (4)
+        </button>
+<button class="filter-btn text-on-surface-variant hover:text-on-surface font-ui-nav text-ui-nav uppercase px-3 py-1.5 rounded-md transition-colors" data-filter="completed">
+          COMPLETED (1)
+        </button>
+<button class="filter-btn text-on-surface-variant hover:text-on-surface font-ui-nav text-ui-nav uppercase px-3 py-1.5 rounded-md transition-colors" data-filter="failed">
+          FAILED (1)
+        </button>
+</div>
+<div class="flex items-center gap-space-sm text-outline font-telemetry-badge text-telemetry-badge uppercase">
+<span class="hidden sm:inline">SORT MATRIX:</span>
+<span class="text-primary font-semibold">DESCENDING SCORE</span>
+<span class="text-outline-variant">|</span>
+<span>LATENCY: 12ms</span>
+</div>
+</div>
+<!-- 3. Main Standings Table Container -->
+<main class="relative z-10 w-full overflow-hidden bg-surface-container-low rounded-xl shadow-2xl">
+<!-- Table Structural Header -->
+<div class="hidden lg:grid grid-cols-12 gap-space-md px-space-lg py-space-sm bg-surface-container-high/70 text-outline font-ui-micro text-ui-micro uppercase tracking-widest items-center select-none">
+<div class="col-span-1 text-center font-bold">RANK</div>
+<div class="col-span-3">OPERATIVE UNIT // CALLSIGN</div>
+<div class="col-span-1">STATUS</div>
+<div class="col-span-2">SECTOR DEPTH</div>
+<div class="col-span-2 text-right">TOTAL SCORE</div>
+<div class="col-span-1 text-right">ELAPSED</div>
+<div class="col-span-1 text-center">SHIELDS</div>
+<div class="col-span-1 text-right">RECOVERIES</div>
+</div>
+<!-- Standings Rows Container -->
+<div class="flex flex-col divide-y divide-outline-variant/20" id="leaderboard-list">
+<!-- RANK #1: Vanguard-07 (Elite Leader) -->
+<article class="leaderboard-row group relative bg-surface-container transition-all hover:bg-surface-container-high/90" data-status="completed">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-sm lg:gap-space-md px-space-lg py-space-md items-center">
+<!-- Rank Column -->
+<div class="lg:col-span-1 flex items-center lg:justify-center gap-space-sm">
+<span class="flex items-center justify-center w-8 h-8 rounded bg-primary text-on-primary font-telemetry-badge text-[13px] font-bold shadow-md">
+                01
+              </span>
+<span class="lg:hidden text-primary font-ui-micro tracking-widest uppercase font-semibold">RANK #01</span>
+</div>
+<!-- Operative Unit Callsign -->
+<div class="lg:col-span-3 flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-ui-action-lg text-ui-action-lg text-primary font-bold uppercase tracking-wider">
+                  VANGUARD-07
+                </span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-secondary font-telemetry-badge text-[9px] uppercase tracking-wider">
+                  OMEGA SQUAD
+                </span>
+</div>
+<div class="font-telemetry-timestamp text-telemetry-timestamp text-outline mt-0.5 tracking-wider">
+                AGENTS: S-719, E-104, V-882, K-401
+              </div>
+</div>
+<!-- Status Pill -->
+<div class="lg:col-span-1 flex items-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary/15 text-primary text-telemetry-badge font-telemetry-badge uppercase tracking-wider">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                COMPLETED
+              </span>
+</div>
+<!-- Sector -->
+<div class="lg:col-span-2 flex flex-col justify-center">
+<span class="font-telemetry-data text-telemetry-data text-on-surface font-medium">
+                SEC-05 (AI CORE)
+              </span>
+<span class="font-telemetry-badge text-[10px] text-primary uppercase tracking-widest">
+                [NODE SECURED 100%]
+              </span>
+</div>
+<!-- Total Score -->
+<div class="lg:col-span-2 flex flex-col lg:items-end">
+<span class="font-telemetry-data text-[18px] leading-tight font-bold text-primary tracking-wide">
+                28,940 <span class="text-[11px] font-normal text-outline">PTS</span>
+</span>
+<span class="font-telemetry-badge text-[10px] text-outline uppercase tracking-wider">
+                +4,200 SPEED BONUS
+              </span>
+</div>
+<!-- Elapsed Time -->
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-on-surface">
+                18:42.04
+              </span>
+</div>
+<!-- Shields Integrity -->
+<div class="lg:col-span-1 flex items-center lg:justify-center gap-1" title="Shield Units: 5/5 Intact">
+<span class="w-2.5 h-3.5 rounded-sm bg-primary shadow-sm"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary shadow-sm"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary shadow-sm"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary shadow-sm"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary shadow-sm"></span>
+</div>
+<!-- Recovery Penalties -->
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-on-surface-variant font-medium">
+                0
+              </span>
+</div>
+</div>
+</article>
+<!-- RANK #2: Cipher-Nine -->
+<article class="leaderboard-row group relative bg-surface-container-low transition-all hover:bg-surface-container" data-status="active">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-outline-variant/80"></div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-sm lg:gap-space-md px-space-lg py-space-md items-center">
+<div class="lg:col-span-1 flex items-center lg:justify-center gap-space-sm">
+<span class="flex items-center justify-center w-8 h-8 rounded bg-surface-container-highest text-secondary-fixed font-telemetry-badge text-[13px] font-bold">
+                02
+              </span>
+<span class="lg:hidden text-secondary font-ui-micro tracking-widest uppercase font-semibold">RANK #02</span>
+</div>
+<div class="lg:col-span-3 flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-ui-action-lg text-ui-action-lg text-on-surface font-semibold uppercase tracking-wider group-hover:text-primary transition-colors">
+                  CIPHER-NINE
+                </span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-outline font-telemetry-badge text-[9px] uppercase">
+                  BLACKOUT
+                </span>
+</div>
+<div class="font-telemetry-timestamp text-telemetry-timestamp text-outline mt-0.5">
+                AGENTS: C-330, R-019, M-712, J-554
+              </div>
+</div>
+<div class="lg:col-span-1 flex items-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-container/15 text-primary text-telemetry-badge font-telemetry-badge uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+                ACTIVE RUN
+              </span>
+</div>
+<div class="lg:col-span-2 flex flex-col justify-center">
+<span class="font-telemetry-data text-telemetry-data text-on-surface">
+                SEC-04 (SUB-CORE)
+              </span>
+<span class="font-telemetry-badge text-[10px] text-outline uppercase">
+                BYPASS IN PROGRESS
+              </span>
+</div>
+<div class="lg:col-span-2 flex flex-col lg:items-end">
+<span class="font-telemetry-data text-[17px] leading-tight font-semibold text-primary tracking-wide">
+                26,110 <span class="text-[11px] font-normal text-outline">PTS</span>
+</span>
+<span class="font-telemetry-badge text-[10px] text-outline uppercase">
+                PACE: +120 PTS/MIN
+              </span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-on-surface font-mono">
+                21:15.80
+              </span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-center gap-1" title="Shield Units: 4/5 Intact">
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-surface-container-highest"></span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-error font-medium" title="1 Recovery penalty deducted">
+                1 <span class="text-[10px] text-outline">(-250)</span>
+</span>
+</div>
+</div>
+</article>
+<!-- RANK #3: Aethel-Overwatch -->
+<article class="leaderboard-row group relative bg-surface-container-low transition-all hover:bg-surface-container" data-status="active">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-outline-variant/40"></div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-sm lg:gap-space-md px-space-lg py-space-md items-center">
+<div class="lg:col-span-1 flex items-center lg:justify-center gap-space-sm">
+<span class="flex items-center justify-center w-8 h-8 rounded bg-surface-container-high text-outline font-telemetry-badge text-[13px] font-bold">
+                03
+              </span>
+<span class="lg:hidden text-outline font-ui-micro tracking-widest uppercase font-semibold">RANK #03</span>
+</div>
+<div class="lg:col-span-3 flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-ui-action-lg text-ui-action-lg text-on-surface font-semibold uppercase tracking-wider group-hover:text-primary transition-colors">
+                  AETHEL-OVERWATCH
+                </span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-outline font-telemetry-badge text-[9px] uppercase">
+                  RECON-2
+                </span>
+</div>
+<div class="font-telemetry-timestamp text-telemetry-timestamp text-outline mt-0.5">
+                AGENTS: A-112, A-808, T-900, L-231
+              </div>
+</div>
+<div class="lg:col-span-1 flex items-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-container/15 text-primary text-telemetry-badge font-telemetry-badge uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+                ACTIVE RUN
+              </span>
+</div>
+<div class="lg:col-span-2 flex flex-col justify-center">
+<span class="font-telemetry-data text-telemetry-data text-on-surface">
+                SEC-03 (RESONANCE)
+              </span>
+<span class="font-telemetry-badge text-[10px] text-outline uppercase">
+                DECIPHERING CIPHER A
+              </span>
+</div>
+<div class="lg:col-span-2 flex flex-col lg:items-end">
+<span class="font-telemetry-data text-[17px] leading-tight font-semibold text-primary tracking-wide">
+                23,450 <span class="text-[11px] font-normal text-outline">PTS</span>
+</span>
+<span class="font-telemetry-badge text-[10px] text-outline uppercase">
+                EST. FINISH: 32:00
+              </span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-on-surface font-mono">
+                24:50.12
+              </span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-center gap-1" title="Shield Units: 3/5 Intact">
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-surface-container-highest"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-surface-container-highest"></span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-error font-medium">
+                2 <span class="text-[10px] text-outline">(-500)</span>
+</span>
+</div>
+</div>
+</article>
+<!-- RANK #4: Valkyrie Protocol -->
+<article class="leaderboard-row group relative bg-surface-container-low transition-all hover:bg-surface-container" data-status="active">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-sm lg:gap-space-md px-space-lg py-space-md items-center">
+<div class="lg:col-span-1 flex items-center lg:justify-center gap-space-sm">
+<span class="flex items-center justify-center w-8 h-8 rounded bg-surface-container text-outline font-telemetry-badge text-[13px]">
+                04
+              </span>
+<span class="lg:hidden text-outline font-ui-micro tracking-widest uppercase font-semibold">RANK #04</span>
+</div>
+<div class="lg:col-span-3 flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-ui-action-lg text-ui-action-lg text-on-surface font-medium uppercase tracking-wider group-hover:text-primary transition-colors">
+                  VALKYRIE PROTOCOL
+                </span>
+</div>
+<div class="font-telemetry-timestamp text-telemetry-timestamp text-outline mt-0.5">
+                AGENTS: V-001, V-002, V-009
+              </div>
+</div>
+<div class="lg:col-span-1 flex items-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-container/15 text-primary text-telemetry-badge font-telemetry-badge uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+                ACTIVE RUN
+              </span>
+</div>
+<div class="lg:col-span-2 flex flex-col justify-center">
+<span class="font-telemetry-data text-telemetry-data text-on-surface">
+                SEC-03 (RESONANCE)
+              </span>
+<span class="font-telemetry-badge text-[10px] text-outline uppercase">
+                SYNCHRONIZING RELAY
+              </span>
+</div>
+<div class="lg:col-span-2 flex flex-col lg:items-end">
+<span class="font-telemetry-data text-[17px] leading-tight font-semibold text-primary tracking-wide">
+                19,820 <span class="text-[11px] font-normal text-outline">PTS</span>
+</span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-on-surface font-mono">
+                26:04.91
+              </span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-center gap-1" title="Shield Units: 2/5 Intact">
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-surface-container-highest"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-surface-container-highest"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-surface-container-highest"></span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-error font-medium">
+                1 <span class="text-[10px] text-outline">(-250)</span>
+</span>
+</div>
+</div>
+</article>
+<!-- RANK #5: Solaris Cognition (Failed Status) -->
+<article class="leaderboard-row group relative bg-surface-container-lowest/80 transition-all hover:bg-surface-container-low opacity-90" data-status="failed">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-error"></div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-sm lg:gap-space-md px-space-lg py-space-md items-center">
+<div class="lg:col-span-1 flex items-center lg:justify-center gap-space-sm">
+<span class="flex items-center justify-center w-8 h-8 rounded bg-surface-container-highest text-error font-telemetry-badge text-[13px]">
+                05
+              </span>
+<span class="lg:hidden text-error font-ui-micro tracking-widest uppercase font-semibold">RANK #05</span>
+</div>
+<div class="lg:col-span-3 flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-ui-action-lg text-ui-action-lg text-on-surface-variant line-through uppercase tracking-wider">
+                  SOLARIS COGNITION
+                </span>
+<span class="px-1.5 py-0.5 rounded bg-error-container/40 text-error font-telemetry-badge text-[9px] uppercase tracking-wider">
+                  TERMINATED
+                </span>
+</div>
+<div class="font-telemetry-timestamp text-telemetry-timestamp text-outline mt-0.5">
+                AGENTS: S-992, S-993, S-994 [DISCONNECTED]
+              </div>
+</div>
+<div class="lg:col-span-1 flex items-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-error-container/20 text-error text-telemetry-badge font-telemetry-badge uppercase tracking-wider">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                FAILED
+              </span>
+</div>
+<div class="lg:col-span-2 flex flex-col justify-center">
+<span class="font-telemetry-data text-telemetry-data text-error line-through">
+                SEC-02 (CRYOGENIC)
+              </span>
+<span class="font-telemetry-badge text-[10px] text-error/80 uppercase">
+                CRITICAL CORE BREACH
+              </span>
+</div>
+<div class="lg:col-span-2 flex flex-col lg:items-end">
+<span class="font-telemetry-data text-[17px] leading-tight font-medium text-secondary-container tracking-wide">
+                14,200 <span class="text-[11px] font-normal text-outline">PTS</span>
+</span>
+<span class="font-telemetry-badge text-[10px] text-error uppercase">
+                PENALIZED: −1,000
+              </span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-error font-mono">
+                14:10.00
+              </span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-center">
+<span class="font-telemetry-badge text-[10px] text-error tracking-wider uppercase font-semibold">
+                OFFLINE
+              </span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-error font-bold">
+                4 <span class="text-[10px] text-error/80">(-1,000)</span>
+</span>
+</div>
+</div>
+</article>
+<!-- RANK #6: Neural Sentinels -->
+<article class="leaderboard-row group relative bg-surface-container-low transition-all hover:bg-surface-container" data-status="active">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-sm lg:gap-space-md px-space-lg py-space-md items-center">
+<div class="lg:col-span-1 flex items-center lg:justify-center gap-space-sm">
+<span class="flex items-center justify-center w-8 h-8 rounded bg-surface-container text-outline font-telemetry-badge text-[13px]">
+                06
+              </span>
+<span class="lg:hidden text-outline font-ui-micro tracking-widest uppercase font-semibold">RANK #06</span>
+</div>
+<div class="lg:col-span-3 flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-ui-action-lg text-ui-action-lg text-on-surface font-medium uppercase tracking-wider group-hover:text-primary transition-colors">
+                  NEURAL SENTINELS
+                </span>
+</div>
+<div class="font-telemetry-timestamp text-telemetry-timestamp text-outline mt-0.5">
+                AGENTS: N-101, N-102
+              </div>
+</div>
+<div class="lg:col-span-1 flex items-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-container/15 text-primary text-telemetry-badge font-telemetry-badge uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+                ACTIVE RUN
+              </span>
+</div>
+<div class="lg:col-span-2 flex flex-col justify-center">
+<span class="font-telemetry-data text-telemetry-data text-on-surface">
+                SEC-01 (AIRLOCK)
+              </span>
+<span class="font-telemetry-badge text-[10px] text-outline uppercase">
+                DECRYPTING ACCESS
+              </span>
+</div>
+<div class="lg:col-span-2 flex flex-col lg:items-end">
+<span class="font-telemetry-data text-[17px] leading-tight font-semibold text-primary tracking-wide">
+                8,950 <span class="text-[11px] font-normal text-outline">PTS</span>
+</span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-on-surface font-mono">
+                09:33.40
+              </span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-center gap-1" title="Shield Units: 5/5 Intact">
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+<span class="w-2.5 h-3.5 rounded-sm bg-primary"></span>
+</div>
+<div class="lg:col-span-1 flex items-center lg:justify-end">
+<span class="font-telemetry-data text-telemetry-data text-on-surface-variant font-medium">
+                0
+              </span>
+</div>
+</div>
+</article>
+</div>
+<!-- Empty State Indicator (Hidden by default, can be toggled via button) -->
+<div class="hidden p-space-xxl flex-col items-center justify-center text-center gap-space-sm bg-surface-container-lowest" id="empty-state-notice">
+<span class="material-symbols-outlined text-[48px] text-outline">radar</span>
+<h3 class="font-editorial-h2 text-editorial-h2 text-on-surface uppercase">NO MATCHING OPERATIVE TELEMETRY</h3>
+<p class="font-ui-nav text-ui-nav text-outline max-w-md">No squad matches the currently armed filter parameter. Adjust filter selection above to inspect active combatants.</p>
+</div>
+<!-- 4. Table Integrated Telemetry Status & Synchronizer Bar -->
+<footer class="bg-surface-container-high/90 px-space-lg py-space-sm flex flex-col md:flex-row items-center justify-between gap-space-sm select-none">
+<div class="flex items-center gap-space-sm w-full md:w-auto">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-telemetry-badge text-telemetry-badge text-outline uppercase tracking-wider truncate">
+            AWAITING 2 ADDITIONAL SQUAD TELEMETRIES... [SYNCHRONIZING SEC-00 AIRLOCK ENTRANTS]
+          </span>
+</div>
+<div class="flex items-center justify-between md:justify-end gap-space-md w-full md:w-auto">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+<span class="font-telemetry-badge text-telemetry-badge text-primary uppercase tracking-widest" id="last-sync-label">
+              LAST SYNCED: 0 SECONDS AGO
+            </span>
+</div>
+<!-- Mini Progress Bar to Next Auto-Sync -->
+<div class="w-20 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary transition-all duration-300 w-0" id="sync-progress"></div>
+</div>
+</div>
+</footer>
+</main>
+<!-- 5. Archival Tactical Field Overview & Visual Telemetry Grid -->
+<section class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<!-- Sector Density Map / Containment Monitor -->
+<div class="bg-surface-container-low p-space-md rounded-xl shadow-lg flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-badge text-telemetry-badge text-outline uppercase tracking-widest">FACILITY SECTOR CONFINEMENT</span>
+<span class="font-telemetry-badge text-telemetry-badge text-primary">SEC 01—05</span>
+</div>
+<!-- Simplified Sector Depth Diagram -->
+<div class="flex flex-col gap-1.5 mt-1">
+<div class="flex items-center justify-between text-[11px] font-telemetry-data text-outline">
+<span>SEC-05 [AI CORE]</span>
+<span class="text-primary">1 SQUAD (100% CONTAINED)</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="w-full h-full bg-primary"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-telemetry-data text-outline mt-1">
+<span>SEC-04 [SUB-CORE]</span>
+<span class="text-primary">1 SQUAD ACTIVE</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="w-4/5 h-full bg-primary/70"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-telemetry-data text-outline mt-1">
+<span>SEC-03 [RESONANCE]</span>
+<span class="text-on-surface">2 SQUADS ACTIVE</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="w-3/5 h-full bg-primary/50"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-telemetry-data text-outline mt-1">
+<span>SEC-02 [CRYOGENIC]</span>
+<span class="text-error">1 SQUAD TERMINATED</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="w-2/5 h-full bg-error"></div>
+</div>
+</div>
+</div>
+<!-- Field Lead Statistics -->
+<div class="bg-surface-container-low p-space-md rounded-xl shadow-lg flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-badge text-telemetry-badge text-outline uppercase tracking-widest">EFFICIENCY APEX</span>
+<span class="font-telemetry-badge text-telemetry-badge text-primary">S-719 RECORD</span>
+</div>
+<div class="flex items-end justify-between my-2">
+<div>
+<div class="font-editorial-h2 text-editorial-h2 text-on-surface uppercase">28,940</div>
+<div class="font-telemetry-badge text-telemetry-badge text-outline uppercase">HIGHEST SESSION SCORE</div>
+</div>
+<div class="text-right">
+<div class="font-editorial-h2 text-editorial-h2 text-primary font-mono">18:42</div>
+<div class="font-telemetry-badge text-telemetry-badge text-outline uppercase">FASTEST TIME-TO-CORE</div>
+</div>
+</div>
+<div class="font-telemetry-timestamp text-telemetry-timestamp text-outline">
+          CALIBRATED BENCHMARK // TOP 0.4% STATION HISTORICAL RUNS
+        </div>
+</div>
+<!-- Projection System Diagnostics & Operational Telemetry -->
+<div class="bg-surface-container-low p-space-md rounded-xl shadow-lg flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-badge text-telemetry-badge text-outline uppercase tracking-widest">DISPLAY PROJECTION HARDWARE</span>
+<span class="font-telemetry-badge text-telemetry-badge text-primary">4K BROADCAST</span>
+</div>
+<div class="flex flex-col gap-1 text-[11px] font-telemetry-data text-outline my-2">
+<div class="flex justify-between">
+<span>PIPELINE BUFFER:</span>
+<span class="text-on-surface">ULTRA-LOW LATENCY (NDI)</span>
+</div>
+<div class="flex justify-between">
+<span>STATION ENCRYPTION:</span>
+<span class="text-primary">ECHO-AES-GCM-256</span>
+</div>
+<div class="flex justify-between">
+<span>SPECTATOR CONCURRENT:</span>
+<span class="text-on-surface">342 TERMINALS</span>
+</div>
+</div>
+<div class="font-telemetry-badge text-telemetry-badge text-outline uppercase tracking-wider flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+          PROJECTOR RESOLUTION: 3840x2160 // CADENCE: 5000ms
+        </div>
+</div>
+</section>
+</div>
+<!-- Inline Interactive Logic (Countdown timer, status filtering, simulated auto-sync) -->
+<script>
+    (function () {
+      let secondsSinceSync = 0;
+      const syncInterval = 5; // 5 seconds cadence
+
+      const syncLabel = document.getElementById('last-sync-label');
+      const syncProgress = document.getElementById('sync-progress');
+      const utcClock = document.getElementById('utc-clock');
+      const rows = document.querySelectorAll('.leaderboard-row');
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const emptyState = document.getElementById('empty-state-notice');
+      const projectorBtn = document.getElementById('projector-mode-toggle');
+
+      // Update real-time UTC Clock
+      function updateClock() {
+        const now = new Date();
+        const hrs = String(now.getUTCHours()).padStart(2, '0');
+        const mins = String(now.getUTCMinutes()).padStart(2, '0');
+        const secs = String(now.getUTCSeconds()).padStart(2, '0');
+        if (utcClock) {
+          utcClock.textContent = `${hrs}:${mins}:${secs} UTC`;
+        }
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      // Auto-Sync Telemetry Simulator (Every 5 seconds)
+      setInterval(() => {
+        secondsSinceSync++;
+        if (secondsSinceSync > syncInterval) {
+          secondsSinceSync = 0;
+          // Trigger visual sync flash on table container
+          const table = document.getElementById('leaderboard-list');
+          if (table) {
+            table.classList.add('opacity-90');
+            setTimeout(() => table.classList.remove('opacity-90'), 250);
+          }
+        }
+        if (syncLabel) {
+          syncLabel.textContent = `LAST SYNCED: ${secondsSinceSync} SECONDS AGO`;
+        }
+        if (syncProgress) {
+          const pct = ((secondsSinceSync) / syncInterval) * 100;
+          syncProgress.style.width = `${pct}%`;
+        }
+      }, 1000);
+
+      // Status Filtering Logic
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Update active styles
+          filterButtons.forEach(b => {
+            b.classList.remove('bg-surface-container-high', 'text-primary');
+            b.classList.add('text-on-surface-variant');
+          });
+          btn.classList.add('bg-surface-container-high', 'text-primary');
+          btn.classList.remove('text-on-surface-variant');
+
+          const filter = btn.getAttribute('data-filter');
+          let visibleCount = 0;
+
+          rows.forEach(row => {
+            const status = row.getAttribute('data-status');
+            if (filter === 'all' || status === filter) {
+              row.classList.remove('hidden');
+              visibleCount++;
+            } else {
+              row.classList.add('hidden');
+            }
+          });
+
+          // Show empty state if none visible
+          if (emptyState) {
+            if (visibleCount === 0) {
+              emptyState.classList.remove('hidden');
+              emptyState.classList.add('flex');
+            } else {
+              emptyState.classList.add('hidden');
+              emptyState.classList.remove('flex');
+            }
+          }
+        });
+      });
+
+      // Projector Fullscreen Handler
+      if (projectorBtn) {
+        projectorBtn.addEventListener('click', () => {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+            projectorBtn.querySelector('span:last-child').textContent = 'EXIT MODE';
+          } else {
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+              projectorBtn.querySelector('span:last-child').textContent = 'PROJECTOR';
+            }
+          }
+        });
+      }
+    })();
+  </script>
+</div></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant/30 py-space-md"><div class="w-full px-margin-mobile md:px-margin-tablet lg:px-margin-desktop flex flex-col sm:flex-row items-center justify-between gap-space-sm"><div class="flex items-center gap-space-xs"><span class="font-telemetry-timestamp text-telemetry-timestamp text-outline uppercase tracking-wider">ECHO STATION // FACILITY ALPHA // ENCRYPTED LINK LEVEL 5</span></div><div class="flex items-center gap-space-md"><span class="font-telemetry-badge text-telemetry-badge text-outline uppercase">ARCHIVAL HASH: #882-C9</span><span class="font-telemetry-badge text-telemetry-badge text-primary-container uppercase">AUTHORIZED EYES ONLY</span></div></div></footer></body></html>

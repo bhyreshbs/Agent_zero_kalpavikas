@@ -1,46 +1,131 @@
-import { supabase } from '../lib/supabase.js';
-
 const BASE = import.meta.env.VITE_API_BASE || '/api';
 
 // ---------------------------------------------------------------------------
-// Session management — backed by Supabase Auth
+// Session management — InsForge Auth tokens issued through the Express backend.
+// The browser only ever talks to the Express API (/auth/login, /auth/refresh,
+// /auth/logout); it holds { access_token, refresh_token, expires_at } locally.
 // ---------------------------------------------------------------------------
+const SESSION_KEY = 'az_session';
+const REFRESH_SKEW_MS = 30_000; // refresh slightly before the access token expires
+const AUTH_PATHS = new Set(['/auth/login', '/auth/refresh', '/auth/logout']);
 
-/**
- * Store a Supabase session returned by the backend after login.
- * Supabase persists it automatically in localStorage under its own key.
- */
+function readSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    return s?.access_token ? s : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeSession(s) {
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch { /* storage unavailable */ }
+}
+
+function clearSession() {
+  try { localStorage.removeItem(SESSION_KEY); } catch { /* storage unavailable */ }
+}
+
+function expiryMs(session) {
+  if (typeof session.expires_in === 'number') return Date.now() + session.expires_in * 1000;
+  try {
+    const payload = JSON.parse(atob(session.access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (typeof payload.exp === 'number') return payload.exp * 1000;
+  } catch { /* fall through */ }
+  return Date.now() + 5 * 60_000;
+}
+
+/** Store the session returned by POST /auth/login. */
 export async function setSession(session) {
   if (session?.access_token && session?.refresh_token) {
-    await supabase.auth.setSession({
+    writeSession({
       access_token:  session.access_token,
       refresh_token: session.refresh_token,
+      expires_at:    expiryMs(session),
     });
   }
 }
 
-/** Get the current Supabase access token (auto-refreshed by the client). */
+// One refresh at a time (all callers share the same in-flight promise) so
+// concurrent requests and the 4 s poll never spend the same refresh token twice.
+let refreshInFlight = null;
+
+// Resolves { ok: true, token } | { ok: false, definitive: boolean }.
+//   definitive = the server rejected the refresh token → the session is over.
+//   !definitive = network/5xx/rate-limit → keep the session and try again later.
+function refreshSession() {
+  if (refreshInFlight) return refreshInFlight;
+  refreshInFlight = (async () => {
+    const used = readSession();
+    if (!used?.refresh_token) return { ok: false, definitive: true };
+    let res;
+    try {
+      res = await fetch(`${BASE}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: used.refresh_token }),
+      });
+    } catch {
+      return { ok: false, definitive: false };
+    }
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.session?.access_token && data.session?.refresh_token) {
+        writeSession({
+          access_token:  data.session.access_token,
+          refresh_token: data.session.refresh_token,
+          expires_at:    expiryMs(data.session),
+        });
+        return { ok: true, token: data.session.access_token };
+      }
+      return { ok: false, definitive: false };
+    }
+    if (res.status === 400 || res.status === 401) {
+      // Another tab may have already rotated the refresh token; use its session instead of logging out.
+      const current = readSession();
+      if (current && current.refresh_token !== used.refresh_token) return { ok: true, token: current.access_token };
+      clearSession();
+      return { ok: false, definitive: true };
+    }
+    return { ok: false, definitive: false };
+  })().finally(() => { refreshInFlight = null; });
+  return refreshInFlight;
+}
+
+/** Current access token, refreshed first if it is about to expire. Null when logged out. */
 export async function getToken() {
-  const { data } = await supabase.auth.getSession();
-  return data?.session?.access_token ?? null;
+  const s = readSession();
+  if (!s) return null;
+  if (s.expires_at - Date.now() > REFRESH_SKEW_MS) return s.access_token;
+  const r = await refreshSession();
+  if (r.ok) return r.token;
+  // Transient failure: the old token may still be valid, let the request decide.
+  return r.definitive ? null : s.access_token;
 }
 
-/** Sign out and clear all stored session data. */
+/** End the session: best-effort server sign-out, always clear local tokens. */
 export async function logout() {
-  await supabase.auth.signOut();
+  const s = readSession();
+  clearSession();
+  if (s?.access_token) {
+    try {
+      await fetch(`${BASE}/auth/logout`, { method: 'POST', headers: { Authorization: `Bearer ${s.access_token}` } });
+    } catch { /* offline: local session is already cleared */ }
+  }
 }
 
-/** Check if there is a currently active session (sync snapshot). */
+/** Check whether a session is stored (sync). A stored refresh token makes an expired access token recoverable. */
 export function isLoggedIn() {
-  // supabase.auth.getSession() is async; this reads the in-memory cache.
-  // Use in non-async contexts (e.g. route guards).
-  try {
-    const raw = localStorage.getItem('sb-' + import.meta.env.VITE_SUPABASE_URL?.split('//')[1]?.split('.')[0] + '-auth-token');
-    if (!raw) return false;
-    const parsed = JSON.parse(raw);
-    return !!(parsed?.access_token);
-  } catch {
-    return false;
+  return !!readSession();
+}
+
+// Session is unrecoverable: clear it and send the player to the login page (once).
+function handleSessionExpired() {
+  clearSession();
+  if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+    window.location.assign('/login');
   }
 }
 
@@ -48,8 +133,7 @@ export function isLoggedIn() {
 // HTTP request helper
 // ---------------------------------------------------------------------------
 async function request(path, { method = 'GET', body, headers = {} } = {}) {
-  const token = await getToken();
-  const res = await fetch(`${BASE}${path}`, {
+  const send = (token) => fetch(`${BASE}${path}`, {
     method,
     headers: {
       'Content-Type': 'application/json',
@@ -58,6 +142,22 @@ async function request(path, { method = 'GET', body, headers = {} } = {}) {
     },
     body: body ? JSON.stringify(body) : undefined,
   });
+
+  const token = await getToken();
+  let res = await send(token);
+
+  // Expired/rejected access token: refresh once and retry once. Never loops:
+  // the retry is not retried, and auth endpoints never trigger a refresh.
+  if (res.status === 401 && token && !AUTH_PATHS.has(path)) {
+    const r = await refreshSession();
+    if (r.ok) {
+      res = await send(r.token);
+      if (res.status === 401) handleSessionExpired();
+    } else if (r.definitive) {
+      handleSessionExpired();
+    }
+  }
+
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     const err = new Error(data.error || `Request failed (${res.status})`);
@@ -81,7 +181,6 @@ export const api = {
   recoverySubmit: (answer)    => request('/game/recovery/submit', { method: 'POST', body: { answer } }),
   chat: (message, target)     => request('/game/chat', { method: 'POST', body: { message, target } }),
   hint: ()                    => request('/game/hint', { method: 'POST' }),
-  leaderboard: ()             => request('/leaderboard'),
   reportSecurityViolation: (reason) => request('/game/security-violation', { method: 'POST', body: { reason } }),
 };
 
@@ -98,6 +197,15 @@ export const adminApi = {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
     return data;
+  },
+  leaderboard:   (adminSecret) => {
+    return fetch(`${BASE}/leaderboard`, {
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': adminSecret },
+    }).then(async res => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    });
   },
   teams:         (adminSecret)             => adminApi.request('/teams', { adminSecret }),
   createTeam:    (body, adminSecret)       => adminApi.request('/teams/create', { method: 'POST', body, adminSecret }),

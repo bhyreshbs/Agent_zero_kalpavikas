@@ -172,13 +172,6 @@ export default function LevelMap3D() {
     <div className="az-map-viewport">
       <div className="az-map-header">
         <div className="az-map-header-left">
-          <button
-            className="az-btn-secondary"
-            onClick={() => { sfx.click(); nav('/leaderboard'); }}
-            onMouseEnter={() => sfx.hover()}
-          >
-            <IconTrophy size={14} style={{ marginRight: 6 }} /> Leaderboard
-          </button>
         </div>
         <div className="az-map-header-center">
           <span className="az-badge az-map-station-badge">ECHO STATION // LEVEL MAP</span>

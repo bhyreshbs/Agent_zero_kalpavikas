@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { dbAll } from '../db/index.js';
+import { requireAdminAuth } from '../middleware/auth.js';
 
 export const leaderboardRouter = Router();
 
 const TERMINAL_STATUSES = new Set(['completed', 'failed']);
 
-leaderboardRouter.get('/', async (req, res) => {
+leaderboardRouter.get('/', requireAdminAuth, async (req, res) => {
   try {
     const rows = await dbAll(
       `SELECT t.team_name as "teamName", s.status, s.current_level as level, s.lives,

@@ -4,6 +4,7 @@ import { FacilityPanel } from '../facility/Facility.jsx';
 import SceneCanvas from '../three/SceneCanvas.jsx';
 import Core3D from '../three/Core3D.jsx';
 import Door3D from '../three/Door3D.jsx';
+import { FacilityPartition } from '../three/FacilityRoom3D.jsx';
 import { IconCheck } from '../GameIcons.jsx';
 
 export default function Level5Scene({ level, onAction, busy, flash }) {
@@ -15,11 +16,13 @@ export default function Level5Scene({ level, onAction, busy, flash }) {
 
   return (
     <div className="az-scene3d-stage">
-      <SceneCanvas tone="white" height="100%">
+      <SceneCanvas tone="amber" height="100%" variant="facility">
+        <FacilityPartition position={[0, 1.5, -3.62]} size={[4.8, 3.0, 0.2]} />
 
-        <Core3D position={[0, 2, -2.6]} active={justSpoke || env.planAccepted} />
+        <Core3D position={[0, 2.1, -1.0]} active={justSpoke || env.planAccepted} variant="facility" />
         <Door3D
-          position={[0, 0, 2.2]}
+          variant="facility"
+          position={[0, 0, -3.42]}
           color={justWon ? '#35f2c2' : '#eaf6ff'}
           label="FINAL EXIT"
           state={justWon ? 'open' : 'closed'}

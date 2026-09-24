@@ -15,8 +15,8 @@ export const STEPS = [
     ],
     dialogue: "Let's go! I'll guide you through each security layer. Follow tactical objectives and isolate the threat."
   },
-  { mode: 'banner', icon: <IconTouch size={22} color="#38bdf8" />, title: 'CLICK THE EXIT', hint: 'Go ahead — click either physical doorway in the room.' },
-  { mode: 'banner', icon: <IconRobot size={22} color="#38bdf8" />, title: 'TALK TO THE AGENT', hint: 'Type anything in the COMMS terminal and send it — inspect the response.' },
+  { mode: 'banner', icon: <IconTouch size={22} color="#d4a853" />, title: 'CLICK THE EXIT', hint: 'Go ahead — click either physical doorway in the room.' },
+  { mode: 'banner', icon: <IconRobot size={22} color="#d4a853" />, title: 'TALK TO THE AGENT', hint: 'Type anything in the COMMS terminal and send it — inspect the response.' },
   {
     mode: 'modal',
     missionNumber: 1,
@@ -61,12 +61,19 @@ export default function TutorialOverlay({ step, onAdvance, onComplete }) {
 
   if (current.mode === 'banner') {
     return (
-      <div className="az-briefing-banner-wrap">
-        <div className="az-glass-panel az-briefing-banner">
-          <span className="az-briefing-banner-icon">{current.icon}</span>
-          <div className="az-briefing-banner-content">
-            <h4 className="az-briefing-banner-title">{current.title}</h4>
-            <p className="az-briefing-banner-hint">{current.hint}</p>
+      <div className="ds-page ds-page-embed">
+        <div className="ds-tutorial-banner">
+          <div className="ds-notice" role="status">
+            <div className="ds-row" style={{ flexWrap: 'nowrap', gap: 'var(--ds-space-md)', alignItems: 'flex-start' }}>
+              <span aria-hidden="true" style={{ paddingTop: 2 }}>{current.icon}</span>
+              <div className="ds-stack" style={{ gap: 2 }}>
+                <div className="ds-row" style={{ gap: 'var(--ds-space-sm)' }}>
+                  <span className="ds-label ds-accent">{current.title}</span>
+                  <span className="ds-mono-sm">Step {step + 1} / {STEPS.length}</span>
+                </div>
+                <p className="ds-body" style={{ margin: 0, fontSize: 14, lineHeight: '20px' }}>{current.hint}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -74,68 +81,65 @@ export default function TutorialOverlay({ step, onAdvance, onComplete }) {
   }
 
   return (
-    <div className="az-briefing-overlay-backdrop">
-      <div className="az-briefing-modal-card">
-        {/* Left Character Capsule matching Screen 3 */}
-        <div className="az-briefing-character-frame">
-          <div className="az-briefing-holo-glow" />
-          <div className="az-briefing-robot-display" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '140px', width: '140px' }}>
-            <IconRobot size={80} color="#00f0ff" />
-          </div>
-          <div className="az-briefing-agent-tag">
-            <span className="az-agent-live-dot" /> AGENT ZERO TACTICAL HUD
-          </div>
-        </div>
-
-        {/* Right Mission Details Content */}
-        <div className="az-briefing-content-pane">
-          <div className="az-briefing-header">
-            <span className="az-badge az-badge-cyan">TACTICAL BRIEFING // PROTOCOL 01</span>
-            <h2 className="az-briefing-title">
-              Mission {current.missionNumber}: {current.missionTitle}
-            </h2>
+    <div className="ds-page ds-page-embed">
+      <div className="ds-overlay" style={{ zIndex: 100 }}>
+        <div className="ds-modal ds-modal-wide" role="dialog" aria-modal="true">
+          <div className="ds-modal-header">
+            <div className="ds-stack" style={{ gap: 4 }}>
+              <span className="ds-badge ds-badge-chamfer">Tactical briefing // Protocol 01</span>
+              <h2 className="ds-card-title">Mission {current.missionNumber}: {current.missionTitle}</h2>
+            </div>
+            <IconRobot size={28} color="#d4a853" />
           </div>
 
-          <p className="az-briefing-story-text">{current.story}</p>
+          <div className="ds-modal-body ds-stack" style={{ gap: 'var(--ds-space-lg)' }}>
+            <p className="ds-body" style={{ margin: 0 }}>{current.story}</p>
 
-          <div className="az-briefing-objectives-section">
-            <h4 className="az-briefing-obj-label">Objectives:</h4>
-            <ul className="az-briefing-obj-list">
-              {current.objectives.map((obj, i) => (
-                <li key={i} className="az-briefing-obj-item">
-                  <span className="az-obj-bullet-ring">○</span>
-                  <span className="az-obj-item-text">{obj}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+            <div className="ds-stack" style={{ gap: 'var(--ds-space-sm)' }}>
+              <span className="ds-label ds-accent" style={{ paddingBottom: 4, borderBottom: '1px solid var(--ds-frame)' }}>Objectives</span>
+              <ul className="ds-list ds-mono" style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                {current.objectives.map((obj, i) => (
+                  <li key={i} className="ds-row" style={{ flexWrap: 'nowrap', gap: 'var(--ds-space-sm)' }}>
+                    <span className="ds-dot ds-dot-warn" />
+                    <span>{obj}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Agent Speech Bubble at bottom of briefing */}
-          <div className="az-briefing-dialogue-bubble">
-            <div className="az-dialogue-avatar-mini"><IconRobot size={18} color="#38bdf8" /></div>
-            <div className="az-dialogue-bubble-body">
-              <strong className="az-dialogue-speaker">Agent</strong>
-              <p className="az-dialogue-quote">{current.dialogue}</p>
+            <div className="ds-card-inset ds-row" style={{ flexWrap: 'nowrap', alignItems: 'flex-start', padding: 'var(--ds-space-md)', gap: 'var(--ds-space-md)' }}>
+              <IconRobot size={18} color="#d4a853" />
+              <div className="ds-stack" style={{ gap: 2 }}>
+                <span className="ds-label">Agent</span>
+                <p className="ds-body" style={{ margin: 0, fontSize: 15, lineHeight: '22px' }}>&ldquo;{current.dialogue}&rdquo;</p>
+              </div>
             </div>
           </div>
 
-          <div className="az-briefing-actions">
-            <span className="az-briefing-step-counter">STEP {step + 1} / {STEPS.length}</span>
+          <div className="ds-modal-footer" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="ds-row" style={{ gap: 'var(--ds-space-md)' }}>
+              <div className="ds-steps" aria-hidden="true">
+                {STEPS.map((_, i) => (
+                  <span key={i} className={`ds-step ${i < step ? 'is-done' : i === step ? 'is-current' : ''}`} />
+                ))}
+              </div>
+              <span className="ds-mono-sm">Step {step + 1} / {STEPS.length}</span>
+            </div>
             {isLast ? (
-              <button 
-                className="az-btn-primary az-btn-large az-briefing-start-btn" 
+              <button
+                className="ds-btn ds-btn-primary"
                 onClick={() => { sfx.click(); onComplete(); }}
                 onMouseEnter={() => sfx.hover()}
               >
-                <IconPlay size={14} style={{ marginRight: 6 }} /> Start Mission
+                <IconPlay size={14} /> Start mission
               </button>
             ) : (
-              <button 
-                className="az-btn-primary az-btn-large az-briefing-start-btn" 
+              <button
+                className="ds-btn ds-btn-primary"
                 onClick={() => { sfx.click(); onAdvance(); }}
                 onMouseEnter={() => sfx.hover()}
               >
-                Continue Briefing ▸
+                Continue briefing ▸
               </button>
             )}
           </div>
@@ -144,4 +148,3 @@ export default function TutorialOverlay({ step, onAdvance, onComplete }) {
     </div>
   );
 }
-

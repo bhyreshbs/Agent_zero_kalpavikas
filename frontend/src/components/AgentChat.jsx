@@ -92,15 +92,15 @@ export default function AgentChat({ targets, onReply, locked, focusRequest, onUn
 
   if (locked) {
     return (
-      <div className="az-chat-collapsed az-glass-panel" style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div className="az-terminal-lock-badge" style={{ color: 'var(--az-text)', fontSize: '0.8rem', letterSpacing: '0.1em' }}>
-           AGENT COMMUNICATION <br/>
-           <span style={{ color: unlocking ? 'var(--az-accent)' : 'var(--az-text-muted)'}}>
-             SIGNAL: {unlockStage}
-           </span>
+      <div className="ds-page ds-page-embed">
+      <div className="ds-comms">
+        <div className="ds-comms-head">
+          <span className="ds-label">Agent communication</span>
+          <span className={`ds-badge ${unlocking ? '' : 'ds-badge-muted'}`}>Signal: {unlockStage}</span>
         </div>
+        <div style={{ padding: 'var(--ds-space-md)' }}>
         <button
-          className="az-chat-talk-btn az-btn-primary"
+          className={`ds-btn ds-btn-primary ds-btn-block${unlocking ? ' is-loading' : ''}`}
           onClick={() => {
             sfx.click();
             setUnlocking(true);
@@ -121,58 +121,63 @@ export default function AgentChat({ targets, onReply, locked, focusRequest, onUn
           }}
           disabled={unlocking}
         >
-          {unlocking ? 'CONNECTING...' : 'ESTABLISH CONNECTION ▸'}
+          {unlocking ? 'Connecting…' : 'Establish connection ▸'}
         </button>
+        </div>
+      </div>
       </div>
     );
   }
 
   if (!expanded) {
     return (
-      <div className="az-chat-collapsed">
-        <button
-          className="az-chat-talk-btn az-btn-primary az-attention-pulse"
-          onClick={() => { sfx.click(); setExpanded(true); }}
-        >
-          ▸ {log.length > 0 ? 'REOPEN COMMS CHANNEL' : 'OPEN COMMS CHANNEL (REQUIRED)'}
-        </button>
+      <div className="ds-page ds-page-embed">
+        <div style={{ textAlign: 'right' }}>
+          <button
+            className="ds-btn ds-btn-primary"
+            onClick={() => { sfx.click(); setExpanded(true); }}
+          >
+            <span className="ds-dot ds-dot-live" style={{ background: 'var(--ds-on-primary)' }} />
+            {log.length > 0 ? 'Reopen comms channel' : 'Open comms channel (required)'}
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="az-terminal az-glass-panel">
-      <div className="az-terminal-titlebar">
-        <div className="az-terminal-titlebar-left">
-          <span className="az-terminal-dot" />
-          <span className="az-terminal-title-text">COMMS CHANNEL // LIVE{target ? ` // UNIT ${target}` : ''}</span>
-        </div>
+    <div className="ds-page ds-page-embed">
+    <div className="ds-comms">
+      <div className="ds-comms-head">
+        <span className="ds-label ds-accent">
+          <span className="ds-dot ds-dot-live" /> Comms channel // live{target ? ` // unit ${target}` : ''}
+        </span>
         <button
-          className="az-chat-minimize"
+          className="ds-btn ds-btn-ghost ds-btn-sm"
           onClick={() => { sfx.click(); setExpanded(false); }}
           title="Minimize terminal"
         >
-          — MINIMIZE
+          — Minimize
         </button>
       </div>
 
       {targets?.length > 1 && (
-        <div className="az-terminal-unit-selector">
+        <div className="ds-comms-units">
           {targets.map((t) => (
             <button
               key={t}
-              className={`az-unit-btn ${target === t ? 'is-active' : ''}`}
+              className={`ds-btn ds-btn-secondary ds-btn-sm ${target === t ? 'is-active' : ''}`}
               onClick={() => { sfx.click(); setTarget(t); }}
             >
-              UNIT {t}
+              Unit {t}
             </button>
           ))}
         </div>
       )}
 
-      <div className="az-terminal-log">
+      <div className="ds-comms-log">
         {log.length === 0 && (
-          <div className="az-terminal-line az-terminal-system">
+          <div className="ds-line is-system">
             // link established. awaiting operative transmission...
           </div>
         )}
@@ -181,23 +186,25 @@ export default function AgentChat({ targets, onReply, locked, focusRequest, onUn
           const text = entry.who === 'agent' && isLast ? entry.text.slice(0, revealedCount) : entry.text;
           const stillTyping = entry.who === 'agent' && isLast && revealedCount < entry.text.length;
           return (
-            <div key={i} className={`az-terminal-line ${entry.who === 'you' ? 'is-you' : 'is-agent'}`}>
-              <span className="az-terminal-prefix">{entry.who === 'you' ? '>' : '::'}</span>{' '}
-              <span className="az-terminal-text">{text}</span>
-              {stillTyping && <span className="az-terminal-cursor">▌</span>}
+            <div key={i} className={`ds-line ${entry.who === 'you' ? 'is-you' : 'is-agent'}`}>
+              <span className="ds-line-prefix">{entry.who === 'you' ? '>' : '::'}</span>
+              <span>
+                {text}
+                {stillTyping && <span className="ds-cursor">▌</span>}
+              </span>
             </div>
           );
         })}
-        {busy && <div className="az-terminal-line az-terminal-system">// transmitting packet to neural mesh...</div>}
+        {busy && <div className="ds-line is-system">// transmitting packet to neural mesh...</div>}
         <div ref={logEndRef} />
       </div>
 
-      {error && <p className="az-error az-terminal-error">{error}</p>}
+      {error && <p className="ds-alert ds-alert-error" role="alert" style={{ margin: '0 var(--ds-space-md) var(--ds-space-sm)' }}>{error}</p>}
 
-      <form onSubmit={send} className="az-terminal-input-row">
-        <span className="az-terminal-prompt">&gt;</span>
+      <form onSubmit={send} className="ds-comms-input">
+        <span className="ds-accent ds-mono">&gt;</span>
         <input
-          className="az-terminal-input"
+          className="ds-input ds-input-sm"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="type tactical transmission..."
@@ -206,12 +213,13 @@ export default function AgentChat({ targets, onReply, locked, focusRequest, onUn
         />
         <button
           type="submit"
-          className="az-terminal-submit-btn az-btn-primary"
+          className={`ds-btn ds-btn-primary ds-btn-sm${busy ? ' is-loading' : ''}`}
           disabled={busy || !input.trim()}
         >
-          {busy ? '⋯' : 'TRANSMIT ▸'}
+          Transmit ▸
         </button>
       </form>
+    </div>
     </div>
   );
 }

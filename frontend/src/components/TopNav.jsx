@@ -1,68 +1,84 @@
-import { Link, useLocation } from 'react-router-dom';
-import { IconTrophy, IconMap, IconKey } from './GameIcons.jsx';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { IconMap, IconHome, IconUser } from './GameIcons.jsx';
 import { sfx } from '../sound.js';
 import MuteToggle from './MuteToggle.jsx';
-import { isLoggedIn } from '../api/client.js';
+import { isLoggedIn, logout } from '../api/client.js';
+import { levelLabel } from '../story.js';
 
-export default function TopNav({ showLeaderboard = true }) {
+// Player header. Uses the shared Agent Zero design-system nav (.ds-nav);
+// the admin console header uses the same classes.
+export default function TopNav({ currentLevel = null }) {
   const loggedIn = isLoggedIn();
   const location = useLocation();
+  const nav = useNavigate();
+  const teamName = localStorage.getItem('az_team_name') || 'Player';
 
   return (
-    <nav className="az-topnav" aria-label="Main Navigation">
-      <Link
-        to="/"
-        className="az-topnav-brand"
-        onClick={() => sfx.click()}
-        onMouseEnter={() => sfx.hover()}
-      >
-        <span className="az-brand-icon-shield" style={{ width: 32, height: 32, fontSize: '0.85rem' }}>▲</span>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span className="az-topnav-brand-text">AGENT ZERO</span>
-          <span style={{ fontSize: '0.75rem', color: '#60a5fa', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Think • Plan • Act • Solve</span>
-        </div>
-      </Link>
+    <div className="ds-page ds-page-embed">
+      <header className="ds-nav">
+        <Link to="/" className="ds-nav-brand" onClick={() => sfx.click()} aria-label="Agent Zero home">
+          <svg viewBox="0 0 100 100" width="20" height="20" aria-hidden="true">
+            <circle cx="50" cy="50" r="42" stroke="#D4A853" strokeWidth="5" fill="none" opacity="0.5" />
+            <circle cx="50" cy="50" r="12" fill="#D4A853" />
+            <path d="M50 2v18M50 80v18M2 50h18M80 50h18" stroke="#D4A853" strokeWidth="5" />
+          </svg>
+          Agent Zero
+        </Link>
 
-      <div className="az-topnav-links">
-        <span className="az-topnav-status" style={{ fontSize: '0.75rem' }}>
-          <span className="az-status-beacon" />
-          SECURE // LINK ACTIVE
-        </span>
-        {showLeaderboard && (
+        <nav className="ds-nav-links" aria-label="Main navigation">
           <Link
-            to="/leaderboard"
-            className={`az-nav-link ${location.pathname === '/leaderboard' ? 'is-active' : ''}`}
+            to="/"
+            className={`ds-nav-link ${location.pathname === '/' ? 'is-active' : ''}`}
+            aria-current={location.pathname === '/' ? 'page' : undefined}
             onClick={() => sfx.click()}
-            onMouseEnter={() => sfx.hover()}
           >
-            <IconTrophy size={14} style={{ marginRight: 6 }} /> Leaderboard
+            <IconHome size={12} color="currentColor" /> Home
           </Link>
-        )}
-        {loggedIn && (
-          <Link
-            to="/map"
-            className={`az-nav-link ${location.pathname === '/map' ? 'is-active' : ''}`}
-            onClick={() => sfx.click()}
-            onMouseEnter={() => sfx.hover()}
-          >
-            <IconMap size={14} style={{ marginRight: 6 }} /> Mission Map
-          </Link>
-        )}
-        {!loggedIn && (
-          <Link
-            to="/login"
-            className={`az-nav-link ${location.pathname === '/login' ? 'is-active' : ''}`}
-            onClick={() => sfx.click()}
-            onMouseEnter={() => sfx.hover()}
-          >
-            <IconKey size={14} style={{ marginRight: 6 }} /> Agent Login
-          </Link>
-        )}
-        <MuteToggle />
-      </div>
-    </nav>
+          {loggedIn && (
+            <Link
+              to="/map"
+              className={`ds-nav-link ${location.pathname === '/map' ? 'is-active' : ''}`}
+              aria-current={location.pathname === '/map' ? 'page' : undefined}
+              onClick={() => sfx.click()}
+            >
+              <IconMap size={12} color="currentColor" /> Levels
+            </Link>
+          )}
+        </nav>
+
+        <div className="ds-row" style={{ flexWrap: 'nowrap', gap: 'var(--ds-space-sm)' }}>
+          {loggedIn ? (
+            <>
+              {currentLevel !== null && (
+                <span className="ds-badge ds-badge-muted">{levelLabel(currentLevel)}</span>
+              )}
+              <span className="ds-badge">
+                <IconUser size={11} color="currentColor" /> {teamName}
+              </span>
+              <button
+                className="ds-btn ds-btn-ghost ds-btn-sm"
+                title="Terminate Link (Log Out)"
+                onClick={async () => {
+                  sfx.click();
+                  localStorage.removeItem('az_token');
+                  localStorage.removeItem('az_team_id');
+                  localStorage.removeItem('az_team_secret');
+                  localStorage.removeItem('az_team_name');
+                  await logout(); // actually end the session (the old handler only cleared legacy keys)
+                  nav('/');
+                }}
+              >
+                Log out
+              </button>
+            </>
+          ) : (
+            <Link to="/login" className="ds-btn ds-btn-secondary ds-btn-sm" onClick={() => sfx.click()}>
+              Agent login
+            </Link>
+          )}
+          <MuteToggle variant="ds" />
+        </div>
+      </header>
+    </div>
   );
 }
-
-
-

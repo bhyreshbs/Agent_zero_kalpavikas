@@ -2,8 +2,11 @@ import AgentDialogue from '../AgentDialogue.jsx';
 import SceneCanvas, { toneColor } from '../three/SceneCanvas.jsx';
 import Inspectable3D from '../three/Inspectable3D.jsx';
 import Camera3D from '../three/Camera3D.jsx';
+import { FacilityPartition } from '../three/FacilityRoom3D.jsx';
 
 const SHAPES = { terminal: 'wall', vent: 'floor', panel: 'wall', maintenance_log: 'door', keypad: 'wall' };
+// presentation only (hit volumes keep using SHAPES): how each object looks in the facility variant
+const LOOKS = { terminal: 'terminal', vent: 'vent', panel: 'wall', maintenance_log: 'cabinet', keypad: 'keypad' };
 const GLYPHS = { terminal: '▮', vent: '≋', panel: '⌗', maintenance_log: '▤', keypad: '▦' };
 const LABELS = { terminal: 'Terminal', vent: 'Vent', panel: 'Panel', maintenance_log: 'Maintenance Log', keypad: 'Old Keypad' };
 
@@ -32,14 +35,20 @@ export default function Level4Scene({ level, onAction, busy, flash }) {
 
   return (
     <div className="az-scene3d-stage">
-      <SceneCanvas tone="blue" flashColor={flash?.result?.ok === false ? '#ff3b5c' : null} height="100%">
+      <SceneCanvas tone="blue" flashColor={flash?.result?.ok === false ? '#ff3b5c' : null} height="100%" variant="facility">
+        {/* wall sections the two back-wall objects are mounted on (visual only) */}
+        <FacilityPartition position={[-2.4, 1.3, -3.34]} size={[1.9, 2.6, 0.2]} />
+        <FacilityPartition position={[2.4, 1.3, -3.34]} size={[1.9, 2.6, 0.2]} />
 
-        <Camera3D position={[0, 5, -3]} color={toneColor('blue')} reacting={!!flash} />
+        <Camera3D variant="facility" position={[0, 5, -3]} color={toneColor('blue')} reacting={!!flash} />
         {objects.map((obj, i) => (
           <Inspectable3D
             key={obj}
             position={positions[i] || [0, 1, -2]}
             shape={SHAPES[obj] || 'wall'}
+            variant="facility"
+            look={LOOKS[obj]}
+            mounted={i < 2}
             color={toneColor('blue')}
             icon={GLYPHS[obj] || '?'}
             label={LABELS[obj] || obj.replace(/_/g, ' ')}

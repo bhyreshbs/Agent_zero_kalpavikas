@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "primary-container": "#d4a853",
+          "on-tertiary-container": "#474137",
+          "surface-container-highest": "#363433",
+          "on-secondary-container": "#b9b5ac",
+          "on-primary": "#412d00",
+          "on-secondary-fixed": "#1d1c16",
+          "surface": "#141312",
+          "on-tertiary-fixed": "#201b13",
+          "on-error": "#690005",
+          "outline-variant": "#4e4637",
+          "tertiary": "#d3c8bb",
+          "surface-bright": "#3b3937",
+          "error-container": "#93000a",
+          "surface-container-high": "#2b2a28",
+          "tertiary-fixed": "#ece1d3",
+          "on-surface-variant": "#d2c5b2",
+          "on-error-container": "#ffdad6",
+          "primary-fixed-dim": "#eec068",
+          "tertiary-fixed-dim": "#cfc5b8",
+          "surface-dim": "#141312",
+          "on-primary-fixed-variant": "#5d4200",
+          "surface-container-low": "#1d1b1a",
+          "on-secondary-fixed-variant": "#494740",
+          "outline": "#9b8f7e",
+          "on-background": "#e6e1df",
+          "on-secondary": "#32302a",
+          "inverse-surface": "#e6e1df",
+          "on-primary-container": "#573d00",
+          "secondary-fixed": "#e7e2d9",
+          "secondary-container": "#494740",
+          "background": "#141312",
+          "inverse-primary": "#7b5804",
+          "secondary": "#cac6bd",
+          "surface-container": "#211f1e",
+          "surface-variant": "#363433",
+          "on-tertiary-fixed-variant": "#4c463c",
+          "error": "#ffb4ab",
+          "primary-fixed": "#ffdea6",
+          "on-tertiary": "#353027",
+          "tertiary-container": "#b7ada1",
+          "on-surface": "#e6e1df",
+          "surface-container-lowest": "#0f0e0d",
+          "primary": "#f2c36b",
+          "on-primary-fixed": "#271900",
+          "secondary-fixed-dim": "#cac6bd",
+          "surface-tint": "#eec068",
+          "inverse-on-surface": "#32302f"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "margin-tablet": "2rem",
+          "space-xl": "2.5rem",
+          "space-xs": "0.25rem",
+          "margin-desktop": "3.5rem",
+          "space-sm": "0.5rem",
+          "gutter-lg": "2rem",
+          "margin-mobile": "1rem",
+          "gutter": "1.5rem",
+          "space-md": "1rem",
+          "space-xxl": "4rem",
+          "gutter-sm": "0.75rem",
+          "margin": "2rem",
+          "space-lg": "1.5rem"
+        },
+        "fontFamily": {
+          "dossier-title": [
+            "Playfair Display"
+          ],
+          "telemetry-timestamp": [
+            "JetBrains Mono"
+          ],
+          "display-hero-mobile": [
+            "Playfair Display"
+          ],
+          "display-hero": [
+            "Playfair Display"
+          ],
+          "telemetry-data": [
+            "JetBrains Mono"
+          ],
+          "editorial-h2": [
+            "Playfair Display"
+          ],
+          "ui-nav": [
+            "Space Grotesk"
+          ],
+          "telemetry-badge": [
+            "JetBrains Mono"
+          ],
+          "editorial-h1": [
+            "Playfair Display"
+          ],
+          "ui-micro": [
+            "Space Grotesk"
+          ],
+          "dossier-title-mobile": [
+            "Playfair Display"
+          ],
+          "body-dossier": [
+            "Playfair Display"
+          ],
+          "ui-action-lg": [
+            "Space Grotesk"
+          ]
+        },
+        "fontSize": {
+          "dossier-title": [
+            "36px",
+            {
+              "lineHeight": "44px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "500"
+            }
+          ],
+          "telemetry-timestamp": [
+            "11px",
+            {
+              "lineHeight": "16px",
+              "fontWeight": "400"
+            }
+          ],
+          "display-hero-mobile": [
+            "36px",
+            {
+              "lineHeight": "44px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "600"
+            }
+          ],
+          "display-hero": [
+            "56px",
+            {
+              "lineHeight": "64px",
+              "letterSpacing": "-0.02em",
+              "fontWeight": "600"
+            }
+          ],
+          "telemetry-data": [
+            "12px",
+            {
+              "lineHeight": "18px",
+              "letterSpacing": "0.02em",
+              "fontWeight": "400"
+            }
+          ],
+          "editorial-h2": [
+            "22px",
+            {
+              "lineHeight": "28px",
+              "letterSpacing": "0.01em",
+              "fontWeight": "400"
+            }
+          ],
+          "ui-nav": [
+            "12px",
+            {
+              "lineHeight": "16px",
+              "letterSpacing": "0.1em",
+              "fontWeight": "500"
+            }
+          ],
+          "telemetry-badge": [
+            "10px",
+            {
+              "lineHeight": "12px",
+              "letterSpacing": "0.05em",
+              "fontWeight": "600"
+            }
+          ],
+          "editorial-h1": [
+            "28px",
+            {
+              "lineHeight": "36px",
+              "fontWeight": "500"
+            }
+          ],
+          "ui-micro": [
+            "10px",
+            {
+              "lineHeight": "14px",
+              "letterSpacing": "0.12em",
+              "fontWeight": "500"
+            }
+          ],
+          "dossier-title-mobile": [
+            "26px",
+            {
+              "lineHeight": "32px",
+              "fontWeight": "500"
+            }
+          ],
+          "body-dossier": [
+            "16px",
+            {
+              "lineHeight": "26px",
+              "fontWeight": "400"
+            }
+          ],
+          "ui-action-lg": [
+            "14px",
+            {
+              "lineHeight": "20px",
+              "letterSpacing": "0.08em",
+              "fontWeight": "600"
+            }
+          ]
+        }
+      },
+    },
+  }</script></head><body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.6)]"><div class="h-16 w-full px-margin-mobile md:px-margin-tablet lg:px-margin-desktop flex items-center justify-between"><div class="flex items-center gap-space-md"><span class="font-ui-micro text-ui-micro uppercase tracking-[0.2em] text-primary px-space-xs py-0.5 bg-primary/10 border border-primary/30">AGENT ZERO</span><span class="hidden sm:inline-block font-telemetry-badge text-telemetry-badge text-outline uppercase tracking-wider">DIRECTORATE LEVEL // SECTOR COMPLETION</span></div><nav class="flex items-center gap-space-sm" data-active-classes="bg-surface-container-high text-primary"><a aria-current="page" class="font-ui-nav uppercase px-space-sm py-1 transition-colors bg-surface-container-high text-primary" data-path="sector-debrief" href="#">Debrief</a><a class="font-ui-nav text-ui-nav uppercase px-space-sm py-1 transition-colors text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high" data-path="operative-dossier" href="#">Operative Log</a><a class="font-ui-nav text-ui-nav uppercase px-space-sm py-1 transition-colors text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high" data-path="telemetry-manifest" href="#">Telemetry</a><a class="font-ui-nav text-ui-nav uppercase px-space-sm py-1 transition-colors text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high" data-path="mission-archive" href="#">Archives</a></nav><div class="flex items-center gap-space-md"><div class="hidden md:flex flex-col text-right"><span class="font-telemetry-timestamp text-telemetry-timestamp text-outline">AUTH: ZERO-994</span><span class="font-telemetry-badge text-telemetry-badge text-primary uppercase">ENCRYPTED CH-8</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface flex-1 flex flex-col"><div class="flex flex-col w-full">
+<!-- Dynamic Ambient Backing Glow & Volumetric Light Beam -->
+<div class="relative w-full overflow-hidden px-margin-mobile md:px-margin-tablet lg:px-margin-desktop py-space-xl flex-1 flex flex-col justify-center">
+<!-- Atmospheric Radial Scrim & Warm Gold Light Shaft -->
+<div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
+<div class="absolute w-[800px] h-[800px] rounded-full bg-primary/5 blur-[120px] -top-40 left-1/4"></div>
+<div class="absolute w-[600px] h-[600px] rounded-full bg-primary-container/10 blur-[140px] bottom-0 right-1/4"></div>
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_35%_40%,rgba(212,168,83,0.12)_0%,rgba(20,19,18,0.7)_55%,rgba(15,14,13,0.98)_100%)]"></div>
+<!-- Subtle Archival Scanlines -->
+<div class="absolute inset-0 bg-[linear-gradient(rgba(242,195,107,0.015)_1px,transparent_1px)] bg-[size:100%_4px] opacity-60"></div>
+</div>
+<!-- Main Split-Screen Architecture (55% Visual Stage / 45% Tactical Dossier) -->
+<div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-stretch max-w-[1540px] mx-auto w-full">
+<!-- ==================== LEFT 55% VISUAL STAGE ==================== -->
+<div class="lg:col-span-7 flex flex-col justify-between space-y-space-lg">
+<!-- Header Grouping -->
+<div class="space-y-space-xs">
+<!-- Classified Overwatch Beacon -->
+<div class="flex items-center gap-space-sm font-telemetry-badge text-telemetry-badge tracking-[0.22em] text-primary uppercase">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span>// SECTOR DECLASSIFICATION // BREACH OVERWATCH CLEARANCE</span>
+<span class="text-outline-variant font-normal">|</span>
+<span class="text-outline font-telemetry-timestamp text-telemetry-timestamp">STATION: BERLIN-09</span>
+</div>
+<!-- Editorial Headline -->
+<div class="pt-space-xs">
+<h1 class="font-display-hero text-display-hero italic text-on-surface leading-tight tracking-tight">
+              SECTOR 03 COMPLETE
+            </h1>
+<p class="font-ui-nav text-ui-nav text-outline uppercase tracking-[0.16em] mt-1">
+              Neural Resonance Chamber Neutralized <span class="text-primary mx-1.5">▪</span> Harmonic Integrity Verified
+            </p>
+</div>
+</div>
+<!-- Geometric Abstract Portal Sigil Element -->
+<div class="relative flex items-center justify-center my-space-md py-space-sm">
+<!-- Volumetric Backing Flare -->
+<div class="absolute w-72 h-72 rounded-full bg-primary/10 blur-[50px]"></div>
+<!-- Master Decoded Sigil (Concentric Mechanical Calibration Rings) -->
+<div class="relative w-[340px] h-[340px] md:w-[390px] md:h-[390px] flex items-center justify-center">
+<!-- Outer Cardinal Orientation Ring -->
+<div class="absolute inset-0 rounded-full border border-primary/20 flex items-center justify-center">
+<span class="absolute -top-3 font-telemetry-timestamp text-telemetry-timestamp text-primary/70 tracking-widest">000°</span>
+<span class="absolute -bottom-3 font-telemetry-timestamp text-telemetry-timestamp text-primary/70 tracking-widest">180°</span>
+<span class="absolute -left-3 font-telemetry-timestamp text-telemetry-timestamp text-primary/70 tracking-widest -rotate-90">270°</span>
+<span class="absolute -right-3 font-telemetry-timestamp text-telemetry-timestamp text-primary/70 tracking-widest rotate-90">090°</span>
+</div>
+<!-- Slow Counter-Rotating Dashed Orbit 1 -->
+<div class="absolute inset-5 rounded-full border border-dashed border-primary/30 animate-[spin_60s_linear_infinite]"></div>
+<!-- Hairline Solid Orbit with Calibrated Tick Marks -->
+<div class="absolute inset-10 rounded-full border border-outline-variant/50">
+<!-- Radial Ticks -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-full h-[1px] bg-primary/20"></div>
+<div class="h-full w-[1px] bg-primary/20 absolute"></div>
+<div class="w-full h-[1px] bg-outline-variant/30 rotate-45"></div>
+<div class="w-full h-[1px] bg-outline-variant/30 -rotate-45"></div>
+</div>
+</div>
+<!-- Rapid Precision Micro-Strobe Ring -->
+<div class="absolute inset-16 rounded-full border border-primary/40 animate-[spin_40s_linear_infinite_reverse]">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_rgba(242,195,107,0.9)]"></div>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-1.5 h-1.5 bg-tertiary-fixed rounded-full"></div>
+</div>
+<!-- Segmented Geometric Ring -->
+<div class="absolute inset-24 rounded-full border-2 border-primary/20 border-t-primary/70 border-b-primary/70 animate-[spin_25s_ease-in-out_infinite]"></div>
+<!-- Deep Inner Well -->
+<div class="relative w-36 h-36 rounded-full bg-surface-container-lowest border border-primary/50 shadow-[inset_0_2px_12px_rgba(0,0,0,0.9)] flex flex-col items-center justify-center backdrop-blur-sm">
+<!-- Echo Glyph Beacon -->
+<span class="text-4xl text-primary drop-shadow-[0_0_18px_rgba(242,195,107,0.7)] select-none">◆</span>
+<span class="font-telemetry-badge text-[9px] tracking-[0.25em] text-primary mt-1 font-semibold uppercase">ECHO-03</span>
+<span class="font-telemetry-timestamp text-[8px] text-outline tracking-wider uppercase">DAMPENED</span>
+</div>
+<!-- Orbital Data Nodes Floating at Tangents -->
+<div class="absolute -top-2 left-6 bg-surface-container-low/90 backdrop-blur-sm border border-outline-variant px-space-xs py-0.5 rounded shadow-sm">
+<span class="font-telemetry-timestamp text-telemetry-timestamp text-primary">CORE HARMONIC: 100.0%</span>
+</div>
+<div class="absolute bottom-4 left-4 bg-surface-container-low/90 backdrop-blur-sm border border-outline-variant px-space-xs py-0.5 rounded shadow-sm">
+<span class="font-telemetry-timestamp text-telemetry-timestamp text-on-surface-variant">FLUX: STABILIZED</span>
+</div>
+<div class="absolute -bottom-2 right-4 bg-surface-container-low/90 backdrop-blur-sm border border-outline-variant px-space-xs py-0.5 rounded shadow-sm">
+<span class="font-telemetry-timestamp text-telemetry-timestamp text-outline">HASH: #ECHO-SEC-03-VERIFIED</span>
+</div>
+</div>
+</div>
+<!-- Agent In-Field Transmission Dispatch Card -->
+<div class="relative bg-surface-container-low/95 border border-primary/25 rounded p-space-md shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+<!-- Mechanical Corner Reticle Accents -->
+<span class="absolute -top-[1px] -left-[1px] w-2 h-2 border-t-2 border-l-2 border-primary"></span>
+<span class="absolute -top-[1px] -right-[1px] w-2 h-2 border-t-2 border-r-2 border-primary"></span>
+<span class="absolute -bottom-[1px] -left-[1px] w-2 h-2 border-b-2 border-l-2 border-primary"></span>
+<span class="absolute -bottom-[1px] -right-[1px] w-2 h-2 border-b-2 border-r-2 border-primary"></span>
+<!-- Transmission Header -->
+<div class="flex items-center justify-between pb-space-sm border-b border-outline-variant/40">
+<div class="flex items-center gap-space-sm">
+<div class="w-6 h-6 rounded bg-primary/10 border border-primary/40 flex items-center justify-center text-primary text-xs">
+                ◆
+              </div>
+<span class="font-ui-nav text-ui-nav uppercase text-on-surface tracking-wider font-semibold">
+                ECHO RELAY AI // COMM LINK ACTIVE
+              </span>
+</div>
+<div class="flex items-center gap-space-xs font-telemetry-timestamp text-telemetry-timestamp text-outline">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span>[TRANS-REC // 14:32:08 UTC]</span>
+</div>
+</div>
+<!-- Dispatch Message -->
+<div class="py-space-sm">
+<p class="font-body-dossier text-body-dossier italic text-on-surface-variant leading-relaxed">
+              “The vibrations have settled. For the first time in ninety cycles, the lower stratum doesn’t hum in agony. You calibrated the dampers with surgical precision, Operative. Sector 04’s blast seals are lifting now.”
+            </p>
+</div>
+<!-- Synthetic Waveform Bar Graph -->
+<div class="flex items-center justify-between pt-space-xs border-t border-outline-variant/20">
+<div class="flex items-end gap-1 h-3">
+<span class="w-0.5 h-1.5 bg-primary/60"></span>
+<span class="w-0.5 h-3 bg-primary"></span>
+<span class="w-0.5 h-2 bg-primary/70"></span>
+<span class="w-0.5 h-1 bg-primary/40"></span>
+<span class="w-0.5 h-2.5 bg-primary"></span>
+<span class="w-0.5 h-1.5 bg-primary/50"></span>
+<span class="w-0.5 h-2 bg-primary/80"></span>
+<span class="w-0.5 h-1 bg-primary/30"></span>
+<span class="w-0.5 h-2.5 bg-primary/90"></span>
+<span class="w-0.5 h-1.5 bg-primary/40"></span>
+</div>
+<span class="font-telemetry-timestamp text-telemetry-timestamp text-outline tracking-widest uppercase">
+              AUDIO SPECTRUM // HARMONIC DAMPENING CONFIRMED
+            </span>
+</div>
+</div>
+</div>
+<!-- ==================== RIGHT 45% MISSION SUMMARY DOSSIER ==================== -->
+<div class="lg:col-span-5 flex flex-col">
+<div class="relative h-full flex flex-col justify-between bg-surface-container/95 border border-primary/30 rounded p-space-lg shadow-[0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-md">
+<!-- Tactical Card Header -->
+<div class="space-y-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs text-primary font-ui-micro text-ui-micro tracking-[0.25em] uppercase font-semibold">
+<span>◆</span>
+<span>MISSION SUMMARY</span>
+</div>
+<span class="font-telemetry-badge text-telemetry-badge bg-primary/10 border border-primary/40 text-primary px-space-xs py-0.5 rounded">
+                CLASSIFIED EYES-ONLY
+              </span>
+</div>
+<h2 class="font-editorial-h2 text-editorial-h2 text-on-surface font-medium">
+              Sector 03 Performance Debrief
+            </h2>
+<div class="font-telemetry-timestamp text-telemetry-timestamp text-outline uppercase tracking-wider">
+              SQUAD VANGUARD-09 // LOG REF: VRG-330-ECHO
+            </div>
+</div>
+<!-- Hairline Divider -->
+<div class="relative my-space-md flex items-center justify-center">
+<div class="w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+<span class="absolute px-2 bg-surface-container text-primary text-[10px]">◆</span>
+</div>
+<!-- Section: Verified Objectives Checklist -->
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between font-ui-micro text-ui-micro tracking-widest text-outline uppercase">
+<span>MANDATORY DIRECTIVES</span>
+<span>STATUS / SCORE</span>
+</div>
+<!-- Objective Item 1 -->
+<div class="bg-surface-container-low border-l-2 border-[#2DD4BF] p-space-sm flex items-center justify-between rounded-r transition-colors hover:bg-surface-container-high/60">
+<div class="flex items-center gap-space-sm">
+<span class="flex items-center justify-center w-5 h-5 rounded bg-[#2DD4BF]/10 text-[#2DD4BF] font-telemetry-badge text-xs font-bold">
+                  ✓
+                </span>
+<div>
+<div class="font-body-dossier text-sm text-on-surface font-normal">Harmonic Dampers Synchronized</div>
+<div class="font-telemetry-timestamp text-telemetry-timestamp text-outline">MILESTONE [02/02 COMPLETE]</div>
+</div>
+</div>
+<div class="text-right">
+<span class="font-telemetry-data text-telemetry-data font-semibold text-[#2DD4BF]">+4,500</span>
+<span class="font-telemetry-timestamp text-telemetry-timestamp text-outline block">PTS</span>
+</div>
+</div>
+<!-- Objective Item 2 -->
+<div class="bg-surface-container-low border-l-2 border-[#2DD4BF] p-space-sm flex items-center justify-between rounded-r transition-colors hover:bg-surface-container-high/60">
+<div class="flex items-center gap-space-sm">
+<span class="flex items-center justify-center w-5 h-5 rounded bg-[#2DD4BF]/10 text-[#2DD4BF] font-telemetry-badge text-xs font-bold">
+                  ✓
+                </span>
+<div>
+<div class="font-body-dossier text-sm text-on-surface font-normal">Acoustic Containment Perimeter Restored</div>
+<div class="font-telemetry-timestamp text-telemetry-timestamp text-outline">STABILITY [100% SECURE]</div>
+</div>
+</div>
+<div class="text-right">
+<span class="font-telemetry-data text-telemetry-data font-semibold text-[#2DD4BF]">+3,200</span>
+<span class="font-telemetry-timestamp text-telemetry-timestamp text-outline block">PTS</span>
+</div>
+</div>
+<!-- Objective Item 3 -->
+<div class="bg-surface-container-low border-l-2 border-[#2DD4BF] p-space-sm flex items-center justify-between rounded-r transition-colors hover:bg-surface-container-high/60">
+<div class="flex items-center gap-space-sm">
+<span class="flex items-center justify-center w-5 h-5 rounded bg-[#2DD4BF]/10 text-[#2DD4BF] font-telemetry-badge text-xs font-bold">
+                  ✓
+                </span>
+<div>
+<div class="font-body-dossier text-sm text-on-surface font-normal">Neural Frequency Leak Nullified</div>
+<div class="font-telemetry-timestamp text-telemetry-timestamp text-outline">ARRAY [03/03 NODES DECOUPLED]</div>
+</div>
+</div>
+<div class="text-right">
+<span class="font-telemetry-data text-telemetry-data font-semibold text-[#2DD4BF]">+2,800</span>
+<span class="font-telemetry-timestamp text-telemetry-timestamp text-outline block">PTS</span>
+</div>
+</div>
+</div>
+<!-- Section: Classified Allocations / Rewards -->
+<div class="mt-space-md space-y-space-xs">
+<div class="font-ui-micro text-ui-micro tracking-widest text-primary uppercase font-semibold">
+              CLASSIFIED ALLOCATIONS // REWARDS
+            </div>
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Reward Chip 1: XP -->
+<div class="bg-surface-container-lowest border border-primary/30 p-space-sm rounded relative overflow-hidden group hover:border-primary transition-colors">
+<div class="absolute -right-4 -bottom-4 text-primary/5 text-5xl font-serif select-none pointer-events-none">★</div>
+<div class="flex items-center gap-space-xs text-primary mb-1">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-telemetry-data text-base font-bold tracking-tight text-on-surface">+100 XP</span>
+</div>
+<div class="font-telemetry-timestamp text-[10px] text-outline uppercase leading-tight">
+                  OPERATIVE PROMOTION PROGRESS
+                </div>
+</div>
+<!-- Reward Chip 2: Credits -->
+<div class="bg-surface-container-lowest border border-primary/30 p-space-sm rounded relative overflow-hidden group hover:border-primary transition-colors">
+<div class="absolute -right-4 -bottom-4 text-primary/5 text-5xl font-serif select-none pointer-events-none">❖</div>
+<div class="flex items-center gap-space-xs text-primary mb-1">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">toll</span>
+<span class="font-telemetry-data text-base font-bold tracking-tight text-on-surface">+50 CREDITS</span>
+</div>
+<div class="font-telemetry-timestamp text-[10px] text-outline uppercase leading-tight">
+                  STATION UPGRADE ALLOTMENT
+                </div>
+</div>
+</div>
+<!-- Grade / Apex Operative Badge -->
+<div class="bg-surface-container-highest/60 border border-outline-variant/60 px-space-sm py-1.5 rounded flex items-center justify-between">
+<span class="font-ui-micro text-[11px] uppercase tracking-wider text-on-surface-variant">OPERATIONAL RATING</span>
+<span class="font-telemetry-badge text-telemetry-badge text-primary uppercase tracking-widest font-semibold">
+                GRADE: APEX OPERATIVE // 98.4% EFFICIENCY
+              </span>
+</div>
+</div>
+<!-- Section: Metadata Telemetry Row -->
+<div class="mt-space-md pt-space-sm border-t border-outline-variant/30 grid grid-cols-3 gap-space-sm items-center text-center">
+<!-- Time Metric -->
+<div class="text-left border-r border-outline-variant/20 pr-space-xs">
+<div class="font-telemetry-data text-sm font-semibold text-on-surface">18:42</div>
+<div class="font-telemetry-timestamp text-[10px] text-outline uppercase">TIME (PAR: 22:00)</div>
+</div>
+<!-- Shields Metric -->
+<div class="text-left border-r border-outline-variant/20 px-space-xs">
+<div class="flex items-center gap-1 mb-0.5">
+<span class="w-2.5 h-3 bg-primary rounded-xs inline-block"></span>
+<span class="w-2.5 h-3 bg-primary rounded-xs inline-block"></span>
+<span class="w-2.5 h-3 bg-primary rounded-xs inline-block"></span>
+<span class="w-2.5 h-3 bg-primary rounded-xs inline-block"></span>
+<span class="w-2.5 h-3 border border-outline-variant bg-transparent rounded-xs inline-block"></span>
+</div>
+<div class="font-telemetry-timestamp text-[10px] text-primary uppercase">04/05 (+800 BONUS)</div>
+</div>
+<!-- Total Tallied Score -->
+<div class="text-right">
+<div class="font-telemetry-data text-lg font-bold text-primary tracking-tight">11,300</div>
+<div class="font-telemetry-timestamp text-[10px] text-outline uppercase">TOTAL SCORE PTS</div>
+</div>
+</div>
+<!-- Action Actions & Forward Trajectory CTA -->
+<div class="mt-space-md space-y-space-xs">
+<button class="w-full py-space-sm bg-primary text-on-primary hover:bg-secondary-fixed transition-all duration-200 font-ui-action-lg text-ui-action-lg uppercase tracking-[0.14em] font-bold flex items-center justify-center gap-space-sm shadow-[0_2px_12px_rgba(212,168,83,0.3)] hover:shadow-[0_4px_20px_rgba(212,168,83,0.5)] active:scale-[0.99] cursor-pointer">
+<span>ENGAGE NEXT SECTOR</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+<a class="w-full py-1 text-center font-ui-micro text-ui-micro uppercase tracking-widest text-outline hover:text-on-surface transition-colors block" href="#">
+              ← RETURN TO SECTOR MAP SCHEMATIC
+            </a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-lowest/90 backdrop-blur-md"><div class="w-full px-margin-mobile md:px-margin-tablet lg:px-margin-desktop py-space-md flex flex-col md:flex-row items-center justify-between gap-space-sm"><div class="flex items-center gap-space-md font-telemetry-timestamp text-telemetry-timestamp text-outline"><span>STATION: BERLIN-BLACK</span><span>ARCHIVAL REF: 884-SIG-ZERO</span><span>TRANSMISSION PURGED ON CLOSE</span></div><div class="font-ui-micro text-ui-micro uppercase tracking-widest text-on-surface-variant">TOP SECRET // ZERO // EYES ONLY</div></div></footer></body></html>

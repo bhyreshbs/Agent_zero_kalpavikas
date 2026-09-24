@@ -2,7 +2,7 @@
  * Database layer — PostgreSQL via node-postgres (pg).
  *
  * Replaces the previous SQLite/better-sqlite3 layer. Connects to the
- * Supabase PostgreSQL database using DATABASE_URL.
+ * InsForge PostgreSQL database using DATABASE_URL.
  *
  * Key design decisions:
  * - pg.Pool for connection pooling (handles 30+ concurrent teams safely)
@@ -13,11 +13,25 @@
  */
 import pg from 'pg';
 
+// The InsForge database is a DIRECT (unpooled) Postgres endpoint with
+// max_connections = 30 shared with InsForge's own services. Every serverless
+// instance owns its own pool, so the per-instance cap must be small:
+//   DB_POOL_MAX (default 3) x concurrent Vercel instances must stay well under 30.
+// Idle connections are released after 10 s so scaled-down instances free their slots.
+const POOL_MAX = Math.max(1, Number.parseInt(process.env.DB_POOL_MAX, 10) || 3);
+
+// SSL: the InsForge URL carries sslmode=require. When the URL already specifies
+// sslmode, node-postgres takes SSL settings from it; otherwise fall back to
+// SSL in production only (certificate not verified, as before).
+const urlHasSslMode = /[?&]sslmode=/.test(process.env.DATABASE_URL || '');
+
 export const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  max: 20,
-  idleTimeoutMillis: 30_000,
+  ...(urlHasSslMode
+    ? {}
+    : { ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false }),
+  max: POOL_MAX,
+  idleTimeoutMillis: 10_000,
   connectionTimeoutMillis: 10_000,
 });
 
@@ -47,9 +61,81 @@ export async function dbRun(sql, params = []) {
   return { rowCount: r.rowCount, rows: r.rows };
 }
 
-/** Get a pool client for manual transaction management. */
+/**
+ * Get a client for manual transaction management.
+ *
+ * Two safeguards live here because the game engine's transactions
+ * (gameEngine.js) hold a client for the whole action AND call pool.query()
+ * (getClientState, logAudit) while holding it, and release the client on early
+ * return paths as well as in `finally`:
+ *
+ *  1. Concurrency cap. Each open transaction needs one extra pooled connection for
+ *     those inner pool.query() calls. If every connection were held by a
+ *     transaction, all of them would wait forever for a connection (deadlock).
+ *     So at most POOL_MAX - 1 transactional clients exist at once; one connection
+ *     is always left for plain queries. Extra callers queue (10 s cap).
+ *  2. Per-checkout handle. The pooled client object is reused by the next caller,
+ *     so calling release() a second time on the raw object would release someone
+ *     else's checkout. Callers get a one-shot handle instead: release() is
+ *     idempotent, and query() on a released handle is refused (ROLLBACK is a no-op).
+ */
+const MAX_TX_CLIENTS = Math.max(1, POOL_MAX - 1);
+const SLOT_WAIT_MS = 10_000;
+let slotsInUse = 0;
+const slotWaiters = [];
+
+function acquireSlot() {
+  if (slotsInUse < MAX_TX_CLIENTS) {
+    slotsInUse += 1;
+    return Promise.resolve();
+  }
+  return new Promise((resolve, reject) => {
+    const waiter = { resolve, timer: null };
+    waiter.timer = setTimeout(() => {
+      const i = slotWaiters.indexOf(waiter);
+      if (i >= 0) slotWaiters.splice(i, 1);
+      reject(new Error('Database busy: too many concurrent game transactions.'));
+    }, SLOT_WAIT_MS);
+    slotWaiters.push(waiter);
+  });
+}
+
+function releaseSlot() {
+  const next = slotWaiters.shift();
+  if (next) {
+    clearTimeout(next.timer);
+    next.resolve(); // slot is handed over, slotsInUse unchanged
+  } else {
+    slotsInUse -= 1;
+  }
+}
+
 export async function getClient() {
-  return pool.connect();
+  await acquireSlot();
+  let raw;
+  try {
+    raw = await pool.connect();
+  } catch (err) {
+    releaseSlot();
+    throw err;
+  }
+  const rawRelease = raw.release; // this checkout's own release function
+  let released = false;
+  return {
+    query: (...args) => {
+      if (released) {
+        const sql = typeof args[0] === 'string' ? args[0] : args[0]?.text;
+        if (sql === 'ROLLBACK') return Promise.resolve({ rows: [], rowCount: 0 });
+        return Promise.reject(new Error('Database client was already released.'));
+      }
+      return raw.query(...args);
+    },
+    release: (err) => {
+      if (released) return;
+      released = true;
+      try { rawRelease(err); } finally { releaseSlot(); }
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------

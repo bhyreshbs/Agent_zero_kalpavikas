@@ -150,29 +150,48 @@ ALTER TABLE admin_config    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_log       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE security_events ENABLE ROW LEVEL SECURITY;
 
+-- Policies are created inside guarded DO blocks so this script can be re-run
+-- safely (CREATE POLICY has no IF NOT EXISTS). Nothing is dropped or altered.
+
 -- Teams: a team can only read its own row
-CREATE POLICY teams_own_read ON teams
-  FOR SELECT TO authenticated
-  USING (auth_user_id = auth.uid());
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'teams' AND policyname = 'teams_own_read') THEN
+    CREATE POLICY teams_own_read ON teams
+      FOR SELECT TO authenticated
+      USING (auth_user_id = auth.uid());
+  END IF;
+END $$;
 
 -- Sessions: a team can only read its own session
-CREATE POLICY sessions_own_read ON game_sessions
-  FOR SELECT TO authenticated
-  USING (team_id IN (SELECT id FROM teams WHERE auth_user_id = auth.uid()));
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'game_sessions' AND policyname = 'sessions_own_read') THEN
+    CREATE POLICY sessions_own_read ON game_sessions
+      FOR SELECT TO authenticated
+      USING (team_id IN (SELECT id FROM teams WHERE auth_user_id = auth.uid()));
+  END IF;
+END $$;
 
 -- Level results: a team can only read its own results
-CREATE POLICY results_own_read ON level_results
-  FOR SELECT TO authenticated
-  USING (session_id IN (
-    SELECT gs.id FROM game_sessions gs
-    JOIN teams t ON t.id = gs.team_id
-    WHERE t.auth_user_id = auth.uid()
-  ));
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'level_results' AND policyname = 'results_own_read') THEN
+    CREATE POLICY results_own_read ON level_results
+      FOR SELECT TO authenticated
+      USING (session_id IN (
+        SELECT gs.id FROM game_sessions gs
+        JOIN teams t ON t.id = gs.team_id
+        WHERE t.auth_user_id = auth.uid()
+      ));
+  END IF;
+END $$;
 
 -- Admin config: all authenticated users can read (game settings are not secret)
-CREATE POLICY config_authenticated_read ON admin_config
-  FOR SELECT TO authenticated
-  USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'admin_config' AND policyname = 'config_authenticated_read') THEN
+    CREATE POLICY config_authenticated_read ON admin_config
+      FOR SELECT TO authenticated
+      USING (true);
+  END IF;
+END $$;
 
 -- Audit log & security events: no direct access — service_role only
 -- (RLS enabled with no permissive policy = denied for all non-service roles)

@@ -490,7 +490,7 @@ const level4 = {
   index: 4,
   name: 'The Game Knows',
   difficulty: 'Medium',
-  costsLife: true,
+  costsLife: false,
 
   init(session, ctx) {
     const rng = makeRng(session)('level4');
@@ -727,7 +727,7 @@ const level5 = {
   index: 5,
   name: 'Final Agent',
   difficulty: 'Final / Maximum',
-  costsLife: true,
+  costsLife: false,
 
   init(session, ctx) {
     // Level 5 reads the SAME locked profile Level 4 did (spec section 16: "Level

@@ -18,8 +18,9 @@ This guide details exactly how to deploy the Agent Zero platform for a live even
 
 **C. Auth Settings**
 1. Go to **Authentication > Providers**.
-2. **Disable** Email Signups (teams must be created by the admin, self-registration is forbidden).
-3. Ensure Email & Password login is **Enabled**.
+2. Keep the **Email** provider **enabled** (team login uses email + password behind the scenes), but turn **off "Allow new users to sign up"** under Authentication > Sign In / Providers (teams are created by the admin through the service role, self-registration is forbidden). Do NOT disable the Email provider itself or every login will fail.
+3. Turning off "Confirm email" is not required: the backend creates users with `email_confirm: true`.
+4. See `SUPABASE_NEW_PROJECT_SETUP.md` for the full migration checklist.
 
 **D. Required Keys**
 You will need to fetch the following keys from **Project Settings > API**:

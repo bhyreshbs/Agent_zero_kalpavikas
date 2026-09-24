@@ -6,8 +6,8 @@ import { generateRecoveryPuzzle, validateRecoveryAnswer } from './recoveryPuzzle
 import { agentChat } from './agentEngine.js';
 import { recordActionObservation, recordChatObservation, finalizeProfile, buildFinalReveal } from './behaviourProfile.js';
 
-const MAX_RECOVERIES  = async () => Number((await getConfig('max_recoveries')) ?? 3);
-const INITIAL_LIVES   = async () => Number((await getConfig('initial_lives'))   ?? 5);
+const MAX_RECOVERIES = async () => Number((await getConfig('max_recoveries')) ?? 3);
+const INITIAL_LIVES = async () => Number((await getConfig('initial_lives')) ?? 5);
 const RECOVERY_WINDOW = async () => Number((await getConfig('recovery_window_seconds')) ?? 30);
 const MAX_HINTS_PER_LEVEL = 2;
 
@@ -118,11 +118,11 @@ async function saveSession(session) {
     WHERE id = $21`,
     [
       session.status,
-      session.started_at        || null,
-      session.completed_at      || null,
+      session.started_at || null,
+      session.completed_at || null,
       session.current_level,
       session.lives,
-      session.max_lives_gained  || 0,
+      session.max_lives_gained || 0,
       session.score,
       session.recovery_attempts,
       session.recovery_successes,
@@ -130,9 +130,9 @@ async function saveSession(session) {
       toJsonStr(session.agent_memory),
       toJsonStr(session.level_states),
       session.time_paused_seconds || 0,
-      session.paused_at         || null,
+      session.paused_at || null,
       session.recovery_started_at || null,
-      session.focus_violations  || 0,
+      session.focus_violations || 0,
       session.security_warnings || 0,
       session.security_life_penalties || 0,
       session.last_violation_at || null,
@@ -160,7 +160,7 @@ export async function createSession(teamId) {
 
   const gameSeed = nanoid(10);
   const duration = Number((await getConfig('game_duration_seconds')) ?? 900);
-  const lives    = await INITIAL_LIVES();
+  const lives = await INITIAL_LIVES();
 
   const res = await dbRun(
     `INSERT INTO game_sessions
@@ -179,7 +179,7 @@ export async function createSession(teamId) {
 
 export async function finalizeRun(session, finalStatus) {
   if (TERMINAL_STATUSES.has(session.status) && session.completed_at) return session;
-  
+
   if (session.status === 'active' && session.paused_at && !TERMINAL_STATUSES.has(session.status)) {
     const pAt = session.paused_at instanceof Date ? session.paused_at : new Date(session.paused_at + (session.paused_at.endsWith('Z') ? '' : 'Z'));
     const start = pAt.getTime();
@@ -187,7 +187,7 @@ export async function finalizeRun(session, finalStatus) {
     session.time_paused_seconds = (session.time_paused_seconds || 0) + elapsed;
     session.paused_at = null;
   }
-  
+
   session.status = finalStatus;
   if (!session.completed_at) {
     session.completed_at = new Date().toISOString();
@@ -208,31 +208,31 @@ export async function exitSession(session) {
   const client = await getClient();
   try {
     await client.query('BEGIN');
-    
+
     // Fetch latest to prevent race condition double-counting
     const res = await client.query('SELECT * FROM game_sessions WHERE id = $1 FOR UPDATE', [session.id]);
     const latest = res.rows[0];
-    
+
     if (['active', 'tutorial'].includes(latest.status) && latest.paused_at && !TERMINAL_STATUSES.has(latest.status)) {
       const pAt = latest.paused_at instanceof Date ? latest.paused_at : new Date(latest.paused_at + (latest.paused_at.endsWith('Z') ? '' : 'Z'));
       const start = pAt.getTime();
       const elapsed = Math.floor((Date.now() - start) / 1000);
-      
+
       const newTimePaused = (latest.time_paused_seconds || 0) + elapsed;
-      
+
       await client.query(
         `UPDATE game_sessions SET status = 'paused', paused_at = NULL, time_paused_seconds = $1 WHERE id = $2`,
         [newTimePaused, session.id]
       );
-      
+
       // Update our local session object so getClientState returns correct info
       session.status = 'paused';
       session.paused_at = null;
       session.time_paused_seconds = newTimePaused;
-      
+
       await logAudit(session.team_id, 'game_exited', { level: session.current_level });
     }
-    
+
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK');
@@ -240,7 +240,7 @@ export async function exitSession(session) {
   } finally {
     client.release();
   }
-  
+
   return session;
 }
 
@@ -256,16 +256,16 @@ export async function reconcileTimerExpiry(session) {
 // ---------------------------------------------------------------------------
 
 export async function getClientState(session) {
-  const level        = LEVEL_BY_INDEX[session.current_level];
-  const levelStates  = parseJson(session.level_states);
+  const level = LEVEL_BY_INDEX[session.current_level];
+  const levelStates = parseJson(session.level_states);
   const behaviourFlags = parseJson(session.behaviour_flags);
-  const memory       = parseJson(session.agent_memory);
-  const remaining    = TERMINAL_STATUSES.has(session.status) ? finalRemainingSeconds(session) : remainingSeconds(session);
-  const hintsUsed    = (behaviourFlags.hintsUsedByLevel || {})[session.current_level] || 0;
+  const memory = parseJson(session.agent_memory);
+  const remaining = TERMINAL_STATUSES.has(session.status) ? finalRemainingSeconds(session) : remainingSeconds(session);
+  const hintsUsed = (behaviourFlags.hintsUsedByLevel || {})[session.current_level] || 0;
 
-  const maxRec  = await MAX_RECOVERIES();
+  const maxRec = await MAX_RECOVERIES();
   const initLiv = await INITIAL_LIVES();
-  const recWin  = await RECOVERY_WINDOW();
+  const recWin = await RECOVERY_WINDOW();
 
   let recovery = null;
   if (session.status === 'recovering' && session.recovery_started_at) {
@@ -276,8 +276,8 @@ export async function getClientState(session) {
     recovery = { secondsRemaining: Math.max(0, recWin - elapsed) };
   }
 
-  const secureEnabled  = (await getConfig('secure_mode_enabled'))  !== 'false';
-  const fsRequired     = (await getConfig('fullscreen_required'))  !== 'false';
+  const secureEnabled = (await getConfig('secure_mode_enabled')) !== 'false';
+  const fsRequired = (await getConfig('fullscreen_required')) !== 'false';
 
   return {
     status: session.status,
@@ -319,13 +319,13 @@ export async function startSession(session) {
   session.started_at = new Date().toISOString();
   session.paused_at = session.started_at;
 
-  const levelStates    = parseJson(session.level_states);
-  const memory         = parseJson(session.agent_memory);
+  const levelStates = parseJson(session.level_states);
+  const memory = parseJson(session.agent_memory);
   const behaviourFlags = parseJson(session.behaviour_flags);
   levelStates.tutorial = LEVEL_BY_INDEX[0].init(session, { memory, behaviourFlags });
 
-  session.level_states  = JSON.stringify(levelStates);
-  session.agent_memory  = JSON.stringify(memory);
+  session.level_states = JSON.stringify(levelStates);
+  session.agent_memory = JSON.stringify(memory);
 
   await dbRun(
     `INSERT INTO level_results (session_id, level) VALUES ($1, 0)`,
@@ -341,18 +341,52 @@ export async function startSession(session) {
 // Wrapped in a PostgreSQL transaction for concurrency safety.
 // ---------------------------------------------------------------------------
 
-export async function applyAction(session, action, payload) {
-  const isTransition = session.status === 'paused' && session.paused_at === null;
+export async function applyAction(unlockedSession, action, payload) {
+  const client = await getClient();
+  let resultToReturn = null;
+  let auditsToLog = [];
 
-  if (session.status === 'paused' && !isTransition) return { error: 'Session is paused by admin.' };
+  try {
+    await client.query('BEGIN');
+    const { rows } = await client.query('SELECT * FROM game_sessions WHERE id = $1 FOR UPDATE', [unlockedSession.id]);
+    let session = rows[0];
 
-  if (action === 'ENTER_SECTOR') {
-    if (!isTransition) {
-      return { error: 'Not in transition state.', clientState: await getClientState(session) };
+    // Evaluate timer inside lock
+    if (isExpired(session) && !TERMINAL_STATUSES.has(session.status)) {
+      if (session.status === 'active' && session.paused_at && !TERMINAL_STATUSES.has(session.status)) {
+        const pAt = session.paused_at instanceof Date ? session.paused_at : new Date(session.paused_at + (session.paused_at.endsWith('Z') ? '' : 'Z'));
+        const start = pAt.getTime();
+        const elapsed = Math.floor((Date.now() - start) / 1000);
+        session.time_paused_seconds = (session.time_paused_seconds || 0) + elapsed;
+        session.paused_at = null;
+      }
+      session.status = 'failed';
+      if (!session.completed_at) session.completed_at = new Date().toISOString();
+      session.score = await calculateScore(session, { includeTimeBonus: false });
+
+      await client.query(
+        `UPDATE game_sessions SET status=$1, completed_at=$2, score=$3, time_paused_seconds=$4, paused_at=NULL WHERE id=$5`,
+        [session.status, session.completed_at, session.score, session.time_paused_seconds || 0, session.id]
+      );
+      await client.query('COMMIT');
+      client.release();
+      await logAudit(session.team_id, 'game_failed', { score: session.score, level: session.current_level });
+      return { error: 'TIME_UP', clientState: await getClientState(session) };
     }
-    const client = await getClient();
-    try {
-      await client.query('BEGIN');
+
+    const isTransition = session.status === 'paused' && session.paused_at === null;
+    if (session.status === 'paused' && !isTransition) {
+      await client.query('ROLLBACK');
+      client.release();
+      return { error: 'Session is paused by admin.' };
+    }
+
+    if (action === 'ENTER_SECTOR') {
+      if (!isTransition) {
+        await client.query('ROLLBACK');
+        client.release();
+        return { error: 'Not in transition state.', clientState: await getClientState(session) };
+      }
       session.status = session.current_level === 0 ? 'tutorial' : 'active';
       session.paused_at = new Date().toISOString();
       await client.query(
@@ -360,99 +394,86 @@ export async function applyAction(session, action, payload) {
         [session.status, session.paused_at, session.id]
       );
       await client.query('COMMIT');
-    } catch (err) {
-      await client.query('ROLLBACK');
-      throw err;
-    } finally {
       client.release();
+      return {
+        result: { ok: true, message: 'Sector active.' },
+        lifeLost: false,
+        levelCompleted: false,
+        advancedToLevel: null,
+        clientState: await getClientState(session),
+      };
     }
-    return {
-      result: { ok: true, message: 'Sector active.' },
-      lifeLost: false,
-      levelCompleted: false,
-      advancedToLevel: null,
-      clientState: await getClientState(session),
-    };
-  }
 
-  if (isTransition) {
-    return { error: 'Must enter sector first.', clientState: await getClientState(session) };
-  }
+    if (isTransition) {
+      await client.query('ROLLBACK');
+      client.release();
+      return { error: 'Must enter sector first.', clientState: await getClientState(session) };
+    }
 
-  if (isExpired(session)) {
-    await reconcileTimerExpiry(session);
-    return { error: 'TIME_UP', clientState: await getClientState(session) };
-  }
-  if (['completed', 'failed', 'disqualified'].includes(session.status)) {
-    return { error: `Session already ${session.status}.` };
-  }
-  if (session.status === 'critical') {
-    return { error: 'Session is in critical state — resolve the recovery puzzle first.' };
-  }
+    if (['completed', 'failed', 'disqualified'].includes(session.status)) {
+      await client.query('ROLLBACK');
+      client.release();
+      return { error: `Session already ${session.status}.` };
+    }
+    if (session.status === 'critical') {
+      await client.query('ROLLBACK');
+      client.release();
+      return { error: 'Session is in critical state — resolve the recovery puzzle first.' };
+    }
 
-  const level          = LEVEL_BY_INDEX[session.current_level];
-  const levelStates    = parseJson(session.level_states);
-  const behaviourFlags = parseJson(session.behaviour_flags);
-  const memory         = parseJson(session.agent_memory);
+    const level = LEVEL_BY_INDEX[session.current_level];
+    const levelStates = parseJson(session.level_states);
+    const behaviourFlags = parseJson(session.behaviour_flags);
+    const memory = parseJson(session.agent_memory);
 
-  behaviourFlags.actionCounts = behaviourFlags.actionCounts || {};
-  behaviourFlags.actionCounts[action] = (behaviourFlags.actionCounts[action] || 0) + 1;
+    behaviourFlags.actionCounts = behaviourFlags.actionCounts || {};
+    behaviourFlags.actionCounts[action] = (behaviourFlags.actionCounts[action] || 0) + 1;
 
-  const outcome = level.act(session, levelStates[level.key], action, payload, { behaviourFlags, memory });
+    const outcome = level.act(session, levelStates[level.key], action, payload, { behaviourFlags, memory });
+    recordActionObservation(behaviourFlags, level.index, action, payload, outcome);
 
-  recordActionObservation(behaviourFlags, level.index, action, payload, outcome);
+    levelStates[level.key] = outcome.levelState;
+    session.level_states = JSON.stringify(levelStates);
+    session.behaviour_flags = JSON.stringify(behaviourFlags);
+    session.agent_memory = JSON.stringify(memory);
 
-  levelStates[level.key]     = outcome.levelState;
-  session.level_states       = JSON.stringify(levelStates);
-  session.behaviour_flags    = JSON.stringify(behaviourFlags);
-  session.agent_memory       = JSON.stringify(memory);
-
-  // Use a transaction for the multi-step update
-  const client = await getClient();
-  let lifeLostThisTurn = false;
-  let advanced = false;
-
-  try {
-    await client.query('BEGIN');
+    let lifeLostThisTurn = false;
+    let advanced = false;
 
     await client.query(
-      `UPDATE level_results SET attempts = attempts + 1, failures = failures + $1
-       WHERE session_id = $2 AND level = $3`,
+      `UPDATE level_results SET attempts = attempts + 1, failures = failures + $1 WHERE session_id = $2 AND level = $3`,
       [outcome.lifeLost ? 1 : 0, session.id, level.index]
     );
 
     if (outcome.lifeLost && level.costsLife) {
       session.lives -= 1;
       lifeLostThisTurn = true;
-      await logAudit(session.team_id, 'life_lost', { level: level.index, lives: session.lives });
+      auditsToLog.push(['life_lost', { level: level.index, lives: session.lives }]);
     }
-
-    const maxRec = await MAX_RECOVERIES();
-    const initLiv = await INITIAL_LIVES();
 
     if (outcome.completed) {
       const levelPoints = LEVEL_PROGRESSION_POINTS[level.index] || 0;
       await client.query(
-        `UPDATE level_results SET completed = 1, completed_at = NOW(), score = $1
-         WHERE session_id = $2 AND level = $3`,
+        `UPDATE level_results SET completed = 1, completed_at = NOW(), score = $1 WHERE session_id = $2 AND level = $3`,
         [levelPoints, session.id, level.index]
       );
 
       if (level.index >= MAIN_LEVEL_COUNT) {
-        await client.query('COMMIT');
-        client.release();
-        await finalizeRun(session, 'completed');
-        return {
-          result: outcome.result,
-          lifeLost: lifeLostThisTurn,
-          levelCompleted: true,
-          advancedToLevel: null,
-          clientState: await getClientState(session),
-        };
+        if (session.status === 'active' && session.paused_at) {
+          const pAt = session.paused_at instanceof Date ? session.paused_at : new Date(session.paused_at + (session.paused_at.endsWith('Z') ? '' : 'Z'));
+          const start = pAt.getTime();
+          const elapsed = Math.floor((Date.now() - start) / 1000);
+          session.time_paused_seconds = (session.time_paused_seconds || 0) + elapsed;
+          session.paused_at = null;
+        }
+        session.status = 'completed';
+        if (!session.completed_at) session.completed_at = new Date().toISOString();
+        session.score = await calculateScore(session, { includeTimeBonus: true });
+        auditsToLog.push(['game_completed', { score: session.score, level: session.current_level }]);
       } else {
         const nextIndex = level.index + 1;
         session.current_level = nextIndex;
-        session.status = 'paused'; // Transition state
+        session.status = 'paused';
 
         if (session.paused_at) {
           const pAt = session.paused_at instanceof Date ? session.paused_at : new Date(session.paused_at + (session.paused_at.endsWith('Z') ? '' : 'Z'));
@@ -472,9 +493,9 @@ export async function applyAction(session, action, payload) {
 
         const nextLevel = LEVEL_BY_INDEX[nextIndex];
         levelStates[nextLevel.key] = nextLevel.init(session, { memory, behaviourFlags });
-        session.level_states    = JSON.stringify(levelStates);
+        session.level_states = JSON.stringify(levelStates);
         session.behaviour_flags = JSON.stringify(behaviourFlags);
-        session.agent_memory    = JSON.stringify(memory);
+        session.agent_memory = JSON.stringify(memory);
 
         await client.query(
           `INSERT INTO level_results (session_id, level) VALUES ($1, $2)`,
@@ -486,14 +507,13 @@ export async function applyAction(session, action, payload) {
 
     if (session.lives <= 0 && session.status !== 'completed') {
       session.status = 'critical';
-      await logAudit(session.team_id, 'entered_critical', {});
+      auditsToLog.push(['entered_critical', {}]);
     }
 
     if (!['completed', 'failed'].includes(session.status)) {
       session.score = await calculateScore(session, { includeTimeBonus: false });
     }
 
-    // Save session within the transaction
     await client.query(
       `UPDATE game_sessions SET
         status=$1, started_at=$2, completed_at=$3, current_level=$4, lives=$5,
@@ -517,26 +537,29 @@ export async function applyAction(session, action, payload) {
     );
 
     await client.query('COMMIT');
+
+    resultToReturn = {
+      result: outcome.result,
+      lifeLost: lifeLostThisTurn,
+      levelCompleted: outcome.completed,
+      advancedToLevel: advanced ? session.current_level : null,
+      clientState: await getClientState(session),
+    };
+
+    // run audits outside lock
+    for (const [action, payload] of auditsToLog) {
+      logAudit(session.team_id, action, payload).catch(e => console.error("Audit error", e));
+    }
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
   } finally {
-    client.release();
+    if (client) client.release();
   }
 
-  return {
-    result: outcome.result,
-    lifeLost: lifeLostThisTurn,
-    levelCompleted: outcome.completed,
-    advancedToLevel: advanced ? session.current_level : null,
-    clientState: await getClientState(session),
-  };
+  return resultToReturn;
 }
-
 // ---------------------------------------------------------------------------
-// Recovery
-// ---------------------------------------------------------------------------
-
 export async function reconcileRecoveryDeadline(session) {
   if (session.status !== 'recovering') return session;
   const recWin = await RECOVERY_WINDOW();
@@ -594,14 +617,14 @@ export async function submitRecoveryAnswer(session, answer) {
   session.recovery_attempts += 1;
   session.recovery_started_at = null;
 
-  const maxRec  = await MAX_RECOVERIES();
+  const maxRec = await MAX_RECOVERIES();
   const initLiv = await INITIAL_LIVES();
 
   if (correct) {
     session.lives = Math.min(session.lives + 1, initLiv + maxRec);
     session.recovery_successes += 1;
     session.status = 'active';
-    session.score  = await calculateScore(session, { includeTimeBonus: false });
+    session.score = await calculateScore(session, { includeTimeBonus: false });
     await logAudit(session.team_id, 'recovery_success', { lives: session.lives });
   } else {
     if (session.recovery_attempts >= maxRec) {
@@ -609,7 +632,7 @@ export async function submitRecoveryAnswer(session, answer) {
       await finalizeRun(session, 'failed');
     } else {
       session.status = 'critical';
-      session.score  = await calculateScore(session, { includeTimeBonus: false });
+      session.score = await calculateScore(session, { includeTimeBonus: false });
       await logAudit(session.team_id, 'recovery_failed', { expired, attemptsLeft: maxRec - session.recovery_attempts });
     }
   }
@@ -621,7 +644,7 @@ export async function submitRecoveryAnswer(session, answer) {
 // ---------------------------------------------------------------------------
 // Chat
 // ---------------------------------------------------------------------------
-const CHAT_LOG_LIMIT   = 12;
+const CHAT_LOG_LIMIT = 12;
 const AGENT_FACTS_LIMIT = 5;
 
 function buildChatContext(session, levelStates, behaviourFlags, memory, target, extra) {
@@ -630,16 +653,16 @@ function buildChatContext(session, levelStates, behaviourFlags, memory, target, 
     level: session.current_level,
     levelName: level.name,
     playerBehaviour: {
-      leftChoices:       behaviourFlags.leftChoices       || 0,
-      rightChoices:      behaviourFlags.rightChoices      || 0,
-      agentTrustCount:   behaviourFlags.agentTrustCount   || 0,
-      chatCountByLevel:  behaviourFlags.chatCountByLevel  || {},
-      actionCounts:      behaviourFlags.actionCounts      || {},
+      leftChoices: behaviourFlags.leftChoices || 0,
+      rightChoices: behaviourFlags.rightChoices || 0,
+      agentTrustCount: behaviourFlags.agentTrustCount || 0,
+      chatCountByLevel: behaviourFlags.chatCountByLevel || {},
+      actionCounts: behaviourFlags.actionCounts || {},
     },
     agentState: null,
   };
 
-  const ls        = levelStates[level.key] || {};
+  const ls = levelStates[level.key] || {};
   const agentFacts = memory.agentFacts || {};
 
   if (level.index === 3) {
@@ -655,10 +678,10 @@ function buildChatContext(session, levelStates, behaviourFlags, memory, target, 
   } else if (level.index === 5) {
     base.agentState = {
       id: 'ZERO',
-      trustLevel:   ls.trustLevel   || 0,
-      state:        ls.agentState   || 'UNCERTAIN',
+      trustLevel: ls.trustLevel || 0,
+      state: ls.agentState || 'UNCERTAIN',
       codeProvided: ls.codeProvided || false,
-      knowsCore:    ls.knowsCore    || false,
+      knowsCore: ls.knowsCore || false,
       planAccepted: ls.planAccepted || false,
     };
   }
@@ -668,16 +691,16 @@ function buildChatContext(session, levelStates, behaviourFlags, memory, target, 
 function intentToAction(level, intent, playerMessage, target) {
   if (level === 3) {
     if (intent === 'REVEAL_CLAIM') return { action: target === 'B' ? 'ASK_B' : 'ASK_A' };
-    if (intent === 'REASSURE')     return { action: target === 'B' ? 'REASSURE_B' : 'REASSURE_A' };
+    if (intent === 'REASSURE') return { action: target === 'B' ? 'REASSURE_B' : 'REASSURE_A' };
     return null;
   }
   if (level === 5) {
     if (intent === 'PRIORITIZE_ESCAPE') return { action: 'INSTRUCT_PRIORITIZE_ESCAPE', payload: {} };
-    if (intent === 'NEGOTIATE')         return { action: 'NEGOTIATE', payload: {} };
-    if (intent === 'DEMAND_EXIT')       return { action: 'INSTRUCT_OPEN_EXIT_DIRECTLY', payload: {} };
-    if (intent === 'QUESTION_OBJECTIVE')return { action: 'ASK_OBJECTIVE', payload: {} };
-    if (intent === 'ASK_PROTECTING')    return { action: 'ASK_PROTECTING', payload: {} };
-    if (intent === 'PROPOSE_PLAN')      return { action: 'PROPOSE_PLAN', payload: {} };
+    if (intent === 'NEGOTIATE') return { action: 'NEGOTIATE', payload: {} };
+    if (intent === 'DEMAND_EXIT') return { action: 'INSTRUCT_OPEN_EXIT_DIRECTLY', payload: {} };
+    if (intent === 'QUESTION_OBJECTIVE') return { action: 'ASK_OBJECTIVE', payload: {} };
+    if (intent === 'ASK_PROTECTING') return { action: 'ASK_PROTECTING', payload: {} };
+    if (intent === 'PROPOSE_PLAN') return { action: 'PROPOSE_PLAN', payload: {} };
     if (intent === 'PROVIDE_CODE') {
       const match = playerMessage.match(/\b(\d{3})\b/);
       if (match) return { action: 'PROVIDE_ACCESS_CODE', payload: { code: match[1] } };
@@ -689,74 +712,108 @@ function intentToAction(level, intent, playerMessage, target) {
 
 const ENGINE_RESOLVED_DIALOGUE = ['REVEAL_CLAIM', 'REASSURE', 'QUESTION_OBJECTIVE', 'ASK_PROTECTING', 'PROPOSE_PLAN'];
 
-export async function chat(session, message, target) {
+export async function chat(unlockedSession, message, target) {
   if (!message || typeof message !== 'string' || !message.trim()) {
     return { error: 'A message is required.' };
   }
-  if (!['tutorial', 'active'].includes(session.status)) {
-    return { error: `Chat is unavailable while the session is ${session.status}.` };
-  }
 
-  const levelStates    = parseJson(session.level_states);
-  const behaviourFlags = parseJson(session.behaviour_flags);
-  const memory         = parseJson(session.agent_memory);
-  memory.agentFacts    = memory.agentFacts || {};
-
-  const level          = LEVEL_BY_INDEX[session.current_level];
   const trimmedMessage = message.trim().slice(0, 300);
-  const speaker        = level.index === 3 ? (target === 'B' ? 'B' : 'A') : null;
-  const factKey        = level.index === 3 ? `3:${speaker}` : `${level.index}:default`;
+
+  // We fetch a read-only snapshot first to avoid blocking the DB while the AI responds
+  let currentLevelIdx = unlockedSession.current_level;
+  let levelStates = parseJson(unlockedSession.level_states);
+  let behaviourFlags = parseJson(unlockedSession.behaviour_flags);
+  let memory = parseJson(unlockedSession.agent_memory);
+  memory.agentFacts = memory.agentFacts || {};
 
   behaviourFlags.chatCountByLevel = behaviourFlags.chatCountByLevel || {};
-  behaviourFlags.chatCountByLevel[level.index] = (behaviourFlags.chatCountByLevel[level.index] || 0) + 1;
-  behaviourFlags.agentTrustCount = (behaviourFlags.agentTrustCount || 0) + 1;
-  const totalChats = Object.values(behaviourFlags.chatCountByLevel).reduce((a, b) => a + b, 0);
+  let totalChats = Object.values(behaviourFlags.chatCountByLevel).reduce((a, b) => a + b, 0) + 1;
 
-  recordChatObservation(behaviourFlags, level.index, trimmedMessage);
+  const context = buildChatContext(unlockedSession, levelStates, behaviourFlags, memory, target, { totalChats });
 
-  const context = buildChatContext(session, levelStates, behaviourFlags, memory, target, { totalChats });
-  let response  = await agentChat(context, trimmedMessage);
-
-  const mapped = intentToAction(level.index, response.intent, trimmedMessage, target);
-  if (mapped) {
-    const ls      = levelStates[level.key];
-    const outcome = level.act(session, ls, mapped.action, mapped.payload || {}, { behaviourFlags, memory });
-    levelStates[level.key] = outcome.levelState;
-    if (ENGINE_RESOLVED_DIALOGUE.includes(response.intent)) {
-      response = { ...response, dialogue: outcome.result.agentLine || outcome.result.message };
-    }
-  }
-
-  if (response.memoryUpdates?.length) {
-    memory.agentFacts[factKey] = [...(memory.agentFacts[factKey] || []), ...response.memoryUpdates].slice(-AGENT_FACTS_LIMIT);
-  }
-  if (response.relationshipUpdate) {
-    memory.agentRelationship = memory.agentRelationship || {};
-    const current = memory.agentRelationship[factKey] || 0;
-    memory.agentRelationship[factKey] = Math.max(-5, Math.min(5, current + response.relationshipUpdate.trustDelta));
-  }
+  // AI Call happens OUTSIDE the transaction lock!
+  let response = await agentChat(context, trimmedMessage);
 
   if (!response.dialogue) response = { ...response, dialogue: 'Processing...' };
 
-  memory.chatLog = memory.chatLog || [];
-  memory.chatLog.push({ level: session.current_level, player: trimmedMessage, agent: response.dialogue, at: Date.now() });
-  if (memory.chatLog.length > CHAT_LOG_LIMIT) memory.chatLog = memory.chatLog.slice(-CHAT_LOG_LIMIT);
+  const client = await getClient();
+  let resultToReturn = null;
+  try {
+    await client.query('BEGIN');
 
-  session.level_states    = JSON.stringify(levelStates);
-  session.behaviour_flags = JSON.stringify(behaviourFlags);
-  session.agent_memory    = JSON.stringify(memory);
+    // NOW acquire lock and merge updates
+    const { rows } = await client.query('SELECT * FROM game_sessions WHERE id = $1 FOR UPDATE', [unlockedSession.id]);
+    const session = rows[0];
 
-  await dbRun(
-    `UPDATE game_sessions SET level_states = $1, behaviour_flags = $2, agent_memory = $3 WHERE id = $4`,
-    [toJsonStr(levelStates), toJsonStr(behaviourFlags), toJsonStr(memory), session.id]
-  );
-  await logAudit(session.team_id, 'chat', { level: session.current_level, source: response.source, intent: response.intent });
+    if (!['tutorial', 'active'].includes(session.status)) {
+      await client.query('ROLLBACK');
+      client.release();
+      return { error: `Chat is unavailable while the session is ${session.status}.` };
+    }
 
-  return { dialogue: response.dialogue, source: response.source, clientState: await getClientState(session) };
+    const level = LEVEL_BY_INDEX[session.current_level];
+    levelStates = parseJson(session.level_states);
+    behaviourFlags = parseJson(session.behaviour_flags);
+    memory = parseJson(session.agent_memory);
+    memory.agentFacts = memory.agentFacts || {};
+
+    // Only apply the intent if the level hasn't changed since the AI call started
+    if (session.current_level === currentLevelIdx) {
+      behaviourFlags.chatCountByLevel = behaviourFlags.chatCountByLevel || {};
+      behaviourFlags.chatCountByLevel[level.index] = (behaviourFlags.chatCountByLevel[level.index] || 0) + 1;
+      behaviourFlags.agentTrustCount = (behaviourFlags.agentTrustCount || 0) + 1;
+      recordChatObservation(behaviourFlags, level.index, trimmedMessage);
+
+      const speaker = level.index === 3 ? (target === 'B' ? 'B' : 'A') : null;
+      const factKey = level.index === 3 ? `3:${speaker}` : `${level.index}:default`;
+
+      const mapped = intentToAction(level.index, response.intent, trimmedMessage, target);
+      if (mapped) {
+        const ls = levelStates[level.key];
+        const outcome = level.act(session, ls, mapped.action, mapped.payload || {}, { behaviourFlags, memory });
+        levelStates[level.key] = outcome.levelState;
+        if (ENGINE_RESOLVED_DIALOGUE.includes(response.intent)) {
+          response = { ...response, dialogue: outcome.result.agentLine || outcome.result.message };
+        }
+      }
+
+      if (response.memoryUpdates?.length) {
+        memory.agentFacts[factKey] = [...(memory.agentFacts[factKey] || []), ...response.memoryUpdates].slice(-AGENT_FACTS_LIMIT);
+      }
+      if (response.relationshipUpdate) {
+        memory.agentRelationship = memory.agentRelationship || {};
+        const current = memory.agentRelationship[factKey] || 0;
+        memory.agentRelationship[factKey] = Math.max(-5, Math.min(5, current + response.relationshipUpdate.trustDelta));
+      }
+    }
+
+    memory.chatLog = memory.chatLog || [];
+    memory.chatLog.push({ level: session.current_level, player: trimmedMessage, agent: response.dialogue, at: Date.now() });
+    if (memory.chatLog.length > CHAT_LOG_LIMIT) memory.chatLog = memory.chatLog.slice(-CHAT_LOG_LIMIT);
+
+    session.level_states = JSON.stringify(levelStates);
+    session.behaviour_flags = JSON.stringify(behaviourFlags);
+    session.agent_memory = JSON.stringify(memory);
+
+    await client.query(
+      `UPDATE game_sessions SET level_states = $1, behaviour_flags = $2, agent_memory = $3 WHERE id = $4`,
+      [toJsonStr(levelStates), toJsonStr(behaviourFlags), toJsonStr(memory), session.id]
+    );
+
+    await client.query('COMMIT');
+    resultToReturn = { dialogue: response.dialogue, source: response.source, clientState: await getClientState(session) };
+
+    logAudit(session.team_id, 'chat', { level: session.current_level, source: response.source, intent: response.intent }).catch(e => console.error(e));
+
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    if (client) client.release();
+  }
+
+  return resultToReturn;
 }
-
-// ---------------------------------------------------------------------------
-// Hints
 // ---------------------------------------------------------------------------
 const HINTS_BY_LEVEL = {
   1: ["The agent's advice depends on something you're carrying, not just where you go.", 'Collect the key before you open the blue door.'],
@@ -836,12 +893,12 @@ export async function reportSecurityViolation(session, reason) {
     }
   }
 
-  session.focus_violations     = (session.focus_violations     || 0) + 1;
-  session.last_violation_at    = new Date().toISOString();
+  session.focus_violations = (session.focus_violations || 0) + 1;
+  session.last_violation_at = new Date().toISOString();
   session.last_violation_reason = safeReason;
 
   const violationNumber = session.focus_violations;
-  const isWarningOnly   = violationNumber === 1;
+  const isWarningOnly = violationNumber === 1;
   let lifeLost = false;
 
   if (isWarningOnly) {

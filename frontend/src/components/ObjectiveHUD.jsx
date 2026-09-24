@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { IconCheck } from './GameIcons.jsx';
 import { sfx } from '../sound.js';
 
-// Game-native Mission Objectives floating widget matching the reference UI:
-// Displays all mission tasks with visual states (Completed green check, Active cyan focus, Pending circle).
+// Display-only wording: the server objective for the key-and-doors level says which door is correct
+// ("Escape through the blue door."), which spoils the puzzle. Show a neutral prompt instead; the
+// server text, the door logic and the objective step/progress state are untouched.
+const displayText = (text) => (/escape through the blue door/i.test(text) ? 'Choose a door' : text);
+
+// Mission objective widget: shows the current (first unfinished) step and progress.
+// Data comes straight from level.objective.steps; nothing is computed beyond counts.
 export default function ObjectiveHUD({ objective }) {
   const doneCount = objective?.steps?.filter((s) => s.done).length ?? 0;
   const prevDoneCount = useRef(doneCount);
@@ -26,23 +30,29 @@ export default function ObjectiveHUD({ objective }) {
   const allDone = activeIndex < 0;
 
   return (
-    <section className={`az-game-objectives-card az-objective-minimal ${justCompleted ? 'az-objective-just-done' : ''}`} aria-label="Current Objective">
-      <div className="az-objective-minimal-header">
-        <span className="az-objectives-title-text" style={{ letterSpacing: '0.15em', fontSize: '0.65rem', opacity: 0.7 }}>OBJECTIVE</span>
-      </div>
-      
-      {allDone ? (
-        <div className="az-objective-minimal-content">
-          <span className="az-objective-item-text" style={{ color: '#10b981' }}>EXIT CONFIRMED</span>
-          <span className="az-objective-status-tag" style={{ color: '#10b981' }}>[UNLOCKED]</span>
+    <div className="ds-page ds-page-embed">
+      <section
+        className={`ds-objective ${allDone ? 'is-done' : ''} ${justCompleted ? 'az-objective-just-done' : ''}`}
+        aria-label="Current Objective"
+      >
+        <div className="ds-row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap', marginBottom: 4 }}>
+          <span className="ds-label">Objective</span>
+          <span className="ds-mono-sm">{doneCount} / {steps.length}</span>
         </div>
-      ) : (
-        <div className="az-objective-minimal-content">
-          <span className="az-objective-item-text">{steps[activeIndex].text}</span>
-          <span className="az-objective-status-tag">[PENDING]</span>
+        <div className="ds-row" style={{ justifyContent: 'space-between', flexWrap: 'nowrap', gap: 'var(--ds-space-md)' }}>
+          {allDone ? (
+            <>
+              <span className="ds-body" style={{ fontSize: 14, lineHeight: '20px', color: 'var(--ds-success-text)' }}>EXIT CONFIRMED</span>
+              <span className="ds-badge ds-badge-success">Unlocked</span>
+            </>
+          ) : (
+            <>
+              <span className="ds-body" style={{ fontSize: 14, lineHeight: '20px' }}>{displayText(steps[activeIndex].text)}</span>
+              <span className="ds-badge">Pending</span>
+            </>
+          )}
         </div>
-      )}
-    </section>
+      </section>
+    </div>
   );
 }
-

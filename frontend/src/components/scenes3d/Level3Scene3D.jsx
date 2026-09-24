@@ -15,11 +15,12 @@ export default function Level3Scene({ level, onAction, busy, flash, setChatFocus
 
   return (
     <div className="az-scene3d-stage">
-      <SceneCanvas tone="violet" flashColor={flash?.result?.ok === false ? '#ff3b5c' : null} height="100%">
+      <SceneCanvas tone="violet" flashColor={flash?.result?.ok === false ? '#ff3b5c' : null} height="100%" variant="facility">
 
-        <Camera3D position={[0, 5, -3]} color={toneColor('violet')} reacting={!!flash} />
+        <Camera3D variant="facility" position={[0, 5, -3]} color={toneColor('violet')} reacting={!!flash} />
 
         <Door3D
+          variant="facility"
           position={[-1.7, 0, -2.4]}
           color={revealedPath === 'left' ? toneColor('cyan') : toneColor('violet')}
           label="LEFT ROUTE"
@@ -28,6 +29,7 @@ export default function Level3Scene({ level, onAction, busy, flash, setChatFocus
           onClick={() => {}}
         />
         <Door3D
+          variant="facility"
           position={[1.7, 0, -2.4]}
           color={revealedPath === 'right' ? toneColor('cyan') : toneColor('violet')}
           label="RIGHT ROUTE"
@@ -37,6 +39,7 @@ export default function Level3Scene({ level, onAction, busy, flash, setChatFocus
         />
 
         <Agent3D
+          variant="facility"
           position={[-1.3, 0, 1.6]}
           color={agentIdentity('UNIT A').color}
           glyph={agentIdentity('UNIT A').glyph}
@@ -46,6 +49,7 @@ export default function Level3Scene({ level, onAction, busy, flash, setChatFocus
           onClick={() => setChatFocusRequest?.({ target: 'A', key: Date.now() })}
         />
         <Agent3D
+          variant="facility"
           position={[1.3, 0, 1.6]}
           color={agentIdentity('UNIT B').color}
           glyph={agentIdentity('UNIT B').glyph}

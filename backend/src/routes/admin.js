@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAdminAuth } from '../middleware/auth.js';
 import { dbGet, dbAll, dbRun, getConfig, setConfig, logAudit } from '../db/index.js';
-import { supabaseAdmin } from '../db/supabaseClient.js';
+import { registerUser, deleteUsers } from '../db/insforgeClient.js';
 import { remainingSeconds } from '../engine/timer.js';
 import { computeProfile, selectLevel4Modules, selectLevel5Modules } from '../engine/behaviourProfile.js';
 import { getScoreBreakdown } from '../engine/gameEngine.js';
@@ -9,7 +9,7 @@ import { getScoreBreakdown } from '../engine/gameEngine.js';
 export const adminRouter = Router();
 adminRouter.use(requireAdminAuth);
 
-// Derives the deterministic Supabase Auth email from a team name.
+// Derives the deterministic InsForge Auth email from a team name.
 // Must match the formula used in auth.js login.
 function teamEmail(teamName) {
   return `${teamName.trim().toLowerCase().replace(/[^a-z0-9]/g, '-')}@agentzero.internal`;
@@ -32,32 +32,39 @@ adminRouter.post('/teams/create', async (req, res) => {
   }
 
   // Check for duplicate team name
-  const existing = await dbGet('SELECT id FROM teams WHERE team_name = $1', [teamName.trim()]);
+  // Case-insensitive: "nexora" must not create a second team next to "Nexora".
+  const existing = await dbGet('SELECT id FROM teams WHERE lower(btrim(team_name)) = lower($1)', [teamName.trim()]);
   if (existing) {
     return res.status(409).json({ error: 'A team with that name already exists.' });
   }
 
   try {
-    // 1. Create Supabase Auth user (handles password hashing securely)
+    // 1. Create InsForge Auth user (InsForge hashes the password; email verification is
+    //    disabled in the project auth config because team emails are internal-only)
     const email = teamEmail(teamName.trim());
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,   // skip email confirmation — admin controls accounts
-    });
-    if (authError) {
-      console.error('[admin/teams/create] Supabase auth error:', authError.message);
+    let authUser;
+    try {
+      authUser = await registerUser({ email, password, name: teamName.trim() });
+    } catch (authError) {
+      console.error('[admin/teams/create] InsForge auth error:', authError.status || '', authError.message);
       return res.status(500).json({ error: `Failed to create auth account: ${authError.message}` });
     }
 
     // 2. Insert team record linked to auth user
-    const { rows } = await dbRun(
-      `INSERT INTO teams (auth_user_id, team_name, member1, member2, member3, contact)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING *`,
-      [authData.user.id, teamName.trim(), member1, member2, member3 || null, contact]
-    );
-    const team = rows[0];
+    let team;
+    try {
+      const { rows } = await dbRun(
+        `INSERT INTO teams (auth_user_id, team_name, member1, member2, member3, contact)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING *`,
+        [authUser.id, teamName.trim(), member1, member2, member3 || null, contact]
+      );
+      team = rows[0];
+    } catch (dbError) {
+      // Do not leave an orphaned auth user behind (it would block retrying the same team name).
+      await deleteUsers([authUser.id]).catch(() => {});
+      throw dbError;
+    }
 
     await logAudit('admin', 'team_created', { teamName: team.team_name, teamId: team.id });
 
@@ -75,15 +82,37 @@ adminRouter.post('/teams/:id/reset-password', async (req, res) => {
     return res.status(400).json({ error: 'New password must be at least 6 characters.' });
   }
 
-  const team = await dbGet('SELECT * FROM teams WHERE id = $1', [req.params.id]);
-  if (!team) return res.status(404).json({ error: 'Team not found.' });
-  if (!team.auth_user_id) return res.status(400).json({ error: 'Team has no auth account.' });
+  try {
+    const team = await dbGet('SELECT * FROM teams WHERE id = $1', [req.params.id]);
+    if (!team) return res.status(404).json({ error: 'Team not found.' });
 
-  const { error } = await supabaseAdmin.auth.admin.updateUserById(team.auth_user_id, { password });
-  if (error) return res.status(500).json({ error: error.message });
+    // InsForge documents no admin "set password" call, so the team's Auth user is
+    // replaced with a new one (same deterministic email, new password) using only the
+    // documented register/delete endpoints. Order matters: teams.auth_user_id is
+    // ON DELETE CASCADE from auth.users, so the team row is detached BEFORE the old
+    // user is deleted (otherwise the team, its session and its results would be
+    // deleted with it). If a step after the detach fails, the team keeps all its
+    // game data with auth_user_id NULL, and running the reset again completes it.
+    const oldUserId = team.auth_user_id;
+    if (oldUserId) {
+      await dbRun('UPDATE teams SET auth_user_id = NULL WHERE id = $1', [team.id]);
+      try {
+        await deleteUsers([oldUserId]);
+      } catch (err) {
+        await dbRun('UPDATE teams SET auth_user_id = $1 WHERE id = $2', [oldUserId, team.id]); // roll back the detach
+        throw err;
+      }
+    }
 
-  await logAudit('admin', 'team_password_reset', { teamId: team.id });
-  res.json({ ok: true });
+    const newUser = await registerUser({ email: teamEmail(team.team_name), password, name: team.team_name });
+    await dbRun('UPDATE teams SET auth_user_id = $1 WHERE id = $2', [newUser.id, team.id]);
+
+    await logAudit('admin', 'team_password_reset', { teamId: team.id });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[admin/reset-password]', err.status || '', err.message);
+    res.status(500).json({ error: 'Failed to reset password.' });
+  }
 });
 
 // ============================================================================

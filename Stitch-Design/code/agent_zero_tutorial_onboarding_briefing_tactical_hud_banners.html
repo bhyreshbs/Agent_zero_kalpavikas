@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Playfair+Display:ital,wght@0,500;0,600;1,400&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {"darkMode":"class","theme":{"extend":{"colors":{"on-tertiary-fixed":"#201b13","error-container":"#93000a","tertiary-fixed":"#ece1d3","inverse-on-surface":"#32302f","surface-container-highest":"#363433","secondary-fixed-dim":"#cac6bd","secondary-fixed":"#e7e2d9","surface-tint":"#eec068","primary-container":"#d4a853","primary-fixed-dim":"#eec068","surface-bright":"#3b3937","secondary":"#cac6bd","surface-container":"#211f1e","on-primary-container":"#573d00","on-error":"#690005","surface-container-lowest":"#0f0e0d","tertiary-container":"#b7ada1","on-surface":"#e6e1df","on-tertiary-fixed-variant":"#4c463c","background":"#141312","tertiary-fixed-dim":"#cfc5b8","outline-variant":"#4e4637","on-primary":"#412d00","primary-fixed":"#ffdea6","on-primary-fixed-variant":"#5d4200","on-secondary-container":"#b9b5ac","surface-container-high":"#2b2a28","surface":"#141312","outline":"#9b8f7e","on-tertiary-container":"#474137","on-error-container":"#ffdad6","inverse-primary":"#7b5804","surface-dim":"#141312","on-secondary":"#32302a","surface-container-low":"#1d1b1a","error":"#ffb4ab","on-secondary-fixed":"#1d1c16","inverse-surface":"#e6e1df","on-surface-variant":"#d2c5b2","surface-variant":"#363433","primary":"#f2c36b","on-primary-fixed":"#271900","on-background":"#e6e1df","tertiary":"#d3c8bb","on-secondary-fixed-variant":"#494740","secondary-container":"#494740","on-tertiary":"#353027"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-xs":"0.25rem","margin":"2rem","space-md":"1rem","margin-tablet":"2rem","space-xxl":"4rem","space-xl":"2.5rem","margin-desktop":"3.5rem","gutter":"1.5rem","gutter-lg":"2rem","space-sm":"0.5rem","margin-mobile":"1rem","gutter-sm":"0.75rem","space-lg":"1.5rem"},"fontFamily":{"display-hero-mobile":["Playfair Display"],"telemetry-data":["JetBrains Mono"],"display-hero":["Playfair Display"],"ui-micro":["Space Grotesk"],"dossier-title-mobile":["Playfair Display"],"ui-action-lg":["Space Grotesk"],"telemetry-badge":["JetBrains Mono"],"body-dossier":["Playfair Display"],"telemetry-timestamp":["JetBrains Mono"],"dossier-title":["Playfair Display"],"ui-nav":["Space Grotesk"],"editorial-h1":["Playfair Display"],"editorial-h2":["Playfair Display"]},"fontSize":{"display-hero-mobile":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"600"}],"telemetry-data":["12px",{"lineHeight":"18px","letterSpacing":"0.02em","fontWeight":"400"}],"display-hero":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"600"}],"ui-micro":["10px",{"lineHeight":"14px","letterSpacing":"0.12em","fontWeight":"500"}],"dossier-title-mobile":["26px",{"lineHeight":"32px","fontWeight":"500"}],"ui-action-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.08em","fontWeight":"600"}],"telemetry-badge":["10px",{"lineHeight":"12px","letterSpacing":"0.05em","fontWeight":"600"}],"body-dossier":["16px",{"lineHeight":"26px","fontWeight":"400"}],"telemetry-timestamp":["11px",{"lineHeight":"16px","fontWeight":"400"}],"dossier-title":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"500"}],"ui-nav":["12px",{"lineHeight":"16px","letterSpacing":"0.1em","fontWeight":"500"}],"editorial-h1":["28px",{"lineHeight":"36px","fontWeight":"500"}],"editorial-h2":["22px",{"lineHeight":"28px","letterSpacing":"0.01em","fontWeight":"400"}]}}}};</script></head><body class="bg-surface font-body-dossier text-body-dossier text-on-surface min-h-screen relative antialiased selection:bg-primary selection:text-on-primary"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.6)]"><div class="h-16 w-full px-gutter flex items-center justify-between"><div class="flex items-center gap-space-md"><img alt="Brand logo. - Primary color: #d4a853
+- Font: playfairDisplay
+- Mode: dark
+- Roundness: rounded-lg
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UknN-Zyf_cNT72v9THqC4o-cd4mMUbYEsgzTylqOmi5Ypvy15TwS-KdLXn0eFR7iV0OS8-wYuQoMOEnb7yEz0tXs2x9yyn6o2g2_gINBh0FtrH5wSZmBVzGolqnAD_-sy3qfow-LxQXXK5OSTDI_7F2Mfo5f925MPJtZgMOLNXNe8xDN5Cq-GxmEQ83mo90PpmTDhHcWrCaBu541UNIUsKNB3J7VJgJob5Jey6ERQTT-Mwex3m0wSYK4yp"/><div class="flex flex-col"><span class="font-ui-nav text-ui-nav uppercase text-on-surface tracking-widest">AGENT ZERO // ECHO PROTOCOL</span><span class="font-telemetry-badge text-telemetry-badge text-outline">FACILITY: SUB-SURFACE TIER-04</span></div></div><div class="hidden lg:flex items-center gap-space-lg"><div class="flex items-center gap-space-xs font-telemetry-data text-telemetry-data text-on-surface-variant"><span class="material-symbols-outlined text-[14px] text-primary">near_me</span><span>LOC: 64°18'N 19°42'W</span></div><span class="text-outline-variant font-telemetry-data text-telemetry-data">//</span><div class="flex items-center gap-space-xs font-telemetry-badge text-telemetry-badge text-primary px-space-xs py-0.5 bg-surface-container-high"><span class="w-1.5 h-1.5 bg-primary"></span><span>CLEARANCE: LEVEL 5 [RESTRICTED]</span></div></div><nav class="flex items-center gap-space-md" data-active-classes="bg-primary-container text-on-primary-container font-ui-nav text-ui-nav"><a class="font-ui-nav text-ui-nav uppercase px-space-sm py-1 text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="station-overview" href="#">Simulation</a><a aria-current="page" class="uppercase px-space-sm py-1 transition-colors bg-primary-container text-on-primary-container font-ui-nav text-ui-nav" data-path="tactical-briefings" href="#">Briefings</a><a class="font-ui-nav text-ui-nav uppercase px-space-sm py-1 text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="station-telemetry" href="#">Telemetry</a><a class="font-ui-nav text-ui-nav uppercase px-space-sm py-1 text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="operative-manifest" href="#">Operatives</a></nav><div class="flex items-center gap-space-md"><div class="hidden sm:flex flex-col items-end font-telemetry-timestamp text-telemetry-timestamp text-on-surface-variant"><span>ZULU: 0344:19</span><span class="text-primary">LINK: SECURE-AES256</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-4rem)] relative"><div class="flex flex-col w-full relative min-h-[calc(100vh-4rem)] overflow-hidden select-none">
+<!-- BACKGROUND: SIMULATED 3D ECHO STATION CHAMBER -->
+<div class="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-surface-container-lowest">
+<!-- Game World Perspective View -->
+<div class="absolute inset-0 flex items-center justify-center scale-105 transform-gpu opacity-45">
+<img class="w-full h-full object-cover object-center filter contrast-125 brightness-75" data-alt="First-person tactical viewpoint inside a brutalist subterranean military bunker chamber with massive circular acoustic dampening rings, reinforced hydraulic blast doors with amber hazard markings, dark wet concrete floor with illuminated teal wireframe tactical grid lines, floor inspection hatch with valve wheel, and warm charcoal slate aesthetic under low rim lighting and faint amber spotlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA9qWVGf_Z300-HysZVwYypo1Tfraq_FJJzLTouTKTJro2DJ44J8XHVOpd8ccMKKw5EkCfWsUvfJ2id13U6aiKAALZ0gE9OVW3b36DPzSKQj7mggZh0nokN5nqXBQiYInnp8UKdGrr06vgNUsJf524-CbPuHYzcr0EdjAgPt56dtJ4A6JcXwsqw6r6Yvg45tO6hwK99zwwefklWZNpGKg57sfST5njLB0Kq8HPoVaJzIKL2PlUxj-G7g"/>
+</div>
+<!-- Atmospheric Grid Overlays & Tactical Floor Rings (SVG) -->
+<svg class="absolute inset-0 w-full h-full opacity-25" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialgradient cx="50%" cy="45%" id="chamber-glow" r="65%">
+<stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.12"></stop>
+<stop offset="50%" stop-color="#d4a853" stop-opacity="0.05"></stop>
+<stop offset="100%" stop-color="#0f0e0d" stop-opacity="0.9"></stop>
+</radialgradient>
+<pattern height="48" id="tactical-grid" patternunits="userSpaceOnUse" width="48">
+<path d="M 48 0 L 0 0 0 48" fill="none" stroke="#9b8f7e" stroke-opacity="0.25" stroke-width="0.5"></path>
+<circle cx="48" cy="0" fill="#d4a853" fill-opacity="0.3" r="1.5"></circle>
+</pattern>
+</defs>
+<rect fill="url(#chamber-glow)" height="100%" width="100%"></rect>
+<rect fill="url(#tactical-grid)" height="100%" width="100%"></rect>
+<!-- Perspective Chamber Acoustic Vectors -->
+<g fill="none" stroke="#2dd4bf" stroke-opacity="0.2" stroke-width="1">
+<circle cx="50%" cy="48%" r="140" stroke-dasharray="4 8"></circle>
+<circle cx="50%" cy="48%" r="280" stroke-dasharray="2 16"></circle>
+<circle cx="50%" cy="48%" r="420" stroke-dasharray="8 12"></circle>
+<line stroke-dasharray="2 4" stroke-opacity="0.1" x1="50%" x2="50%" y1="0" y2="100%"></line>
+<line stroke-dasharray="2 4" stroke-opacity="0.1" x1="0" x2="100%" y1="48%" y2="48%"></line>
+</g>
+</svg>
+<!-- Sub-surface Ambient Vignette & Noise Simulation -->
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/80 to-surface-container-lowest/40"></div>
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,transparent_35%,#0f0e0d_95%)] opacity-85"></div>
+</div>
+<!-- HUD IN-GAME PERSISTENT HEADER TELEMETRY STRIP -->
+<div class="relative z-10 w-full px-gutter pt-3 pb-2 flex items-center justify-between font-telemetry-badge text-telemetry-badge text-outline border-b border-outline-variant/20 bg-surface-container-lowest/60 backdrop-blur-sm">
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="w-1.5 h-1.5 bg-primary animate-pulse"></span>
+<span class="font-ui-micro text-ui-micro uppercase tracking-widest text-on-surface">ECHO STATION // SECTOR 00</span>
+</div>
+<span class="text-outline-variant">//</span>
+<span class="font-telemetry-data text-telemetry-data text-outline">LOC: CHAMBER-DAMPING-01</span>
+<span class="text-outline-variant">//</span>
+<span class="font-telemetry-data text-telemetry-data text-outline">GRID: REF: TUT-09</span>
+</div>
+<!-- Switcher Controls for Top In-Game Instruction Banners -->
+<div class="flex items-center gap-space-xs bg-surface-container-high/80 p-0.5 px-1.5 shadow-sm">
+<span class="font-ui-micro text-ui-micro uppercase text-outline mr-1 tracking-wider">HUD PREVIEW:</span>
+<button class="px-2 py-0.5 text-telemetry-badge transition-all bg-primary-container text-on-primary-container font-medium" id="banner-btn-1" onclick="setBannerState(1)">B-01: EXIT</button>
+<button class="px-2 py-0.5 text-telemetry-badge transition-all text-on-surface-variant hover:text-on-surface font-medium" id="banner-btn-2" onclick="setBannerState(2)">B-02: HARMONICS</button>
+<button class="px-2 py-0.5 text-telemetry-badge transition-all text-on-surface-variant hover:text-on-surface font-medium" id="banner-btn-3" onclick="setBannerState(3)">B-03: SQUAD</button>
+</div>
+<div class="hidden md:flex items-center gap-space-md font-telemetry-timestamp text-telemetry-timestamp">
+<div class="flex items-center gap-1">
+<span class="text-outline">SYNAPSE LATENCY:</span>
+<span class="text-primary font-telemetry-data text-telemetry-data">12ms</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="text-outline">ISOLATION:</span>
+<span class="text-[#2dd4bf]">99.8% SEALED</span>
+</div>
+</div>
+</div>
+<!-- 1. TOP IN-GAME INSTRUCTIONAL BANNER (Docked just below the shell/HUD) -->
+<div class="relative z-20 w-full px-gutter mt-2 flex justify-center">
+<div class="w-full max-w-4xl bg-surface-container-lowest/90 backdrop-blur-md shadow-2xl p-space-sm pl-space-md pr-space-lg flex items-center justify-between transition-all duration-300 relative overflow-hidden group" id="tactical-banner">
+<!-- Top Accent Line -->
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#2dd4bf]/80 to-transparent"></div>
+<div class="absolute inset-y-0 left-0 w-1 bg-[#2dd4bf]"></div>
+<!-- Icon + Instruction Content -->
+<div class="flex items-center gap-space-md min-w-0 pr-space-md">
+<!-- Teal Tactical Icon Well -->
+<div class="w-10 h-10 shrink-0 bg-surface-container-high/90 flex items-center justify-center relative">
+<span class="material-symbols-outlined text-[#2dd4bf] text-[22px] transition-all" id="banner-icon">sensor_door</span>
+<div class="absolute -bottom-0.5 -right-0.5 w-1 h-1 bg-primary"></div>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-telemetry-badge text-telemetry-badge uppercase tracking-wider text-[#2dd4bf] bg-[#2dd4bf]/10 px-1 py-0.2" id="banner-badge">DIRECTIVE 01</span>
+<span class="font-ui-action-lg text-ui-action-lg uppercase tracking-wider text-on-surface truncate font-semibold" id="banner-title">CLICK THE EXIT</span>
+</div>
+<p class="font-body-dossier text-[13px] leading-tight text-on-surface-variant italic truncate mt-0.5" id="banner-subtitle">
+            Go ahead — click either physical doorway in the room to initialize clearance handshake.
+          </p>
+</div>
+</div>
+<!-- Telemetry Readout Indicator on Banner -->
+<div class="hidden sm:flex flex-col items-end shrink-0 pl-space-md font-telemetry-data text-telemetry-data border-l border-outline-variant/30">
+<span class="text-primary flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-[#2dd4bf] rounded-full animate-ping"></span>
+<span>AWAITING INPUT</span>
+</span>
+<span class="text-outline text-[10px] tracking-widest mt-0.5">ACTION: IN-WORLD CLICK</span>
+</div>
+</div>
+</div>
+<!-- 2. MAIN CLASSIFIED ONBOARDING BRIEFING MODAL OVERLAY -->
+<div class="relative z-30 flex-1 flex items-center justify-center px-4 py-6 transition-all duration-300" id="briefing-modal-container">
+<!-- Modal Card (max-w-[760px]) -->
+<div class="w-full max-w-[760px] bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.85)] relative overflow-hidden flex flex-col transition-all duration-300">
+<!-- Top 1px Amber Accent Line -->
+<div class="w-full h-[2px] bg-primary shadow-[0_0_8px_rgba(212,168,83,0.4)]"></div>
+<!-- Corner Marginalia Markers -->
+<span class="absolute top-2 left-2 font-telemetry-badge text-[9px] text-outline/50 tracking-widest pointer-events-none">+ SEC_00 // CLASSIFIED</span>
+<span class="absolute top-2 right-2 font-telemetry-badge text-[9px] text-outline/50 tracking-widest pointer-events-none">[RESTRICTED_ACCESS]</span>
+<!-- 2-COLUMN STRUCTURE -->
+<div class="flex flex-col md:flex-row w-full flex-1">
+<!-- a) LEFT COLUMN: "ECHO AGENT IDENTITY CAPSULE" (~230px) -->
+<div class="w-full md:w-[230px] shrink-0 bg-[#0c0b0a] p-space-md flex flex-col justify-between items-center text-center relative overflow-hidden border-b md:border-b-0 md:border-r border-outline-variant/20">
+<!-- Holographic Scanline Motif & Subtle Backdrop Grid -->
+<div class="absolute inset-0 opacity-15 pointer-events-none bg-[linear-gradient(rgba(45,212,191,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(45,212,191,0.1)_1px,transparent_1px)] bg-[size:16px_16px]"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#2dd4bf]/5 to-transparent pointer-events-none animate-pulse"></div>
+<!-- Top Capsule Tag -->
+<div class="w-full flex items-center justify-between text-outline font-telemetry-badge text-[9px] mb-3 z-10">
+<span>SYN-AI // v4.2</span>
+<span class="text-primary flex items-center gap-1">
+<span class="w-1 h-1 bg-primary"></span> LINKED
+            </span>
+</div>
+<!-- Holographic Echo Glyph Visualizer -->
+<div class="my-auto py-3 flex flex-col items-center justify-center relative z-10">
+<!-- Rotating Concentric Telemetry Rings -->
+<div class="relative w-36 h-36 flex items-center justify-center">
+<!-- Outer Dashed Ring -->
+<svg class="absolute inset-0 w-full h-full animate-[spin_36s_linear_infinite]" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" opacity="0.4" r="46" stroke="#9b8f7e" stroke-dasharray="3 6" stroke-width="0.75"></circle>
+<circle cx="50" cy="50" fill="none" opacity="0.6" r="40" stroke="#2dd4bf" stroke-dasharray="1 10" stroke-width="0.5"></circle>
+<line stroke="#2dd4bf" stroke-width="1.5" x1="50" x2="50" y1="2" y2="7"></line>
+<line stroke="#2dd4bf" stroke-width="1.5" x1="50" x2="50" y1="93" y2="98"></line>
+<line stroke="#d4a853" stroke-width="1.5" x1="2" x2="7" y1="50" y2="50"></line>
+<line stroke="#d4a853" stroke-width="1.5" x1="93" x2="98" y1="50" y2="50"></line>
+</svg>
+<!-- Inner Counter-Rotating Ring with Degree Marks -->
+<svg class="absolute inset-3 w-[calc(100%-24px)] h-[calc(100%-24px)] animate-[spin_24s_linear_infinite_reverse]" viewbox="0 0 80 80">
+<circle cx="40" cy="40" fill="none" opacity="0.5" r="36" stroke="#d4a853" stroke-dasharray="4 8" stroke-width="0.75"></circle>
+<circle cx="40" cy="40" fill="none" opacity="0.3" r="28" stroke="#2dd4bf" stroke-width="0.5"></circle>
+<!-- Degree tick indicators -->
+<text fill="#9b8f7e" font-family="JetBrains Mono" font-size="5" text-anchor="middle" x="40" y="8">000°</text>
+<text fill="#9b8f7e" font-family="JetBrains Mono" font-size="5" text-anchor="middle" x="74" y="42">090°</text>
+<text fill="#9b8f7e" font-family="JetBrains Mono" font-size="5" text-anchor="middle" x="40" y="76">180°</text>
+<text fill="#9b8f7e" font-family="JetBrains Mono" font-size="5" text-anchor="middle" x="6" y="42">270°</text>
+</svg>
+<!-- Luminous Teal Glyph Center -->
+<div class="relative z-10 w-16 h-16 flex items-center justify-center bg-surface-container-lowest/80 backdrop-blur-md rounded-none shadow-[inset_0_1px_4px_rgba(0,0,0,0.9)]">
+<!-- Large Geometric Diamond Glyph -->
+<div class="w-7 h-7 border border-[#2dd4bf] rotate-45 flex items-center justify-center bg-[#2dd4bf]/10 shadow-[0_0_15px_rgba(45,212,191,0.35)] transition-all">
+<div class="w-3 h-3 bg-[#2dd4bf]"></div>
+</div>
+</div>
+</div>
+<!-- Agent Identity Labeling -->
+<div class="mt-3">
+<span class="font-ui-nav text-[15px] font-bold tracking-[0.35em] text-[#2dd4bf] block">ECHO</span>
+<span class="font-telemetry-badge text-[9px] text-outline uppercase tracking-wider block mt-0.5">AGENT ZERO TACTICAL HUD</span>
+</div>
+<!-- Operational Status Indicator -->
+<div class="mt-3 flex items-center justify-center gap-1.5 px-2.5 py-1 bg-surface-container-high/90">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+<span class="font-telemetry-badge text-[10px] text-primary tracking-wider font-semibold">LIVE SYNAPSE</span>
+</div>
+</div>
+<!-- Sub-telemetry in Identity Capsule -->
+<div class="w-full text-left font-telemetry-timestamp text-[10px] text-outline-variant pt-2 border-t border-outline-variant/20 z-10">
+<div class="flex justify-between items-center text-outline">
+<span>FREQ:</span>
+<span class="text-[#2dd4bf] font-telemetry-data text-[11px]">142.80 MHz</span>
+</div>
+<div class="flex justify-between items-center text-outline mt-0.5">
+<span>COGNITIVE:</span>
+<span class="text-on-surface">NOMINAL</span>
+</div>
+<div class="flex justify-between items-center text-outline mt-0.5">
+<span>BUFFER:</span>
+<span class="text-primary font-telemetry-data text-[11px]">STREAM ACTIVE</span>
+</div>
+</div>
+</div>
+<!-- b) RIGHT COLUMN: "BRIEFING CONTENT PANE" (~530px) -->
+<div class="flex-1 p-space-md md:p-space-lg flex flex-col justify-between bg-surface-container-low/95">
+<div>
+<!-- Top Step Header & Classification Stamp -->
+<div class="flex items-center justify-between pb-2 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="font-telemetry-badge text-telemetry-badge uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 border-l-2 border-primary" id="step-badge">
+                  TACTICAL BRIEFING // PROTOCOL 01
+                </span>
+<span class="font-telemetry-timestamp text-telemetry-timestamp text-outline">LEVEL 5 CLEARANCE</span>
+</div>
+<div class="font-telemetry-badge text-[9px] text-[#9e382b] bg-[#9e382b]/10 px-1.5 py-0.5 uppercase tracking-widest font-bold">
+                TOP SECRET // ZERO
+              </div>
+</div>
+<!-- Mission Title (Playfair Display Large Serif) -->
+<h2 class="font-editorial-h1 text-editorial-h1 text-on-surface mt-3 transition-all duration-200" id="briefing-title">
+              Mission 01: The Acoustic Threshold
+            </h2>
+<!-- Editorial Lore Paragraph -->
+<p class="font-body-dossier text-body-dossier text-on-surface-variant mt-2 text-[15px] leading-relaxed transition-all duration-200" id="briefing-lore">
+              Welcome to Echo Station, Operative. Before you breach the subterranean core, you must attune your neural telemetry to our damper arrays. Unsynchronized acoustic resonance will collapse the containment bulkhead within seconds.
+            </p>
+<!-- Objectives Checklist -->
+<div class="mt-4 bg-surface-container-lowest/70 p-3">
+<div class="flex items-center justify-between mb-2">
+<span class="font-ui-micro text-ui-micro uppercase tracking-widest text-primary font-semibold">DIRECTIVE OBJECTIVES</span>
+<span class="font-telemetry-badge text-[9px] text-outline uppercase">3 MANDATORY</span>
+</div>
+<ul class="space-y-2 font-telemetry-data text-[12px] text-on-surface" id="briefing-objectives">
+<li class="flex items-start gap-2">
+<span class="text-primary font-bold shrink-0 mt-0.5">○</span>
+<span class="text-on-surface">Locate and inspect the Primary Damper terminal at North Bulkhead.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="text-primary font-bold shrink-0 mt-0.5">○</span>
+<span class="text-on-surface">Decouple the harmonic feedback loop before vibration exceeds 90%.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="text-primary font-bold shrink-0 mt-0.5">○</span>
+<span class="text-on-surface">Establish biometric handshake on the central console.</span>
+</li>
+</ul>
+</div>
+<!-- Agent ECHO Tactical Dialogue Bubble -->
+<div class="mt-4 bg-[#161513] p-3 shadow-inner relative group transition-all">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex items-center justify-between mb-1 pl-2">
+<div class="flex items-center gap-1.5">
+<span class="text-[#2dd4bf] text-xs">◆</span>
+<span class="font-ui-micro text-[10px] text-outline uppercase tracking-wider font-semibold">ECHO // SUBTERRANEAN SYNTHETIC ADVISOR</span>
+</div>
+<span class="font-telemetry-timestamp text-[10px] text-outline-variant">DEEP_FEED // AUDIO</span>
+</div>
+<blockquote class="pl-2 font-body-dossier italic text-[14px] text-on-surface leading-snug" id="briefing-dialogue">
+                “Listen closely to the reverberations in the floor plates. When the frequency drops to a purr, you're safe to turn the key.”
+              </blockquote>
+</div>
+</div>
+<!-- CARD FOOTER BAR WITH PAGINATION & STEP ACTIONS -->
+<div class="mt-6 pt-3 border-t border-outline-variant/20 flex flex-col sm:flex-row items-center justify-between gap-3">
+<!-- Left: Step Indicator & Stepper Pips -->
+<div class="flex items-center gap-3">
+<span class="font-telemetry-data text-telemetry-data text-outline font-semibold" id="step-counter">STEP 1 / 5</span>
+<!-- Visual Step Indicator Dots -->
+<div class="flex items-center gap-1.5" id="stepper-dots">
+<button class="w-3.5 h-1.5 bg-primary transition-all cursor-pointer" onclick="goToStep(1)" title="Go to Step 1"></button>
+<button class="w-3.5 h-1.5 bg-outline-variant transition-all cursor-pointer" onclick="goToStep(2)" title="Go to Step 2"></button>
+<button class="w-3.5 h-1.5 bg-outline-variant transition-all cursor-pointer" onclick="goToStep(3)" title="Go to Step 3"></button>
+<button class="w-3.5 h-1.5 bg-outline-variant transition-all cursor-pointer" onclick="goToStep(4)" title="Go to Step 4"></button>
+<button class="w-3.5 h-1.5 bg-outline-variant transition-all cursor-pointer" onclick="goToStep(5)" title="Go to Step 5"></button>
+</div>
+<!-- Quick Prev Button if step > 1 -->
+<button class="hidden font-telemetry-data text-telemetry-data text-outline hover:text-on-surface transition-colors px-1.5 py-0.5" id="btn-prev" onclick="prevStep()">
+                ◀ BACK
+              </button>
+</div>
+<!-- Right: Action Buttons -->
+<div class="flex items-center gap-space-md w-full sm:w-auto justify-end">
+<button class="font-ui-micro text-ui-micro uppercase text-outline hover:text-on-surface transition-colors tracking-widest px-2 py-1" onclick="toggleModalBackdrop()">
+                SKIP TUTORIAL [ESC]
+              </button>
+<button class="bg-primary text-on-primary font-ui-action-lg text-ui-action-lg uppercase tracking-wider px-space-md py-2 font-bold hover:bg-[#ede8df] transition-all flex items-center gap-1.5 shadow-md active:translate-y-0.5" id="btn-next" onclick="nextStep()">
+<span>CONTINUE BRIEFING</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- FLOATING GAME CHAMBER STATUS & TOGGLE HUD FOOTER CONTROLS -->
+<div class="relative z-20 w-full px-gutter pb-3 flex flex-col sm:flex-row items-center justify-between text-outline text-telemetry-data gap-2">
+<div class="flex items-center gap-space-md bg-surface-container-lowest/80 px-space-md py-1 backdrop-blur-sm border-l border-primary/40">
+<span class="flex items-center gap-1.5 text-on-surface-variant font-telemetry-timestamp text-telemetry-timestamp">
+<span class="material-symbols-outlined text-primary text-[14px]">graphic_eq</span>
+<span>ACOUSTIC RESONANCE: <strong class="text-on-surface font-telemetry-data">32.4 dB</strong> [STABLE]</span>
+</span>
+<span class="text-outline-variant font-telemetry-data text-telemetry-data">//</span>
+<span class="text-on-surface-variant font-telemetry-timestamp text-telemetry-timestamp">
+        HATCH SEAL: <span class="text-[#2dd4bf]">PRESSURIZED</span>
+</span>
+</div>
+<!-- Toggle Backdrop Button for Live Chamber Inspection -->
+<div class="flex items-center gap-2">
+<button class="bg-surface-container-high/90 hover:bg-surface-container-highest text-on-surface font-ui-micro text-ui-micro uppercase px-space-md py-1.5 tracking-widest flex items-center gap-1.5 transition-all shadow-sm" id="btn-toggle-hud" onclick="toggleModalBackdrop()">
+<span class="material-symbols-outlined text-primary text-[15px]">visibility</span>
+<span id="toggle-label">INSPECT GAME WORLD / HIDE MODAL</span>
+</button>
+</div>
+</div>
+</div>
+<!-- INTERACTIVE FLOW SCRIPT -->
+<script>
+  // Briefing steps data dictionary
+  const briefingSteps = [
+    {
+      step: 1,
+      badge: "TACTICAL BRIEFING // PROTOCOL 01",
+      title: "Mission 01: The Acoustic Threshold",
+      lore: "Welcome to Echo Station, Operative. Before you breach the subterranean core, you must attune your neural telemetry to our damper arrays. Unsynchronized acoustic resonance will collapse the containment bulkhead within seconds.",
+      objectives: [
+        "Locate and inspect the Primary Damper terminal at North Bulkhead.",
+        "Decouple the harmonic feedback loop before vibration exceeds 90%.",
+        "Establish biometric handshake on the central console."
+      ],
+      dialogue: "“Listen closely to the reverberations in the floor plates. When the frequency drops to a purr, you're safe to turn the key.”",
+      btnText: "CONTINUE BRIEFING",
+      isFinal: false
+    },
+    {
+      step: 2,
+      badge: "TACTICAL BRIEFING // PROTOCOL 02",
+      title: "Protocol 02: Neural Harmonic Alignment",
+      lore: "Sub-level acoustic reflections create phantom telemetry across optical sensors. To distinguish authentic hostiles from sound mirages, calibrate your receiver against our encrypted carrier frequency.",
+      objectives: [
+        "Rotate the left frequency vernier dial until resonant pitch lowers below 40dB.",
+        "Align signal phases using the tactile slide bar on your lower wrist HUD.",
+        "Lock down baseline cipher when amber wave harmonics collapse into teal."
+      ],
+      dialogue: "“Trust the waveform over what your eyes register. Down here, geometry is easily bent by reverberation.”",
+      btnText: "CONTINUE BRIEFING",
+      isFinal: false
+    },
+    {
+      step: 3,
+      badge: "TACTICAL BRIEFING // PROTOCOL 03",
+      title: "Protocol 03: Squad Comms & Shield Reserves",
+      lore: "Underground comms operate over pulsed sonic bursts. If your kinetic acoustic shield collapses, you are allotted an exact 30-second window to re-energize via station wall cells.",
+      objectives: [
+        "Confirm audio cipher synchrony with Operative 02 over secondary relay.",
+        "Test emergency shield discharge by double-tapping the blast buffer key.",
+        "Locate nearby pneumatic recharge node highlighted in cyan on your HUD."
+      ],
+      dialogue: "“Shields don't regenerate automatically beneath 400 meters. Keep a line of sight to a wall capacitor at all times.”",
+      btnText: "CONTINUE BRIEFING",
+      isFinal: false
+    },
+    {
+      step: 4,
+      badge: "TACTICAL BRIEFING // PROTOCOL 04",
+      title: "Protocol 04: The Overseer Directive",
+      lore: "Station telemetry reports unauthorized telemetry spikes along the Lower Core elevator shaft. Station security is under automated lockdown; standard override codes are strictly forbidden.",
+      objectives: [
+        "Bypass perimeter laser trip-sensors using the acoustic dampening shroud.",
+        "Extract the classified surveillance black-box from Auxiliary Terminal C.",
+        "Purge memory log buffer prior to advancing toward the central vault."
+      ],
+      dialogue: "“If the automated sentries cycle into amber alert, hold completely motionless. They track kinetic vibration, not vision.”",
+      btnText: "CONTINUE BRIEFING",
+      isFinal: false
+    },
+    {
+      step: 5,
+      badge: "TACTICAL BRIEFING // PROTOCOL 05",
+      title: "Protocol 05: Facility Breach Engagement",
+      lore: "All telemetry parameters are verified and locked. The containment blast doors are primed for unsealing. Once you initiate engagement, extraction coordinates will be sealed for 180 seconds.",
+      objectives: [
+        "Insert tactical cipher key into the central floor hatch spindle.",
+        "Authorize final clearance handshake via thumbprint scanner.",
+        "Descend into Sub-Surface Tier-04 and secure the Echo Core."
+      ],
+      dialogue: "“Breach authorization granted, Operative Zero. Step forward into the chamber. I will guide you through the dark.”",
+      btnText: "START MISSION",
+      isFinal: true
+    }
+  ];
+
+  // Banner State Configurations
+  const bannerStates = {
+    1: {
+      icon: "sensor_door",
+      badge: "DIRECTIVE 01",
+      title: "CLICK THE EXIT",
+      subtitle: "Go ahead — click either physical doorway in the room to initialize clearance handshake."
+    },
+    2: {
+      icon: "tune",
+      badge: "DIRECTIVE 02",
+      title: "ALIGN NEURAL HARMONICS",
+      subtitle: "Rotate the frequency dial until resonant hum drops below 40dB threshold."
+    },
+    3: {
+      icon: "shield_with_heart",
+      badge: "DIRECTIVE 03",
+      title: "VERIFY SQUAD UPLINK",
+      subtitle: "Confirm audio cipher synchrony with Operative 02 before unsealing bulkhead."
+    }
+  };
+
+  let currentStepIndex = 0;
+  let isModalHidden = false;
+
+  function renderStep(index) {
+    const data = briefingSteps[index];
+    currentStepIndex = index;
+
+    // Update text contents
+    document.getElementById("step-badge").textContent = data.badge;
+    document.getElementById("briefing-title").textContent = data.title;
+    document.getElementById("briefing-lore").textContent = data.lore;
+    document.getElementById("briefing-dialogue").innerHTML = `&ldquo;${data.dialogue.replace(/[“”]/g, "")}&rdquo;`;
+    document.getElementById("step-counter").textContent = `STEP ${data.step} / 5`;
+
+    // Update objectives list
+    const objList = document.getElementById("briefing-objectives");
+    objList.innerHTML = "";
+    data.objectives.forEach(obj => {
+      const li = document.createElement("li");
+      li.className = "flex items-start gap-2";
+      li.innerHTML = `
+        <span class="text-primary font-bold shrink-0 mt-0.5">○</span>
+        <span class="text-on-surface">${obj}</span>
+      `;
+      objList.appendChild(li);
+    });
+
+    // Update Button
+    const nextBtn = document.getElementById("btn-next");
+    nextBtn.innerHTML = `
+      <span>${data.btnText}</span>
+      <span class="material-symbols-outlined text-[16px]">${data.isFinal ? "play_arrow" : "arrow_forward"}</span>
+    `;
+
+    // Show/hide Back button
+    const prevBtn = document.getElementById("btn-prev");
+    if (index > 0) {
+      prevBtn.classList.remove("hidden");
+    } else {
+      prevBtn.classList.add("hidden");
+    }
+
+    // Update stepper dots
+    const dotsContainer = document.getElementById("stepper-dots");
+    const dots = dotsContainer.querySelectorAll("button");
+    dots.forEach((dot, idx) => {
+      if (idx === index) {
+        dot.className = "w-3.5 h-1.5 bg-primary transition-all cursor-pointer";
+      } else if (idx < index) {
+        dot.className = "w-3.5 h-1.5 bg-[#2dd4bf] transition-all cursor-pointer";
+      } else {
+        dot.className = "w-3.5 h-1.5 bg-outline-variant/50 hover:bg-outline transition-all cursor-pointer";
+      }
+    });
+
+    // Automatically align top banner to corresponding training directives for steps 1-3
+    if (index === 0) setBannerState(1, false);
+    if (index === 1) setBannerState(2, false);
+    if (index === 2) setBannerState(3, false);
+  }
+
+  function nextStep() {
+    if (currentStepIndex < briefingSteps.length - 1) {
+      renderStep(currentStepIndex + 1);
+    } else {
+      // Final step action -> start mission simulation
+      toggleModalBackdrop();
+      const banner = document.getElementById("tactical-banner");
+      banner.classList.add("ring-2", "ring-primary");
+      setTimeout(() => banner.classList.remove("ring-2", "ring-primary"), 1200);
+    }
+  }
+
+  function prevStep() {
+    if (currentStepIndex > 0) {
+      renderStep(currentStepIndex - 1);
+    }
+  }
+
+  function goToStep(stepNumber) {
+    renderStep(stepNumber - 1);
+  }
+
+  function setBannerState(stateId, updateButtons = true) {
+    const data = bannerStates[stateId];
+    if (!data) return;
+
+    document.getElementById("banner-icon").textContent = data.icon;
+    document.getElementById("banner-badge").textContent = data.badge;
+    document.getElementById("banner-title").textContent = data.title;
+    document.getElementById("banner-subtitle").textContent = data.subtitle;
+
+    if (updateButtons) {
+      [1, 2, 3].forEach(id => {
+        const btn = document.getElementById(`banner-btn-${id}`);
+        if (id === stateId) {
+          btn.className = "px-2 py-0.5 text-telemetry-badge transition-all bg-primary-container text-on-primary-container font-medium";
+        } else {
+          btn.className = "px-2 py-0.5 text-telemetry-badge transition-all text-on-surface-variant hover:text-on-surface font-medium";
+        }
+      });
+    }
+  }
+
+  function toggleModalBackdrop() {
+    const container = document.getElementById("briefing-modal-container");
+    const label = document.getElementById("toggle-label");
+
+    isModalHidden = !isModalHidden;
+    if (isModalHidden) {
+      container.classList.add("opacity-0", "pointer-events-none", "scale-95");
+      label.textContent = "RESTORE CLASSIFIED BRIEFING MODAL";
+    } else {
+      container.classList.remove("opacity-0", "pointer-events-none", "scale-95");
+      label.textContent = "INSPECT GAME WORLD / HIDE MODAL";
+    }
+  }
+
+  // Keyboard shortcut listener (ESC to toggle modal)
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      toggleModalBackdrop();
+    } else if (e.key === "ArrowRight") {
+      nextStep();
+    } else if (e.key === "ArrowLeft") {
+      prevStep();
+    }
+  });
+</script></main><footer class="w-full bg-surface-container-lowest/80 backdrop-blur-md"><div class="w-full px-gutter py-space-sm flex flex-col md:flex-row items-center justify-between gap-space-sm font-telemetry-data text-telemetry-data text-on-surface-variant"><div class="flex items-center gap-space-md"><span>ARCHIVE REF: AZ-ECHO-8821</span><span>STATION DEPTH: -480M</span><span class="text-primary">ENCRYPTED CONSOLE RUNTIME</span></div><div class="flex items-center gap-space-md font-ui-micro text-ui-micro uppercase tracking-widest"><span>SECRECY ACT PROTOCOL ZERO</span><span>© 2024 ECHO SYSTEM CORE</span></div></div></footer></body></html>
